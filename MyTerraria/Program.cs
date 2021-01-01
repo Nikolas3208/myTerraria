@@ -28,7 +28,7 @@ namespace MyTerraria
             Game = new Game();      // Создаём новый объект класса игры
             Clock clock = new Clock();
 
-            //while (Window.IsOpen)
+            while (Window.IsOpen)
             {
                 Delta = clock.Restart().AsSeconds();
 
