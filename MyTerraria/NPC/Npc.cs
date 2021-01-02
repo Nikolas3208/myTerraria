@@ -24,12 +24,13 @@ namespace MyTerraria.NPC
 
         public Npc(World world) : base(world)
         {
+            
         }
 
         // Возрождение NPC
         public void Spawn()
         {
-            Position = StartPosition;
+            Position = new Vector2f(80,100);
             velocity = new Vector2f();
             // тут возможно будут спецэффекты
         }

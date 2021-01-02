@@ -7,7 +7,7 @@ namespace MyTerraria.UI
     {
         public const int TITLE_BAR_HEIGHT = 25;
 
-        public bool IsVisibleTitleBar = true;                       // Рисовать заголовочную часть окна?
+        public bool IsVisibleTitleBar = false;                       // Рисовать заголовочную часть окна?
         public Color BodyColor = new Color(80, 80, 80, 127);        // Цвет заливки формы
         public Color TitleColor = new Color(60, 60, 60, 127);       // Цвет заливки заголовочной части
         public Color TitleColorOver = new Color(68, 60, 60, 255);   // Цвет заливки заголовочной части при наведении курсора мыши

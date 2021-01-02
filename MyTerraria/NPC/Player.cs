@@ -9,10 +9,9 @@ namespace MyTerraria.NPC
 {
     class Player : Npc
     {
-        public static RenderWindow Window { private set; get; }
-
         public const float PLAYER_MOVE_SPEED = 4f;
-        public const float PLAYER_MOVE_SPEED_ACCELERATION = 0.2f;
+        public const float PLAYER_MOVE_SPEED_ACCELERATION = 0.6f;
+        public Vector2f movement2;
 
         public Color HairColor = new Color(255, 0, 0);  // Цвет волос
         public Color BodyColor = new Color(255, 229, 186);  // Цвет кожи
@@ -33,7 +32,6 @@ namespace MyTerraria.NPC
 
         public Player(World world) : base(world)
         {
-            //Window = new RenderWindow(new VideoMode(800, 600), "Моя Terraria!");
             rect = new RectangleShape(new Vector2f(Tile.TILE_SIZE * 1.5f, Tile.TILE_SIZE * 2.8f));
             rect.Origin = new Vector2f(rect.Size.X / 2, 0);
             isRectVisible = true;
@@ -207,7 +205,7 @@ namespace MyTerraria.NPC
 
         public override void OnKill()
         {
-            Spawn();
+            //Spawn();
         }
 
         public override void UpdateNPC()
@@ -218,29 +216,23 @@ namespace MyTerraria.NPC
             if (UIManager.Over == null && UIManager.Drag == null)
             {
                 Vector2i mousePos = Mouse.GetPosition(Program.Window);
-                //Mouse.SetPosition(new Vector2i(100, 200));
                 Tile tile = world.GetTileByWorldPos(mousePos);
-                if (tile == null || tile != null)
-                {
-                    //FloatRect tileRect = tile.GetFloatRect();
-                    DebugRender.AddRectangle(mousePos.X + world.xShift, mousePos.Y, 16, 16, Color.Green);
+
+                    DebugRender.AddRectangle(mousePos.X + world.xShift * Tile.TILE_SIZE, mousePos.Y + world.yShift * Tile.TILE_SIZE, Tile.TILE_SIZE, Tile.TILE_SIZE, Color.Green);
 
                     if (Mouse.IsButtonPressed(Mouse.Button.Left))
                     {
                         int i = (int)(mousePos.X / Tile.TILE_SIZE) + world.xShift;
-                        int j = (int)(mousePos.Y / Tile.TILE_SIZE);
+                        int j = (int)(mousePos.Y / Tile.TILE_SIZE) + world.yShift;
                         world.SetTile(TileType.NONE, i, j);
                     }
-                }
-                if (tile == null)
-                {
+
                     if (Mouse.IsButtonPressed(Mouse.Button.Right))
                     {
                         int i = (int)(mousePos.X / Tile.TILE_SIZE) + world.xShift;
-                        int j = (int)(mousePos.Y / Tile.TILE_SIZE);
+                        int j = (int)(mousePos.Y / Tile.TILE_SIZE) + world.yShift;
                         world.SetTile(TileType.GROUND, i, j);
                     }
-                }
             }
         }
 
@@ -255,16 +247,19 @@ namespace MyTerraria.NPC
             if (isJump && !isFly)
             {
                 velocity.Y = -10f;
+                //Program.CameraMove2();
             }
 
             if (isMove)
             {
                 if (isMoveLeft)
                 {
+
                     if (movement.X > 0)
                         movement.X = 0;
                     
                     movement.X -= PLAYER_MOVE_SPEED_ACCELERATION;
+                    movement2.X = movement.X;
                     Direction = -1;
                 }
                 else if (isMoveRight)
@@ -274,6 +269,7 @@ namespace MyTerraria.NPC
 
                     movement.X += PLAYER_MOVE_SPEED_ACCELERATION;
                     Direction = 1;
+                    movement2.X = movement.X;
                 }
 
                 if (movement.X > PLAYER_MOVE_SPEED)

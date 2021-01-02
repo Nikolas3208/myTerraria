@@ -17,7 +17,7 @@ namespace MyTerraria
             if (!Enabled) return;
 
             var obj = new RectangleShape(new Vector2f(w, h));
-            obj.Position = new Vector2f(x + world.xShift, y);
+            obj.Position = new Vector2f(x, y);
             obj.FillColor = Color.Transparent;
             obj.OutlineColor = color;
             obj.OutlineThickness = 1;

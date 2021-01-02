@@ -9,7 +9,7 @@ namespace MyTerraria
     class World : Transformable, Drawable
     {
         // Кол-во плиток по ширине и высоте
-        public const int WORLD_WIDTH = 1000;
+        public const int WORLD_WIDTH = 100;
         public const int WORLD_HEIGHT = 100;
 
         public static Random Rand { private set; get; }
@@ -165,11 +165,18 @@ namespace MyTerraria
         }
 
         public int xShift = 0;
+        public int yShift = 0;
         public int ishifted = 0;
+        public int ishifted2 = 0;
 
         public void ChangeHorizontalShift(int x)
         {
             xShift += x;
+        }
+
+        public void ChangeWertykalShift(int y)
+        {
+            yShift += y;
         }
 
         // Нарисовать мир
@@ -182,7 +189,14 @@ namespace MyTerraria
                 {
                     ishifted = i + xShift;
                     if (ishifted > -1 && ishifted < WORLD_WIDTH && tiles[ishifted, j] != null)
+                    {
                         target.Draw(tiles[ishifted, j]);
+                    }
+                    ishifted2 = j + yShift;
+                    if (ishifted2 > -1 && ishifted2 < WORLD_HEIGHT && tiles[i, ishifted2] != null)
+                    {
+                        target.Draw(tiles[i, ishifted2]);
+                    }
                 }
             }
 

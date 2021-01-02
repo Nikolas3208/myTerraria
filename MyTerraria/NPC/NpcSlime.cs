@@ -5,10 +5,10 @@ namespace MyTerraria.NPC
 {
     class NpcSlime : Npc
     {
-        const float TIME_WAIT_JUMP = 1f;
+        public const float TIME_WAIT_JUMP = 1f;
 
         SpriteSheet spriteSheet;
-        float waitTimer = 0f;
+        public float waitTimer = 0f;
 
         public NpcSlime(World world) : base(world)
         {
