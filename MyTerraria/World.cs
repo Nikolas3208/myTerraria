@@ -177,9 +177,9 @@ namespace MyTerraria
             XShift += x;
         }
 
-        public void ChangeVertikalShift(int x)
+        public void ChangeVertikalShift(int y)
         {
-            YShift += x;
+            YShift += y;
         }
 
         public void SetWindowSize(Vector2u size)

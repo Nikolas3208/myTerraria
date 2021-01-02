@@ -224,14 +224,14 @@ namespace MyTerraria.NPC
                     if (Mouse.IsButtonPressed(Mouse.Button.Left))
                     {
                         int i = (int)(mousePos.X / Tile.TILE_SIZE) + (int)world.XShift;
-                        int j = (int)(mousePos.Y / Tile.TILE_SIZE);
+                        int j = (int)(mousePos.Y / Tile.TILE_SIZE) + (int)world.YShift;
                         world.SetTile(TileType.NONE, i, j);
                     }
 
                     if (Mouse.IsButtonPressed(Mouse.Button.Right))
                     {
                         int i = (int)(mousePos.X / Tile.TILE_SIZE) + (int)world.XShift;
-                        int j = (int)(mousePos.Y / Tile.TILE_SIZE);
+                        int j = (int)(mousePos.Y / Tile.TILE_SIZE) + (int)world.YShift;
                         world.SetTile(TileType.GROUND, i, j);
                     }
                 } 
@@ -249,14 +249,21 @@ namespace MyTerraria.NPC
             if (isJump && !isFly)
             {
                 velocity.Y = -10f;
-                //Program.CameraMove2();
+                //Program.ASD();
             }
 
+            if (isFly && !isJump)
+            {
+                //Program.ASD();
+            }
             if (isMove)
             {
+                if (isFly && !isJump)
+                {
+                    Program.ASD();
+                }
                 if (isMoveLeft)
                 {
-
                     if (movement.X > 0)
                         movement.X = 0;
                     

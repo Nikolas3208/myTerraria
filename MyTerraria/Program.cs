@@ -70,7 +70,24 @@ namespace MyTerraria
                         Window.SetView(view);
                     }
                     break;
+                case Keyboard.Key.Space:
+                    view = Window.GetView();
+                    view.Move(new Vector2f(0, -horizontalShiftPx));
+                    Game.World.ChangeVertikalShift(-1);
+                    Window.SetView(view);
+                    break;
+
             }
+        }
+
+        public static void ASD()
+        {
+            View view;
+
+            view = Window.GetView();
+            view.Move(new Vector2f(0, horizontalShiftPx));
+            Game.World.ChangeVertikalShift(1);
+            Window.SetView(view);
         }
 
         private static void Win_Resized(object sender, SFML.Window.SizeEventArgs e)

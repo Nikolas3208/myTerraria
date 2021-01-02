@@ -30,7 +30,7 @@ namespace MyTerraria.NPC
         // Возрождение NPC
         public void Spawn()
         {
-            Position = new Vector2f(80,100);
+            Position = StartPosition;
             velocity = new Vector2f();
             // тут возможно будут спецэффекты
         }
@@ -47,7 +47,7 @@ namespace MyTerraria.NPC
             var vec = vector.X += 5;
 
             View viev = new View();
-            viev.Move(new Vector2f(vec,6));
+            viev.Move(new Vector2f(vec, 1000));
         }
 
         public override void Draw(RenderTarget target, RenderStates states)
