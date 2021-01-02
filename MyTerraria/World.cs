@@ -168,10 +168,17 @@ namespace MyTerraria
         public int yShift = 0;
         public int ishifted = 0;
         public int ishifted2 = 0;
-
+        public int xSiftMax = WORLD_WIDTH;
         public void ChangeHorizontalShift(int x)
         {
             xShift += x;
+            if (xShift >= -18)
+            {
+                Program.horizontalShiftPx = 0;
+                xShift = 0;
+
+            }
+            //Program.horizontalShiftPx = 16;
         }
 
         public void ChangeWertykalShift(int y)
@@ -193,7 +200,7 @@ namespace MyTerraria
                         target.Draw(tiles[ishifted, j]);
                     }
                     ishifted2 = j + yShift;
-                    if (ishifted2 > -1 && ishifted2 < WORLD_HEIGHT && tiles[i, ishifted2] != null)
+                    if (ishifted2 > -1 && ishifted2 < WORLD_HEIGHT && tiles[i,ishifted2] != null)
                     {
                         target.Draw(tiles[i, ishifted2]);
                     }

@@ -12,13 +12,13 @@ namespace MyTerraria
     {
         public bool IsDestroyed = false;        // Объект уничтожен?
 
-        protected RectangleShape rect;
-        protected Vector2f velocity;
-        protected Vector2f movement;
-        protected World world;
-        protected bool isFly = true;
-        protected bool isRectVisible = true;
-        protected bool isGhost = false;         // Режим призрака?
+        public RectangleShape rect;
+        public Vector2f velocity;
+        public Vector2f movement;
+        public World world;
+        public bool isFly = true;
+        public  bool isRectVisible = true;
+        public bool isGhost = false;         // Режим призрака?
 
         public Entity(World world)
         {

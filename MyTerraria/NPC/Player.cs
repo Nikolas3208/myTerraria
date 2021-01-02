@@ -205,7 +205,7 @@ namespace MyTerraria.NPC
 
         public override void OnKill()
         {
-            //Spawn();
+            Spawn();
         }
 
         public override void UpdateNPC()
@@ -218,21 +218,23 @@ namespace MyTerraria.NPC
                 Vector2i mousePos = Mouse.GetPosition(Program.Window);
                 Tile tile = world.GetTileByWorldPos(mousePos);
 
-                    DebugRender.AddRectangle(mousePos.X + world.xShift * Tile.TILE_SIZE, mousePos.Y + world.yShift * Tile.TILE_SIZE, Tile.TILE_SIZE, Tile.TILE_SIZE, Color.Green);
-
+                DebugRender.AddRectangle(mousePos.X + world.xShift * Tile.TILE_SIZE, mousePos.Y + world.yShift * Tile.TILE_SIZE, Tile.TILE_SIZE, Tile.TILE_SIZE, Color.Green);
+                if (mousePos.Y >= World.WORLD_HEIGHT&& mousePos.X >= World.WORLD_WIDTH)
+                {
                     if (Mouse.IsButtonPressed(Mouse.Button.Left))
                     {
-                        int i = (int)(mousePos.X / Tile.TILE_SIZE) + world.xShift;
-                        int j = (int)(mousePos.Y / Tile.TILE_SIZE) + world.yShift;
+                        int i = (int)(mousePos.X / Tile.TILE_SIZE) + (int)world.xShift;
+                        int j = (int)(mousePos.Y / Tile.TILE_SIZE) + (int)world.yShift;
                         world.SetTile(TileType.NONE, i, j);
                     }
 
                     if (Mouse.IsButtonPressed(Mouse.Button.Right))
                     {
-                        int i = (int)(mousePos.X / Tile.TILE_SIZE) + world.xShift;
-                        int j = (int)(mousePos.Y / Tile.TILE_SIZE) + world.yShift;
+                        int i = (int)(mousePos.X / Tile.TILE_SIZE) + (int)world.xShift;
+                        int j = (int)(mousePos.Y / Tile.TILE_SIZE) + (int)world.yShift;
                         world.SetTile(TileType.GROUND, i, j);
                     }
+                } 
             }
         }
 

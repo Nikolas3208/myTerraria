@@ -13,7 +13,7 @@ namespace MyTerraria
         public static Game Game { private set; get; }
         public static float Delta { private set; get; }
 
-        private static int horizontalShiftPx = Tile.TILE_SIZE;
+        public static int horizontalShiftPx = Tile.TILE_SIZE;
 
         static void Main(string[] args)
         {
@@ -51,20 +51,24 @@ namespace MyTerraria
             View view;
             World world = new World();
             Player player = new Player(world);
+            Vector2f vector2 = new Vector2f(100, 100);
+            int x = 0;
 
             switch (e.Code)
             {
                 case Keyboard.Key.D:
+                    x = 1;
                     view = Window.GetView();
                     view.Move(new Vector2f(horizontalShiftPx,0));
-                    Game.World.ChangeHorizontalShift(1);
+                    Game.World.ChangeHorizontalShift(x);
                     Window.SetView(view);
                     break;
 
                 case Keyboard.Key.A:
+                    x = 1;
                     view = Window.GetView();
                     view.Move(new Vector2f(-horizontalShiftPx, 0));
-                    Game.World.ChangeHorizontalShift(-1);
+                    Game.World.ChangeHorizontalShift(-x);
                     Window.SetView(view);
                     break;
             }
