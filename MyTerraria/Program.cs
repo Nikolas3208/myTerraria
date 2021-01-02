@@ -49,52 +49,28 @@ namespace MyTerraria
         public static void Win_KeyPressed(object sender, KeyEventArgs e)
         {
             View view;
-            World world = new World();
-            Player player = new Player(world);
-            Vector2f vector2 = new Vector2f(100, 100);
-            int x = 0;
 
             switch (e.Code)
             {
                 case Keyboard.Key.D:
-                    x = 1;
-                    view = Window.GetView();
-                    view.Move(new Vector2f(horizontalShiftPx,0));
-                    Game.World.ChangeHorizontalShift(x);
-                    Window.SetView(view);
+                    if (Game.World.XShift <= Game.World.MAX_XShift - 51)
+                    {
+                        view = Window.GetView();
+                        view.Move(new Vector2f(horizontalShiftPx, 0));
+                        Game.World.ChangeHorizontalShift(1);
+                        Window.SetView(view);
+                    }
                     break;
-
                 case Keyboard.Key.A:
-                    x = 1;
-                    view = Window.GetView();
-                    view.Move(new Vector2f(-horizontalShiftPx, 0));
-                    Game.World.ChangeHorizontalShift(-x);
-                    Window.SetView(view);
+                    if (Game.World.XShift > Game.World.MIN_XShift)
+                    {
+                        view = Window.GetView();
+                        view.Move(new Vector2f(-horizontalShiftPx, 0));
+                        Game.World.ChangeHorizontalShift(-1);
+                        Window.SetView(view);
+                    }
                     break;
             }
-        }
-
-        public static void CameraMove2()
-        {
-            View view;
-
-            World world = new World();
-            Player player = new Player(world);
-
-            view = Window.GetView();
-            view.Move(new Vector2f(0, -horizontalShiftPx));
-            Game.World.ChangeWertykalShift(-1);
-            Window.SetView(view);
-        }
-
-        public static void CameraMove()
-        {
-            View view;
-
-            view = Window.GetView();
-            view.Move(new Vector2f(0, horizontalShiftPx));
-            Game.World.ChangeWertykalShift(1);
-            Window.SetView(view);
         }
 
         private static void Win_Resized(object sender, SFML.Window.SizeEventArgs e)

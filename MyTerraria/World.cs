@@ -8,9 +8,13 @@ namespace MyTerraria
 {
     class World : Transformable, Drawable
     {
+        private Vector2u windowSize;
+        public int MAX_XShift { get { return WORLD_WIDTH - (int)windowSize.X / 2 / Tile.TILE_SIZE; } }
+        public int MIN_XShift { get { return -((int)windowSize.X / 2 / Tile.TILE_SIZE); } }
+
         // Кол-во плиток по ширине и высоте
         public const int WORLD_WIDTH = 100;
-        public const int WORLD_HEIGHT = 100;
+        public const int WORLD_HEIGHT = 100;//
 
         public static Random Rand { private set; get; }
 
@@ -164,28 +168,24 @@ namespace MyTerraria
 
         }
 
-        public int xShift = 0;
-        public int yShift = 0;
-        public int ishifted = 0;
-        public int ishifted2 = 0;
-        public int xSiftMax = WORLD_WIDTH;
+        public int XShift { get; private set; } = 0;
+
+        public int YShift { get; private set; } = 0;
+
         public void ChangeHorizontalShift(int x)
         {
-            xShift += x;
-            if (xShift >= -18)
-            {
-                Program.horizontalShiftPx = 0;
-                xShift = 0;
-
-            }
-            //Program.horizontalShiftPx = 16;
+            XShift += x;
         }
 
-        public void ChangeWertykalShift(int y)
+        public void ChangeVertikalShift(int x)
         {
-            yShift += y;
+            YShift += x;
         }
 
+        public void SetWindowSize(Vector2u size)
+        {
+            windowSize = size;
+        }
         // Нарисовать мир
         public void Draw(RenderTarget target, RenderStates states)
         {
@@ -194,16 +194,13 @@ namespace MyTerraria
             {
                 for (int j = 0; j < Program.Window.Size.Y / Tile.TILE_SIZE + 1; j++)
                 {
-                    ishifted = i + xShift;
+                    int ishifted = i + XShift;
                     if (ishifted > -1 && ishifted < WORLD_WIDTH && tiles[ishifted, j] != null)
-                    {
                         target.Draw(tiles[ishifted, j]);
-                    }
-                    ishifted2 = j + yShift;
-                    if (ishifted2 > -1 && ishifted2 < WORLD_HEIGHT && tiles[i,ishifted2] != null)
-                    {
-                        target.Draw(tiles[i, ishifted2]);
-                    }
+
+                    int isVer = j + YShift;
+                    if (isVer > -1 && isVer < WORLD_WIDTH && tiles[i, isVer] != null)
+                        target.Draw(tiles[i, isVer]);
                 }
             }
 
