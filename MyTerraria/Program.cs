@@ -34,7 +34,7 @@ namespace MyTerraria
                 Delta = clock.Restart().AsSeconds();
 
                 Window.DispatchEvents();
-
+                
                 Game.Update();
 
                 Window.Clear(Color.Cyan);
@@ -51,17 +51,23 @@ namespace MyTerraria
 
             switch (e.Code)
             {
-                case Keyboard.Key.Right:
-                    view = Window.GetView();
-                    view.Move(new Vector2f(horizontalShiftPx, 0));
-                    Game.World.ChangeHorizontalShift(1);
-                    Window.SetView(view);
+                case Keyboard.Key.D:
+                    if (Game.World.XShift < Game.World.MAX_XShift)
+                    {
+                        view = Window.GetView();
+                        view.Move(new Vector2f(horizontalShiftPx, 0));
+                        Game.World.ChangeHorizontalShift(1);
+                        Window.SetView(view);
+                    }
                     break;
-                case Keyboard.Key.Left:
-                    view = Window.GetView();
-                    view.Move(new Vector2f(-horizontalShiftPx, 0));
-                    Game.World.ChangeHorizontalShift(-1);
-                    Window.SetView(view);
+                case Keyboard.Key.A:
+                    if (Game.World.XShift > Game.World.MIN_XShift)
+                    {
+                        view = Window.GetView();
+                        view.Move(new Vector2f(-horizontalShiftPx, 0));
+                        Game.World.ChangeHorizontalShift(-1);
+                        Window.SetView(view);
+                    }
                     break;
 
                 case Keyboard.Key.Up:
@@ -80,6 +86,7 @@ namespace MyTerraria
         private static void Win_Resized(object sender, SFML.Window.SizeEventArgs e)
         {
             Window.SetView(new View(new FloatRect(0, 0, e.Width, e.Height)));
+            Game.World.SetWindowSize(Window.Size);
         }
 
         private static void Win_Closed(object sender, EventArgs e)

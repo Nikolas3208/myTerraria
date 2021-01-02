@@ -214,27 +214,30 @@ namespace MyTerraria.NPC
 
             if (UIManager.Over == null && UIManager.Drag == null)
             {
-                var mousePos = Mouse.GetPosition(Program.Window);
-                var tile = world.GetTileByWorldPos(mousePos);
+                Vector2i mousePos = Mouse.GetPosition(Program.Window);
+                //Mouse.SetPosition(new Vector2i(100, 200));
+                Tile tile = world.GetTileByWorldPos(mousePos);
                 if (tile != null)
                 {
-                    FloatRect tileRect = tile.GetFloatRect();
-                    DebugRender.AddRectangle(tileRect, Color.Green);
-                    //DebugRender.AddRectangle(mousePos.X, mousePos.Y, 16f, 16f, Color.Green);
+                    //FloatRect tileRect = tile.GetFloatRect();
+                    DebugRender.AddRectangle(mousePos.X + world.XShift * Tile.TILE_SIZE, mousePos.Y, Tile.TILE_SIZE, Tile.TILE_SIZE, Color.Green);
+                    //DebugRender.AddRectangle(tile.GetFloatRect(), Color.Green);
 
                     if (Mouse.IsButtonPressed(Mouse.Button.Left))
                     {
-                        int i = (int)(mousePos.X / Tile.TILE_SIZE);
+                        int i = (int)(mousePos.X / Tile.TILE_SIZE) + world.XShift;
                         int j = (int)(mousePos.Y / Tile.TILE_SIZE);
                         world.SetTile(TileType.NONE, i, j);
                     }
                 }
-
-                if (Mouse.IsButtonPressed(Mouse.Button.Right))
+                if (tile == null)
                 {
-                    int i = (int)(mousePos.X / Tile.TILE_SIZE);
-                    int j = (int)(mousePos.Y / Tile.TILE_SIZE);
-                    world.SetTile(TileType.GROUND, i, j);
+                    if (Mouse.IsButtonPressed(Mouse.Button.Right))
+                    {
+                        int i = (int)(mousePos.X / Tile.TILE_SIZE) + world.XShift;
+                        int j = (int)(mousePos.Y / Tile.TILE_SIZE);
+                        world.SetTile(TileType.GROUND, i, j);
+                    }
                 }
             }
         }

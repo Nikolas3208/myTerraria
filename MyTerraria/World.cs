@@ -8,9 +8,13 @@ namespace MyTerraria
 {
     class World : Transformable, Drawable
     {
+        private Vector2u windowSize;
+        public int MAX_XShift { get { return WORLD_WIDTH - (int)windowSize.X / 2 / Tile.TILE_SIZE; } }
+        public int MIN_XShift { get { return -((int)windowSize.X / 2 / Tile.TILE_SIZE); } }
+
         // Кол-во плиток по ширине и высоте
-        public const int WORLD_WIDTH = 300;
-        public const int WORLD_HEIGHT = 100;
+        public const int WORLD_WIDTH = 100;
+        public const int WORLD_HEIGHT = 100;//
 
         public static Random Rand { private set; get; }
 
@@ -164,13 +168,17 @@ namespace MyTerraria
 
         }
 
-        int xShift = 0;
+        public int XShift { get; private set; } = 0;
 
         public void ChangeHorizontalShift(int x)
         {
-            xShift += x;
+            XShift += x;
         }
 
+        public void SetWindowSize(Vector2u size)
+        {
+            windowSize = size;
+        }
         // Нарисовать мир
         public void Draw(RenderTarget target, RenderStates states)
         {
@@ -179,7 +187,7 @@ namespace MyTerraria
             {
                 for (int j = 0; j < Program.Window.Size.Y / Tile.TILE_SIZE + 1; j++)
                 {
-                    int ishifted = i + xShift;
+                    int ishifted = i + XShift;
                     if (ishifted > -1 && ishifted < WORLD_WIDTH && tiles[ishifted, j] != null)
                         target.Draw(tiles[ishifted, j]);
                 }
