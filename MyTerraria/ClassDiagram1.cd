@@ -1,0 +1,205 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="MyTerraria.UI.UIBase" Collapsed="true">
+    <Position X="3.5" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAwAAAAABACAgoggCAAAQEAAAAAAAAADAAAQABoAAgA=</HashCode>
+      <FileName>UI\UIBase.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="MyTerraria.UI.UIInvertory" Collapsed="true">
+    <Position X="5.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAgAACAAAAAAAAAIAAAAAAAAQ=</HashCode>
+      <FileName>UI\UIInvertory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.UI.UIInvertoryCell" Collapsed="true">
+    <Position X="3.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAACAQAAAAEAAAAAAAAAAAACAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>UI\UIInvertoryCell.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.UI.UIItemStack" Collapsed="true">
+    <Position X="1.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAEAAAAJggAAAAAAAAAAAAAAAAAJAAAQAAAAAgA=</HashCode>
+      <FileName>UI\UIItemStack.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.UI.UIManager" Collapsed="true">
+    <Position X="6.5" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAIAAgAAAAIAAAAAIAAAACAAAAAAAAIAAAA=</HashCode>
+      <FileName>UI\UIManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.UI.UIWindow" Collapsed="true">
+    <Position X="5.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAQACAAAgAAAAAAAAAAAQCAgAAAARAAABIAAAA=</HashCode>
+      <FileName>UI\UIWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.NPC.Camera" Collapsed="true">
+    <Position X="13.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NPC\Camera.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.NPC.Npc" Collapsed="true">
+    <Position X="10.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAEAAAAgAAADEAAAAAAAAAQAQEAAAAAAAAAAA=</HashCode>
+      <FileName>NPC\Npc.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.NPC.NpcFastSlime" Collapsed="true">
+    <Position X="8.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NPC\NpcFastSlime.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.NPC.NpcSlime" Collapsed="true">
+    <Position X="8.25" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAkAAAAAAAAAAABAQAAAIAAAAAAQEAAAAAAAAAAA=</HashCode>
+      <FileName>NPC\NpcSlime.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.NPC.Player" Collapsed="true">
+    <Position X="12" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAEAAEQCACAAAIABAMQAAAESAAAAQEAQAAAABAAQA=</HashCode>
+      <FileName>NPC\Player.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.Items.Item" Collapsed="true">
+    <Position X="5.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACQAAAAAAAAAAgAAAIEAAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Items\Item.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.Items.ItemTile" Collapsed="true">
+    <Position X="5.5" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Items\ItemTile.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.AnimationFrame" Collapsed="true">
+    <Position X="4.75" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAEAAAAAAAA=</HashCode>
+      <FileName>AnimSprite.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.Animation" Collapsed="true">
+    <Position X="3" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAEAAAAAAABAAQQAAAAAAIAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>AnimSprite.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.AnimSprite" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACEAAAAAgBAAgAAAAAAAAABAAAAEAAQgAAAgAAAAgA=</HashCode>
+      <FileName>AnimSprite.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="MyTerraria.Content" Collapsed="true">
+    <Position X="8.25" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAgCAEAIBAAAAAEgAAAgBAAAAAAAAAEUAAAAAIQAA=</HashCode>
+      <FileName>Content.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.DebugRender" Collapsed="true">
+    <Position X="3" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAoAAAAAAAAAAAQAAAAAAAAAAAABAAAA=</HashCode>
+      <FileName>DebugRender.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.Entity" Collapsed="true">
+    <Position X="8.75" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QCYAEAAAAAAEAgAQAAgAIAAAAIAAAAAAAAQAgIAAAAA=</HashCode>
+      <FileName>Entity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="MyTerraria.Game" Collapsed="true">
+    <Position X="4.75" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAEAAAABAAAgAAAAAAAAAAAAAAAAAAAAIAAQAAAAA=</HashCode>
+      <FileName>Game.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.InfoItem" Collapsed="true">
+    <Position X="6.5" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAABAAAAgAAAAEAIIABgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>InfoItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.MathHelper" Collapsed="true">
+    <Position X="8.25" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MathHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.Program" Collapsed="true">
+    <Position X="3" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAQAAAAQAAAAAAAAAAAAAgAQAAAQAAADAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.SpriteSheet" Collapsed="true">
+    <Position X="4.75" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAMAAAAACAAAAAAAAAAAAAAAAAAAEQAAAIAAAAEAAA=</HashCode>
+      <FileName>SpriteSheet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyTerraria.Tile" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6.5" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAABQAAAAAAAgAAAABAAMAEQAABBAAAAAAAAEAEAgQ=</HashCode>
+      <FileName>Tile.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="MyTerraria.World" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="8.25" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gRQAABAAAAEAAgAAAAgAAAAAAgEAAAAAAIAAAEEAAAA=</HashCode>
+      <FileName>World.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Enum Name="MyTerraria.DirectionType" Collapsed="true">
+    <Position X="3" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAACACAAAAAAAI=</HashCode>
+      <FileName>Entity.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="MyTerraria.TileType" Collapsed="true">
+    <Position X="4.75" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQAACAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>Tile.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
