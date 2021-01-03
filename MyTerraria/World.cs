@@ -9,11 +9,11 @@ namespace MyTerraria
     class World : Transformable, Drawable
     {
         private Vector2u windowSize;
-        public int MAX_XShift { get { return WORLD_WIDTH - (int)windowSize.X / 2 / Tile.TILE_SIZE; } }
-        public int MIN_XShift { get { return -((int)windowSize.X / 2 / Tile.TILE_SIZE); } }
+        //public int MAX_XShift { get { return WORLD_WIDTH;/* - (int)windowSize.X / 2 / Tile.TILE_SIZE;*/ } }
+        //public int MIN_XShift { get { return 0;/* -((int)windowSize.X / 2 / Tile.TILE_SIZE);*/ } }
 
         // Кол-во плиток по ширине и высоте
-        public const int WORLD_WIDTH = 100;
+        public const int WORLD_WIDTH = 200;
         public const int WORLD_HEIGHT = 100;//
 
         public static Random Rand { private set; get; }
@@ -182,8 +182,23 @@ namespace MyTerraria
         // Нарисовать мир
         public void Draw(RenderTarget target, RenderStates states)
         {
+            var pos = Program.Game.Player.Position;
+            var tilesPos = (pos.X / Tile.TILE_SIZE, pos.Y / Tile.TILE_SIZE);
+            var tilesPerScreen = (Program.Window.Size.X / Tile.TILE_SIZE, Program.Window.Size.Y / Tile.TILE_SIZE);
+            var LeftMostTilesPos = (int)(tilesPos.Item1 - tilesPerScreen.Item1 / 2);
+            var TopMostTilesPos = (int)(tilesPos.Item2 - tilesPerScreen.Item2 / 2);
+
+            for (int i = LeftMostTilesPos; i < LeftMostTilesPos + tilesPerScreen.Item1 + 1; i++)
+            {
+                for (int j = TopMostTilesPos; j < TopMostTilesPos + tilesPerScreen.Item2 + 1; j++)
+                {
+                    if (i > -1 && j > -1 && i < WORLD_WIDTH && j < WORLD_HEIGHT && tiles[i, j] != null)
+                        target.Draw(tiles[i, j]);
+                }
+            }
+
             // Рисуем чанки
-            for (int i = 0; i < Program.Window.Size.X / Tile.TILE_SIZE + 1; i++)
+            /*for (int i = 0; i < Program.Window.Size.X / Tile.TILE_SIZE + 1; i++)
             {
                 for (int j = 0; j < Program.Window.Size.Y / Tile.TILE_SIZE + 1; j++)
                 {
@@ -191,7 +206,7 @@ namespace MyTerraria
                     if (ishifted > -1 && ishifted < WORLD_WIDTH && tiles[ishifted, j] != null)
                         target.Draw(tiles[ishifted, j]);
                 }
-            }
+            }*/
 
             // Рисуем вещи
             foreach (var item in items)

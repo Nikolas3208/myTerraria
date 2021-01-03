@@ -37,12 +37,21 @@ namespace MyTerraria
                 
                 Game.Update();
 
+                CenterScreen();
+
                 Window.Clear(Color.Cyan);
 
                 Game.Draw();
 
                 Window.Display();
             }
+        }
+
+        private static void CenterScreen()
+        {
+            var pos = Game.Player.Position;
+            var newPos = (pos.X - Window.Size.X / 2, pos.Y - Window.Size.Y / 2);
+            Window.SetView(new View(new FloatRect(newPos.Item1, newPos.Item2, Window.Size.X, Window.Size.Y)));
         }
 
         private static void Win_KeyPressed(object sender, KeyEventArgs e)
@@ -52,22 +61,22 @@ namespace MyTerraria
             switch (e.Code)
             {
                 case Keyboard.Key.D:
-                    if (Game.World.XShift < Game.World.MAX_XShift)
+                    /*if (Game.World.XShift < Game.World.MAX_XShift)
                     {
-                        view = Window.GetView();
-                        view.Move(new Vector2f(horizontalShiftPx, 0));
+                        //view = Window.GetView();
+                        //view.Move(new Vector2f(horizontalShiftPx, 0));
                         Game.World.ChangeHorizontalShift(1);
-                        Window.SetView(view);
-                    }
+                        //Window.SetView(view);
+                    }*/
                     break;
                 case Keyboard.Key.A:
-                    if (Game.World.XShift > Game.World.MIN_XShift)
+                    /*if (Game.World.XShift > Game.World.MIN_XShift)
                     {
-                        view = Window.GetView();
-                        view.Move(new Vector2f(-horizontalShiftPx, 0));
+                        //view = Window.GetView();
+                        //view.Move(new Vector2f(-horizontalShiftPx, 0));
                         Game.World.ChangeHorizontalShift(-1);
-                        Window.SetView(view);
-                    }
+                        //Window.SetView(view);
+                    }*/
                     break;
 
                 case Keyboard.Key.Up:
