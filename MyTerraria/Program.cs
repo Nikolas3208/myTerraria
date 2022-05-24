@@ -15,8 +15,9 @@ namespace MyTerraria
         private static int horizontalShiftPx = Tile.TILE_SIZE;
 
         static void Main(string[] args)
-        {
-            Window = new RenderWindow(new VideoMode(800, 600), "My Terraria!");
+        {   
+            //Создание окна
+            Window = new RenderWindow(new VideoMode(1920, 1080), "My Terraria!");
             Window.SetVerticalSyncEnabled(true);
 
             Window.Closed += Win_Closed;
@@ -29,6 +30,7 @@ namespace MyTerraria
             Game = new Game();      // Создаём новый объект класса игры
             Clock clock = new Clock();
 
+            //Основной цикл программы
             while (Window.IsOpen)
             {
                 Delta = clock.Restart().AsSeconds();
@@ -49,8 +51,11 @@ namespace MyTerraria
 
         private static void CenterScreen()
         {
+            //Позиция игрока
             var pos = Game.Player.Position;
+            //Получаем цент относительно персонажа
             var newPos = (pos.X - Window.Size.X / 2, pos.Y - Window.Size.Y / 2);
+            //Установка центра
             Window.SetView(new View(new FloatRect(newPos.Item1, newPos.Item2, Window.Size.X, Window.Size.Y)));
         }
 

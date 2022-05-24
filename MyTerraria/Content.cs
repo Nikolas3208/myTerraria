@@ -48,7 +48,7 @@ namespace MyTerraria
             texUIInvertoryBack = new Texture(CONTENT_DIR + "Textures\\ui\\Inventory_Back.png");
 
             // Шрифт
-            //font = new Font(FONT_DIR + "brushtype.ttf");
+            font = new Font(FONT_DIR + "arial.ttf");
         }
     }
 }

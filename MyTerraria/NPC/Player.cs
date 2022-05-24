@@ -208,34 +208,36 @@ namespace MyTerraria.NPC
             Spawn();
         }
 
+        public Vector2i mousePos;
         public override void UpdateNPC()
         {
             updateMovement();
 
             if (UIManager.Over == null && UIManager.Drag == null)
             {
-                Vector2i mousePos = Mouse.GetPosition(Program.Window);
+                mousePos = Mouse.GetPosition(Program.Window);
                 //Mouse.SetPosition(new Vector2i(100, 200));
+                Tile tile1 = world.GetTileByWorldPos(mousePos.X + (Position.X - Program.Window.Size.X), mousePos.Y + (Position.Y - Program.Window.Size.Y));
                 Tile tile = world.GetTileByWorldPos(mousePos);
                 if (tile != null)
                 {
                     //FloatRect tileRect = tile.GetFloatRect();
-                    DebugRender.AddRectangle(mousePos.X + world.XShift * Tile.TILE_SIZE, mousePos.Y, Tile.TILE_SIZE, Tile.TILE_SIZE, Color.Green);
-                    //DebugRender.AddRectangle(tile.GetFloatRect(), Color.Green);
+                    DebugRender.AddRectangle(mousePos.X + (Position.X - Program.Window.Size.X / 2), mousePos.Y + (Position.Y - Program.Window.Size.Y / 2), Tile.TILE_SIZE, Tile.TILE_SIZE, Color.Green);
+                    //DebugRender.AddRectangle(tileRect, Color.Green);
 
                     if (Mouse.IsButtonPressed(Mouse.Button.Left))
                     {
-                        int i = (int)(mousePos.X / Tile.TILE_SIZE) + world.XShift;
-                        int j = (int)(mousePos.Y / Tile.TILE_SIZE);
+                        int i = (int)(mousePos.X + (Position.X - Program.Window.Size.X / 2)) / Tile.TILE_SIZE;
+                        int j = (int)(mousePos.Y + (Position.Y - Program.Window.Size.Y / 2)) / Tile.TILE_SIZE;
                         world.SetTile(TileType.NONE, i, j);
                     }
                 }
-                if (tile == null)
+                if (tile1 == null)
                 {
                     if (Mouse.IsButtonPressed(Mouse.Button.Right))
                     {
-                        int i = (int)(mousePos.X / Tile.TILE_SIZE) + world.XShift;
-                        int j = (int)(mousePos.Y / Tile.TILE_SIZE);
+                        int i = (int)(mousePos.X + (Position.X - Program.Window.Size.X / 2)) / Tile.TILE_SIZE;
+                        int j = (int)(mousePos.Y + (Position.Y - Program.Window.Size.Y / 2)) / Tile.TILE_SIZE;
                         world.SetTile(TileType.GROUND, i, j);
                     }
                 }

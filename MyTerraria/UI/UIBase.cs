@@ -58,7 +58,7 @@ namespace MyTerraria.UI
             set { rectShape.Size = (Vector2f)value; }
         }
 
-        public bool IsAllowDrag = false;    // Разрешено перетаскивать UI мышью?
+        public bool IsAllowDrag = true;    // Разрешено перетаскивать UI мышью?
         public Vector2i DragOffset { get; private set; }
 
         protected RectangleShape rectShape;

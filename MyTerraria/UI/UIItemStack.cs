@@ -55,6 +55,7 @@ namespace MyTerraria.UI
             rectShapeImage.TextureRect = infoItem.SpriteSheet.GetTextureRect(infoItem.SpriteI, infoItem.SpriteJ);
 
             textCount = new Text("0", Content.font, 15);
+            textCount.Color = Color.Black;
 
             ItemCount = count;
         }

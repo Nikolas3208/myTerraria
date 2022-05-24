@@ -11,6 +11,8 @@ namespace MyTerraria
 
         World world;    // Мир
         NpcFastSlime slime; // Слизень
+        
+        DebagInfo debag;
 
         // Слизни
         List<NpcSlime> slimes = new List<NpcSlime>();
@@ -32,6 +34,8 @@ namespace MyTerraria
             slime = new NpcFastSlime(world);
             slime.StartPosition = new Vector2f(500, 150);
             slime.Spawn();
+
+            debag = new DebagInfo(Player.Position.X, Player.Position.Y);
 
             for (int i = 0; i < 5; i++)
             {
@@ -73,6 +77,7 @@ namespace MyTerraria
             Program.Window.Draw(world);
             Program.Window.Draw(Player);
             Program.Window.Draw(slime);
+            Program.Window.Draw(debag);
 
             foreach (var s in slimes)
                 Program.Window.Draw(s);
