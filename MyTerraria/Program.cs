@@ -74,7 +74,7 @@ namespace MyTerraria
                     Game.Player.block_Type = "STONE";
                     break;
                 case Keyboard.Key.Num4:
-                    
+                    Game.Player.block_Type = "DESK";
                     break;
             }
         }

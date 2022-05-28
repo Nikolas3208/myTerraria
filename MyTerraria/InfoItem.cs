@@ -5,6 +5,8 @@
         public static InfoItem ItemGround = new InfoItem().SetSprite(Content.ssTileGround, 9, 3);
         public static InfoItem ItemGrass = new InfoItem().SetSprite(Content.ssTileGrass , 9, 3);
         public static InfoItem ItemStone = new InfoItem().SetSprite(Content.ssTileSone, 9, 3);
+        public static InfoItem ItemTreeBrak = new InfoItem().SetSprite(Content.ssTileDesk, 0, 0);
+        public static InfoItem ItemTreeDesk = new InfoItem().SetSprite(Content.ssTileDesk1, 9, 3);
 
         //------------------------
 

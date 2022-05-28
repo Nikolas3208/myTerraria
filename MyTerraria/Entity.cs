@@ -96,9 +96,13 @@ namespace MyTerraria
                 Position += velocity + movement;
         }
 
+        int a, b;
+
         bool updateWallCollision(int i, int j, int iOffset, ref Vector2f stepPos, FloatRect stepRect)
         {
             var dirType = iOffset > 0 ? DirectionType.Right : DirectionType.Left;
+
+            a = i; b = j;
 
             Tile[] walls = new Tile[] {
                 world.GetTile(i + iOffset, j - 1),
@@ -117,7 +121,7 @@ namespace MyTerraria
 
                 if (updateCollision(stepRect, tileRect, dirType, ref stepPos))
                 {
-                    isWallCollided = true;
+                        isWallCollided = true;
                 }
             }
 
@@ -128,15 +132,14 @@ namespace MyTerraria
         {
             if (rectNPC.Intersects(rectTile))
             {
-                if (direction == DirectionType.Up)
-                    pos = new Vector2f(pos.X, rectTile.Top + rectTile.Height - 1);
-                else if (direction == DirectionType.Down)
-                    pos = new Vector2f(pos.X, rectTile.Top - rectNPC.Height + 1);
-                else if (direction == DirectionType.Left)
-                    pos = new Vector2f(rectTile.Left + rectTile.Width - 1, pos.Y);
-                else if (direction == DirectionType.Right)
-                    pos = new Vector2f(rectTile.Left - rectNPC.Width + 1, pos.Y);
-
+                    if (direction == DirectionType.Up)
+                        pos = new Vector2f(pos.X, rectTile.Top + rectTile.Height - 1);
+                    else if (direction == DirectionType.Down)
+                        pos = new Vector2f(pos.X, rectTile.Top - rectNPC.Height + 1);
+                    else if (direction == DirectionType.Left)
+                        pos = new Vector2f(rectTile.Left + rectTile.Width - 1, pos.Y);
+                    else if (direction == DirectionType.Right)
+                        pos = new Vector2f(rectTile.Left - rectNPC.Width + 1, pos.Y);
                 return true;
             }
 

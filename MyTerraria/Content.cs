@@ -11,6 +11,12 @@ namespace MyTerraria
         public static SpriteSheet ssTileGrass; // Grass
         public static SpriteSheet ssTileSone; // Stone
 
+        public static SpriteSheet ssTileTreeBark; // Tree
+        public static SpriteSheet ssTileTreeTops; // Tree
+        public static SpriteSheet ssTileVegetation; // Tree
+        public static SpriteSheet ssTileDesk; // Tree
+        public static SpriteSheet ssTileDesk1; // Tree
+
         // NPC
         public static SpriteSheet ssNpcSlime; // Слизень
 
@@ -31,8 +37,14 @@ namespace MyTerraria
         public static void Load()
         {
             ssTileGround = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_0.png"));
-            ssTileGrass = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_1.png"));
-            ssTileSone = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_130.png"));
+            ssTileGrass = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_2.png"));
+            ssTileSone = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_1.png"));
+
+            ssTileDesk = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\Item_9.png"));
+            ssTileDesk1 = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_30.png"));
+            ssTileTreeBark = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 0, new Texture(CONTENT_DIR + "Textures\\Tiles_5.png"));
+            ssTileTreeTops = new SpriteSheet(3, 1, true, 1, new Texture(CONTENT_DIR + "Textures\\Tree_Tops.png"));
+            ssTileVegetation = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_3.png"));
 
             // NPC
             ssNpcSlime = new SpriteSheet(1, 2, true, 0, new Texture(CONTENT_DIR + "Textures\\npc\\slime.png"));

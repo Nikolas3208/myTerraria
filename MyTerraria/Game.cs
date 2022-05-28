@@ -27,7 +27,7 @@ namespace MyTerraria
 
             // Создаём игрока
             Player = new Player(world);
-            Player.StartPosition = new Vector2f(1500, 50);
+            Player.StartPosition = new Vector2f(1500, 80 * 16);
             Player.Spawn();
 
             // Создаём быстрого слизня

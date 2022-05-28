@@ -231,6 +231,10 @@ namespace MyTerraria.NPC
             {
                 type = TileType.STONE;
             }
+            if (block_Type == "DESK")
+            {
+                type = TileType.DESK;
+            }
 
 
             DebugRender.AddRectangle(mousePos.X + (Position.X - Program.Window.Size.X / 2), mousePos.Y + (Position.Y - Program.Window.Size.Y / 2), Tile.TILE_SIZE, Tile.TILE_SIZE, Color.Green);
@@ -256,6 +260,14 @@ namespace MyTerraria.NPC
                     if (Program.Game.World.type_Tile[i, j] == "STONE")
                     {
                         world.DelTile(TileType.STONE, i, j);
+                    }
+                    if (Program.Game.World.type_Tile[i, j] == "TREEBRAK")
+                    {
+                        world.DelTile(TileType.TREEBRAK, i, j);
+                    }
+                    if (Program.Game.World.type_Tile[i, j] == "DESK")
+                    {
+                        world.DelTile(TileType.DESK, i, j);
                     }
 
                 }
