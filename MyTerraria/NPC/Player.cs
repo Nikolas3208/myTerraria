@@ -234,6 +234,7 @@ namespace MyTerraria.NPC
 
 
             DebugRender.AddRectangle(mousePos.X + (Position.X - Program.Window.Size.X / 2), mousePos.Y + (Position.Y - Program.Window.Size.Y / 2), Tile.TILE_SIZE, Tile.TILE_SIZE, Color.Green);
+
             if (UIManager.Over == null && UIManager.Drag == null)
             {
                 mousePos = Mouse.GetPosition(Program.Window);
@@ -244,7 +245,19 @@ namespace MyTerraria.NPC
                 {
                     int i = (int)(mousePos.X + (Position.X - Program.Window.Size.X / 2)) / Tile.TILE_SIZE;
                     int j = (int)(mousePos.Y + (Position.Y - Program.Window.Size.Y / 2)) / Tile.TILE_SIZE;
-                    world.SetTile(TileType.NONE, i, j);
+                    if (Program.Game.World.type_Tile[i, j] == "GROUND")
+                    {
+                        world.DelTile(TileType.GROUND, i, j);
+                    }
+                    if (Program.Game.World.type_Tile[i, j] == "GRASS")
+                    {
+                        world.DelTile(TileType.GRASS, i, j);
+                    }
+                    if (Program.Game.World.type_Tile[i, j] == "STONE")
+                    {
+                        world.DelTile(TileType.STONE, i, j);
+                    }
+
                 }
                 if (tile1 == null)
                 {

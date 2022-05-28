@@ -94,6 +94,8 @@ namespace MyTerraria
             }
         }
 
+        public string[,] type_Tile = new string[600, 2000];
+
         // Установить плитку
         public void SetTile(TileType type, int i, int j)
         {
@@ -116,28 +118,61 @@ namespace MyTerraria
                 var tile = new Tile(type, upTile, downTile, leftTile, rightTile);
                 tile.Position = new Vector2f(i * Tile.TILE_SIZE, j * Tile.TILE_SIZE) + Position;
                 tiles[i, j] = tile;
+                type_Tile[i, j] = type.ToString();
             }
-            else
-            {
-                var tile = tiles[i, j];
+        }
 
-                if (tile != null)
+        public void DelTile(TileType type, int i, int j)
+        {
+            if (i < 0)
+            {
+                i = 0;
+            }
+            if (j < 0)
+            {
+                j = 0;
+            }
+
+            // Находим соседей
+            Tile upTile = GetTile(i, j - 1);     // Верхний сосед
+            Tile downTile = GetTile(i, j + 1);   // Нижний сосед
+            Tile leftTile = GetTile(i - 1, j);   // Левый сосед
+            Tile rightTile = GetTile(i + 1, j);  // Правый сосед
+
+            var tile = tiles[i, j];
+
+            if (tile != null)
+            {
+                if (type == TileType.GROUND)
                 {
                     var item = new ItemTile(this, InfoItem.ItemGround);
                     item.Position = tile.Position;
                     items.Add(item);
-                    //Program.Game.Player.c++;
                 }
+                else if (type == TileType.GRASS)
+                {
+                    var item = new ItemTile(this, InfoItem.ItemGrass);
+                    item.Position = tile.Position;
+                    items.Add(item);
+                }
+                else if (type == TileType.STONE)
+                {
+                    var item = new ItemTile(this, InfoItem.ItemStone);
+                    item.Position = tile.Position;
+                    items.Add(item);
 
-                
-                tiles[i, j] = null;
-
-                // Присваиваем соседей, а соседям эту плитку
-                if (upTile != null) upTile.DownTile = null;
-                if (downTile != null) downTile.UpTile = null;
-                if (leftTile != null) leftTile.RightTile = null;
-                if (rightTile != null) rightTile.LeftTile = null;
+                }
             }
+            
+
+            tiles[i, j] = null;
+
+            // Присваиваем соседей, а соседям эту плитку
+            if (upTile != null) upTile.DownTile = null;
+            if (downTile != null) downTile.UpTile = null;
+            if (leftTile != null) leftTile.RightTile = null;
+            if (rightTile != null) rightTile.LeftTile = null;
+
         }
 
         // Получить плитку по мировым координатам
@@ -160,7 +195,9 @@ namespace MyTerraria
         public Tile GetTile(int i, int j)
         {
             if (i >= 0 && j >= 0 && i < WORLD_WIDTH && j < WORLD_HEIGHT)
+            {
                 return tiles[i, j];
+            }
             else
                 return null;
         }

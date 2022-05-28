@@ -3,6 +3,8 @@
     class InfoItem
     {
         public static InfoItem ItemGround = new InfoItem().SetSprite(Content.ssTileGround, 9, 3);
+        public static InfoItem ItemGrass = new InfoItem().SetSprite(Content.ssTileGrass , 9, 3);
+        public static InfoItem ItemStone = new InfoItem().SetSprite(Content.ssTileSone, 9, 3);
 
         //------------------------
 
