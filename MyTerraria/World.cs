@@ -13,8 +13,8 @@ namespace MyTerraria
         //public int MIN_XShift { get { return 0;/* -((int)windowSize.X / 2 / Tile.TILE_SIZE);*/ } }
 
         // Кол-во плиток по ширине и высоте
-        public const int WORLD_WIDTH = 200;
-        public const int WORLD_HEIGHT = 100;//
+        public const int WORLD_WIDTH = 300;
+        public const int WORLD_HEIGHT = 1000;
 
         public static Random Rand { private set; get; }
 
@@ -27,11 +27,11 @@ namespace MyTerraria
         // Конструктор класса
         public World()
         {
-            tiles = new Tile[WORLD_WIDTH, WORLD_HEIGHT];
+            tiles = new Tile[600, 2000];
         }
 
         // Генерируем новый мир
-        public void GenerateWorld(int seed = -1)
+        public void GenerateWorld(int seed = 0)
         {
             Rand = seed >= 0 ? new Random(seed) : new Random((int)DateTime.Now.Ticks);
 
@@ -56,7 +56,7 @@ namespace MyTerraria
             }
 
             // Сглаживание
-            for (int i = 1; i < WORLD_WIDTH - 1; i++)
+            for (int i = 0; i < WORLD_WIDTH - 1; i++)
             {
                 float sum = arr[i];
                 int count = 1;
@@ -81,19 +81,35 @@ namespace MyTerraria
                 arr[i] = (int)(sum / count);
             }
 
+            //Генерируем деревья
+            for (int i = 0; i < 1; i++)
+            {
+
+            }
+
             // Ставим плитки на карту
             for (int i = 0; i < WORLD_WIDTH; i++)
             {
-                SetTile(TileType.GRASS, i, arr[i]);
+                SetTile(TileType.GRASS, i, arr[i] + 100);
 
                 for (int j = arr[i] + 1; j < WORLD_HEIGHT; j++)
-                    SetTile(TileType.GROUND, i, j);
+                    SetTile(TileType.GROUND, i, j + 100);
+
+                
             }
         }
 
         // Установить плитку
         public void SetTile(TileType type, int i, int j)
         {
+            if (i < 0)
+            {
+                i = 0;
+            }
+            if (j < 0)
+            {
+                j = 0;
+            }
             // Находим соседей
             Tile upTile = GetTile(i, j - 1);     // Верхний сосед
             Tile downTile = GetTile(i, j + 1);   // Нижний сосед
@@ -109,13 +125,16 @@ namespace MyTerraria
             else
             {
                 var tile = tiles[i, j];
+
                 if (tile != null)
                 {
                     var item = new ItemTile(this, InfoItem.ItemGround);
                     item.Position = tile.Position;
                     items.Add(item);
+                    Program.Game.Player.c++;
                 }
 
+                
                 tiles[i, j] = null;
 
                 // Присваиваем соседей, а соседям эту плитку
@@ -168,17 +187,6 @@ namespace MyTerraria
 
         }
 
-        public int XShift { get; private set; } = 0;
-
-        public void ChangeHorizontalShift(int x)
-        {
-            XShift += x;
-        }
-
-        public void SetWindowSize(Vector2u size)
-        {
-            windowSize = size;
-        }
         // Нарисовать мир
         public void Draw(RenderTarget target, RenderStates states)
         {

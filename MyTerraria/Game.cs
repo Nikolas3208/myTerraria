@@ -35,7 +35,7 @@ namespace MyTerraria
             slime.StartPosition = new Vector2f(500, 150);
             slime.Spawn();
 
-            debag = new DebagInfo(Player.Position.X, Player.Position.Y);
+            debag = new DebagInfo();
 
             for (int i = 0; i < 5; i++)
             {

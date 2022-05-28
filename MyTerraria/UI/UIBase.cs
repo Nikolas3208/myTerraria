@@ -65,26 +65,30 @@ namespace MyTerraria.UI
 
         public virtual void UpdateOver(Vector2i mousePos)
         {
-            var localMousePos = mousePos - GlobalPosition + GlobalOrigin;
+            UIManager.Drag = this;
+            var localMousePos = mousePos - (GlobalPosition + GlobalOrigin);// + Program.Game.Player.Position - Program.Window.Size;
+            localMousePos += new Vector2i((int)(Program.Game.Player.Position.X - Program.Window.Size.X / 2), (int)(Program.Game.Player.Position.Y - Program.Window.Size.Y / 2));
 
-            if (rectShape.GetLocalBounds().Contains(localMousePos.X, localMousePos.Y))
+            /*if (rectShape.GetLocalBounds().Contains(localMousePos.X, localMousePos.Y))
             {
-                if (UIManager.Drag == null)
-                {
-                    if (IsAllowDrag && Mouse.IsButtonPressed(Mouse.Button.Left))
-                    {
-                        UIManager.Drag = this;
-                        DragOffset = mousePos - GlobalPosition;
-                        OnDragBegin();
-                    }
-                }
+                 if (UIManager.Drag == null)
+                 {
+                     if (IsAllowDrag && Mouse.IsButtonPressed(Mouse.Button.Left))
+                     {
+                         UIManager.Drag = this;
+                         //DragOffset = mousePos - GlobalPosition;
+                         OnDragBegin();
+                     }
+                 }
+             
+                OnDragBegin();
 
                 if (UIManager.Drag != this)
                     UIManager.Over = this;
-
+               
                 for (int i = 0; i < Childs.Count; i++)
                     Childs[i].UpdateOver(mousePos);
-            }
+            }*/
         }
 
         public virtual void Update()

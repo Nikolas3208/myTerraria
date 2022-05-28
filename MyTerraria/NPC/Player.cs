@@ -34,6 +34,7 @@ namespace MyTerraria.NPC
             //Window = new RenderWindow(new VideoMode(800, 600), "Моя Terraria!");
             rect = new RectangleShape(new Vector2f(Tile.TILE_SIZE * 1.5f, Tile.TILE_SIZE * 2.8f));
             rect.Origin = new Vector2f(rect.Size.X / 2, 0);
+
             isRectVisible = false;
 
             // Волосы
@@ -208,29 +209,37 @@ namespace MyTerraria.NPC
             Spawn();
         }
 
+        /*public double a;
+        public double d;*/
+        public double c;
+        
         public Vector2i mousePos;
         public override void UpdateNPC()
         {
             updateMovement();
+            DebugRender.AddRectangle(mousePos.X + (Position.X - Program.Window.Size.X / 2), mousePos.Y + (Position.Y - Program.Window.Size.Y / 2), Tile.TILE_SIZE, Tile.TILE_SIZE, Color.Green);
 
+            /*a = (Math.Pow(mousePos.X,2) - (Position.X * Position.X) + (mousePos.Y * mousePos.Y) - (Position.Y * Position.Y));
+            a = (Math.Pow(mousePos.X, 2) - Math.Pow(Position.X, 2));
+            d = (Math.Pow(mousePos.Y, 2) - Math.Pow(Position.Y, 2));
+            c = a + d;
+            if (c < 0)
+            {
+                c = c * -1;
+            }
+            c = (int)Math.Sqrt((int)c);
+            c = (int)(c / 16);*/
             if (UIManager.Over == null && UIManager.Drag == null)
             {
                 mousePos = Mouse.GetPosition(Program.Window);
-                //Mouse.SetPosition(new Vector2i(100, 200));
-                Tile tile1 = world.GetTileByWorldPos(mousePos.X + (Position.X - Program.Window.Size.X), mousePos.Y + (Position.Y - Program.Window.Size.Y));
-                Tile tile = world.GetTileByWorldPos(mousePos);
-                if (tile != null)
-                {
-                    //FloatRect tileRect = tile.GetFloatRect();
-                    DebugRender.AddRectangle(mousePos.X + (Position.X - Program.Window.Size.X / 2), mousePos.Y + (Position.Y - Program.Window.Size.Y / 2), Tile.TILE_SIZE, Tile.TILE_SIZE, Color.Green);
-                    //DebugRender.AddRectangle(tileRect, Color.Green);
 
-                    if (Mouse.IsButtonPressed(Mouse.Button.Left))
-                    {
-                        int i = (int)(mousePos.X + (Position.X - Program.Window.Size.X / 2)) / Tile.TILE_SIZE;
-                        int j = (int)(mousePos.Y + (Position.Y - Program.Window.Size.Y / 2)) / Tile.TILE_SIZE;
-                        world.SetTile(TileType.NONE, i, j);
-                    }
+                Tile tile1 = world.GetTileByWorldPos(mousePos.X + (Position.X - Program.Window.Size.X), mousePos.Y + (Position.Y - Program.Window.Size.Y) - 1000 * 16);
+
+                if (Mouse.IsButtonPressed(Mouse.Button.Left))
+                {
+                    int i = (int)(mousePos.X + (Position.X - Program.Window.Size.X / 2)) / Tile.TILE_SIZE;
+                    int j = (int)(mousePos.Y + (Position.Y - Program.Window.Size.Y / 2)) / Tile.TILE_SIZE;
+                    world.SetTile(TileType.NONE, i, j);
                 }
                 if (tile1 == null)
                 {

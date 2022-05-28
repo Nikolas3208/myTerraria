@@ -9,6 +9,7 @@ namespace MyTerraria
 
         public static SpriteSheet ssTileGround; // Ground
         public static SpriteSheet ssTileGrass; // Grass
+        public static SpriteSheet ssTileTREE; // TREE
 
         // NPC
         public static SpriteSheet ssNpcSlime; // Слизень
