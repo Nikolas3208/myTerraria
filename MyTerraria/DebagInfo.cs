@@ -24,8 +24,8 @@ namespace MyTerraria
             text.Position = new Vector2f(Mouse.GetPosition(Program.Window).X, Mouse.GetPosition(Program.Window).Y);
             text.Position = new Vector2f(Program.Game.Player.Position.X, Program.Game.Player.Position.Y);
             text.DisplayedString = "Player: " + "X: " + (Program.Game.Player.Position.X / 16).ToString() + "Y: " + (Program.Game.Player.Position.Y / 16).ToString() + "\n" +
-                                   "Mouse: " + "X: " + (Program.Game.Player.mousePos.X / 16).ToString() + "Y: " + (Program.Game.Player.mousePos.Y / 16).ToString()+
-                                   "A: " + (Program.Game.Player.c).ToString();
+                                   "Mouse: " + "X: " + (Program.Game.Player.mousePos.X / 16).ToString() + "Y: " + (Program.Game.Player.mousePos.Y / 16).ToString() +
+                                   "A: " + (Program.Game.Player.block_Type).ToString();
             text.Draw(target, states);
         }
     }

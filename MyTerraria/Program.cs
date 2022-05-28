@@ -64,17 +64,17 @@ namespace MyTerraria
             switch (e.Code)
             {
 
-                case Keyboard.Key.W:
-                    pos.Y++;
+                case Keyboard.Key.Num1:
+                    Game.Player.block_Type = "GROUND";
                     break;
-                case Keyboard.Key.S:
-                    pos.Y--;
+                case Keyboard.Key.Num2:
+                    Game.Player.block_Type = "GRASS";
                     break;
-                case Keyboard.Key.A:
-                    pos.X--;
+                case Keyboard.Key.Num3:
+                    Game.Player.block_Type = "STONE";
                     break;
-                case Keyboard.Key.D:
-                    pos.X++;
+                case Keyboard.Key.Num4:
+                    
                     break;
             }
         }

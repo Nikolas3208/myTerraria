@@ -9,7 +9,7 @@ namespace MyTerraria
 
         public static SpriteSheet ssTileGround; // Ground
         public static SpriteSheet ssTileGrass; // Grass
-        public static SpriteSheet ssTileTREE; // TREE
+        public static SpriteSheet ssTileSone; // Stone
 
         // NPC
         public static SpriteSheet ssNpcSlime; // Слизень
@@ -32,6 +32,7 @@ namespace MyTerraria
         {
             ssTileGround = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_0.png"));
             ssTileGrass = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_1.png"));
+            ssTileSone = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_130.png"));
 
             // NPC
             ssNpcSlime = new SpriteSheet(1, 2, true, 0, new Texture(CONTENT_DIR + "Textures\\npc\\slime.png"));

@@ -81,21 +81,16 @@ namespace MyTerraria
                 arr[i] = (int)(sum / count);
             }
 
-            //Генерируем деревья
-            for (int i = 0; i < 1; i++)
-            {
-
-            }
-
             // Ставим плитки на карту
             for (int i = 0; i < WORLD_WIDTH; i++)
             {
                 SetTile(TileType.GRASS, i, arr[i] + 100);
 
-                for (int j = arr[i] + 1; j < WORLD_HEIGHT; j++)
+                for (int j = arr[i] + 1; j < 30; j++)
                     SetTile(TileType.GROUND, i, j + 100);
 
-                
+                for (int i1 = 0; i1 < WORLD_HEIGHT; i1++)
+                    SetTile(TileType.STONE, i, i1 + 130);
             }
         }
 
@@ -131,7 +126,7 @@ namespace MyTerraria
                     var item = new ItemTile(this, InfoItem.ItemGround);
                     item.Position = tile.Position;
                     items.Add(item);
-                    Program.Game.Player.c++;
+                    //Program.Game.Player.c++;
                 }
 
                 

@@ -9,7 +9,7 @@ namespace MyTerraria
         NONE,       // Пусто
         GROUND,     // Почва
         GRASS,       // Земляной блок с травой
-        TREE
+        STONE
     }
 
     // Класс плитки
@@ -122,8 +122,8 @@ namespace MyTerraria
                 case TileType.GRASS:
                     SpriteSheet = Content.ssTileGrass;    // Земляной блок с травой
                     break;
-                case TileType.TREE:
-                    SpriteSheet = Content.ssTileTREE;
+                case TileType.STONE:
+                    SpriteSheet = Content.ssTileSone;
                     break;
             }
 
