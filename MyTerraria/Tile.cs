@@ -614,6 +614,18 @@ namespace MyTerraria
                         int i = World.Rand.Next(0, 3); // Случайное число от 0 до 2
                         rectShape.TextureRect = SpriteSheet.GetTextureRect(9, 0 + i);
                     }
+                    // Если есть только левый сосед
+                    else if (upTile == null && downTile != null && leftTile != null && rightTile == null)
+                    {
+                        int i = World.Rand.Next(0, 3); // Случайное число от 0 до 2
+                        rectShape.TextureRect = SpriteSheet.GetTextureRect(1, 6 + i);
+                    }
+                    // Если есть только правый сосед
+                    else if (upTile == null && downTile != null && leftTile == null && rightTile != null)
+                    {
+                        int i = World.Rand.Next(0, 3); // Случайное число от 0 до 2
+                        rectShape.TextureRect = SpriteSheet.GetTextureRect(2, 6 + i);
+                    }
                     break;
                 case TileType.TREETOPS:
                     //int i = World.Rand.Next(0, 3); // Случайное число от 0 до 2

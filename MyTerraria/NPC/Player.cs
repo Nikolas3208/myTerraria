@@ -3,6 +3,7 @@ using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
 using System;
+using System.Threading;
 
 
 namespace MyTerraria.NPC
@@ -35,7 +36,7 @@ namespace MyTerraria.NPC
         {
             //Window = new RenderWindow(new VideoMode(800, 600), "Моя Terraria!");
             rect = new RectangleShape(new Vector2f(Tile.TILE_SIZE * 1.5f, Tile.TILE_SIZE * 2.8f));
-            rect.Origin = new Vector2f(rect.Size.X / 2, 0);
+            rect.Origin = new Vector2f(rect.Size.X / 2, 3);
 
             isRectVisible = false;
 
@@ -213,8 +214,8 @@ namespace MyTerraria.NPC
 
         
         TileType type = TileType.GROUND;
-        
         public Vector2i mousePos;
+
         public override void UpdateNPC()
         {
             updateMovement();
@@ -249,27 +250,27 @@ namespace MyTerraria.NPC
                 {
                     int i = (int)(mousePos.X + (Position.X - Program.Window.Size.X / 2)) / Tile.TILE_SIZE;
                     int j = (int)(mousePos.Y + (Position.Y - Program.Window.Size.Y / 2)) / Tile.TILE_SIZE;
-                    if (Program.Game.World.type_Tile[i, j] == "GROUND")
-                    {
-                        world.DelTile(TileType.GROUND, i, j);
-                    }
-                    if (Program.Game.World.type_Tile[i, j] == "GRASS")
-                    {
-                        world.DelTile(TileType.GRASS, i, j);
-                    }
-                    if (Program.Game.World.type_Tile[i, j] == "STONE")
-                    {
-                        world.DelTile(TileType.STONE, i, j);
-                    }
-                    if (Program.Game.World.type_Tile[i, j] == "TREEBRAK")
-                    {
-                        world.DelTile(TileType.TREEBRAK, i, j);
-                    }
-                    if (Program.Game.World.type_Tile[i, j] == "DESK")
-                    {
-                        world.DelTile(TileType.DESK, i, j);
-                    }
 
+                        if (Program.Game.World.type_Tile[i, j] == "GROUND")
+                        {
+                            world.DelTile(TileType.GROUND, i, j);
+                        }
+                        if (Program.Game.World.type_Tile[i, j] == "GRASS")
+                        {
+                            world.DelTile(TileType.GRASS, i, j);
+                        }
+                        if (Program.Game.World.type_Tile[i, j] == "STONE")
+                        {
+                            world.DelTile(TileType.STONE, i, j);
+                        }
+                        if (Program.Game.World.type_Tile[i, j] == "TREEBRAK")
+                        {
+                            world.DelTile(TileType.TREEBRAK, i, j);
+                        }
+                        if (Program.Game.World.type_Tile[i, j] == "DESK")
+                        {
+                            world.DelTile(TileType.DESK, i, j);
+                        }
                 }
                 if (tile1 == null)
                 {
@@ -291,9 +292,9 @@ namespace MyTerraria.NPC
             bool isMove = isMoveLeft || isMoveRight;
 
             // Прыжок
-            if (isJump && !isFly)
+            if (isJump && !isFly && velocity.Y >= 0)
             {
-                velocity.Y = -10f;
+                velocity.Y += -10f;
             }
 
             if (isMove)

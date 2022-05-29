@@ -92,16 +92,17 @@ namespace MyTerraria
                     SetTile(TileType.GROUND, i, j + 100);
             }
 
-            //Генерация камня
+            //Генерация деревьев
             for (int i = 0; i < WORLD_WIDTH; i++)
             {
                 i += Rand.Next(4, 10);
+                int f1 = Rand.Next(5, 9);
                 for (int j = 0; j < WORLD_HEIGHT; j++)
                 {
-
                     if (type_Tile[i, j] == "GRASS")
                     {
                         c = -j + 1;
+                        int f = Rand.Next(-1, 1);
 
                         SetTile(TileType.TREEBRAK, i, -9 - c);
                         SetTile(TileType.TREEBRAK, i, -8 - c);
@@ -113,15 +114,23 @@ namespace MyTerraria
                         SetTile(TileType.TREEBRAK, i, -2 - c);
                         SetTile(TileType.TREEBRAK, i, -1 - c);
                         SetTile(TileType.TREEBRAK, i, -0 - c);
+                        SetTile(TileType.TREEBRAK, i + f, -0 - c);
                                                         
                         SetTile(TileType.TREETOPS, i, -9 - c);
                     }
                 }
             }
 
+            
+
+            //Program.Game.Player.StartPosition = new Vector2f((WORLD_WIDTH / 2) * 16, c);
+
         }
 
         public string[,] type_Tile = new string[600, 2000];
+
+
+        public TileType tile1;
 
         // Установить плитку
         public void SetTile(TileType type, int i, int j)
@@ -148,7 +157,9 @@ namespace MyTerraria
                 tiles[i, j] = tile;
                 type_Tile[i, j] = type.ToString();
             }
+            tile1 = type;
         }
+
 
         public void DelTile(TileType type, int i, int j)
         {

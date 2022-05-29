@@ -19,6 +19,8 @@ namespace MyTerraria
 
         public World World { get { return world; } }
 
+        int c = 0;
+
         public Game()
         {
             // Создаём новый мир и выполняем его генерацию
@@ -27,7 +29,19 @@ namespace MyTerraria
 
             // Создаём игрока
             Player = new Player(world);
-            Player.StartPosition = new Vector2f(1500, 80 * 16);
+            for (int i = 0; i < World.WORLD_WIDTH; i++)
+            {
+                i += World.Rand.Next(4, 10);
+                for (int j = 0; j < World.WORLD_HEIGHT; j++)
+                {
+                    if (World.type_Tile[i, j] == "GRASS")
+                    {
+                        c = -j + 1;
+                        Player.StartPosition = new Vector2f(i, (-1 - c) * 16);
+                    }
+                }
+            }
+            //Player.StartPosition = new Vector2f(1500, );
             Player.Spawn();
 
             // Создаём быстрого слизня
@@ -61,7 +75,7 @@ namespace MyTerraria
             world.Update();
 
             Player.Update();
-            slime.Update();
+            //slime.Update();
 
             foreach (var s in slimes)
                 s.Update();
