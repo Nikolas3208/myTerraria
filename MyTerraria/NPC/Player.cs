@@ -15,7 +15,7 @@ namespace MyTerraria.NPC
         public const float PLAYER_MOVE_SPEED = 4f;
         public const float PLAYER_MOVE_SPEED_ACCELERATION = 0.2f;
 
-        public Color HairColor = new Color(255, 0, 0);  // Цвет волос
+        public Color HairColor = new Color(0, 240, 10);  // Цвет волос
         public Color BodyColor = new Color(255, 229, 186);  // Цвет кожи
         public Color ShirtColor = new Color(255, 255, 0);  // Цвет куртки
         public Color LegsColor = new Color(0, 76, 135);  // Цвет штанов
