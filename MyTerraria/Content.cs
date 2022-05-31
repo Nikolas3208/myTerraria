@@ -42,7 +42,7 @@ namespace MyTerraria
 
             ssTileDesk = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\Item_9.png"));
             ssTileDesk1 = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_30.png"));
-            ssTileTreeBark = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 0, new Texture(CONTENT_DIR + "Textures\\Tiles_5.png"));
+            ssTileTreeBark = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE + 4, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_5.png"));
             ssTileTreeTops = new SpriteSheet(3, 1, true, 1, new Texture(CONTENT_DIR + "Textures\\Tree_Tops.png"));
             ssTileVegetation = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_3.png"));
 

@@ -66,14 +66,10 @@ namespace MyTerraria
                     int j = (int)((stepPos.Y + rect.Size.Y) / Tile.TILE_SIZE);
                     Tile tile = world.GetTile(i, j);
                     Tile tile1 = world.GetTile(i, j - 4);
-                    if (i < 0)
+                    if (i < 0 || i > World.WORLD_WIDTH)
                         i = 0;
-                    if (j < 0)
+                    if (j < 0 || j > World.WORLD_HEIGHT)
                         j = 0;
-                    if (i > 599)
-                        i = 599;
-                    if (j > 1999)
-                        j = 1999;
 
                     if (Program.Game.World.type_Tile[i, j] != "TREEBRAK" && Program.Game.World.type_Tile[i, j] != "TREETOPS")
                     {
@@ -88,7 +84,7 @@ namespace MyTerraria
                                 velocity.Y = 0;
                                 isFly = false;
 
-                                isBreakStep = true;
+                                isBreakStep = false;
                             }
                             else
                                 isFly = true;
@@ -103,15 +99,12 @@ namespace MyTerraria
 
                         DebugRender.AddRectangle(tileRect, Color.Red);
 
-                        if (updateCollision(stepRect, tileRect, DirectionType.Up, ref stepPos) && isGhost1)
+                        if (updateCollision(stepRect, tileRect, DirectionType.Up, ref stepPos))
                         {
-                            velocity.Y = 11;
-                            isFly = true;
 
-                            isBreakStep = true;
                         }
                         else if (isGhost1)
-                            isFly = true;
+                            isFly = false;
                     }
 
                     if (updateWallCollision(i, j, -1, ref stepPos, stepRect) || updateWallCollision(i, j, 1, ref stepPos, stepRect))

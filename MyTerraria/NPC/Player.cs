@@ -216,6 +216,8 @@ namespace MyTerraria.NPC
         TileType type = TileType.GROUND;
         public Vector2i mousePos;
 
+        public float a;
+
         public override void UpdateNPC()
         {
             updateMovement();
@@ -237,15 +239,15 @@ namespace MyTerraria.NPC
                 type = TileType.DESK;
             }
 
-
+            mousePos = Mouse.GetPosition(Program.Window);
             DebugRender.AddRectangle(mousePos.X + (Position.X - Program.Window.Size.X / 2), mousePos.Y + (Position.Y - Program.Window.Size.Y / 2), Tile.TILE_SIZE, Tile.TILE_SIZE, Color.Green);
 
-            if (UIManager.Over == null && UIManager.Drag == null)
+            Vector2f mousePosGlobal = new Vector2f(mousePos.X + (Position.X - Program.Window.Size.X / 2), mousePos.Y + (Position.Y - Program.Window.Size.Y / 2));
+            a = MathHelper.GetDistance(Position, mousePosGlobal);
+
+            if (UIManager.Over == null && UIManager.Drag == null && a < 150)
             {
-                mousePos = Mouse.GetPosition(Program.Window);
-
                 Tile tile1 = world.GetTileByWorldPos(mousePos.X + (Position.X - Program.Window.Size.X), mousePos.Y + (Position.Y - Program.Window.Size.Y) - 1000 * 16);
-
                 if (Mouse.IsButtonPressed(Mouse.Button.Left))
                 {
                     int i = (int)(mousePos.X + (Position.X - Program.Window.Size.X / 2)) / Tile.TILE_SIZE;
@@ -283,12 +285,14 @@ namespace MyTerraria.NPC
                 }
             }
         }
-
+        bool isJump;
         private void updateMovement()
         {
             bool isMoveLeft = Keyboard.IsKeyPressed(Keyboard.Key.A);
             bool isMoveRight = Keyboard.IsKeyPressed(Keyboard.Key.D);
-            bool isJump = Keyboard.IsKeyPressed(Keyboard.Key.Space);
+            if(!isFly)
+                isJump = Keyboard.IsKeyPressed(Keyboard.Key.Space);
+            
             bool isMove = isMoveLeft || isMoveRight;
 
             // Прыжок

@@ -6,7 +6,7 @@ namespace MyTerraria
 {
     public class DebugRender
     {
-        public static bool Enabled = false;
+        public static bool Enabled = true;
 
         static List<Drawable> objects = new List<Drawable>();
 

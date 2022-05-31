@@ -29,16 +29,12 @@ namespace MyTerraria
 
             // Создаём игрока
             Player = new Player(world);
-            for (int i = 0; i < World.WORLD_WIDTH; i++)
+            for (int j = 0; j < World.WORLD_HEIGHT; j++)
             {
-                i += World.Rand.Next(4, 10);
-                for (int j = 0; j < World.WORLD_HEIGHT; j++)
+                if (World.type_Tile[World.WORLD_WIDTH / 2, j] == "GRASS")
                 {
-                    if (World.type_Tile[i, j] == "GRASS")
-                    {
-                        c = -j + 1;
-                        Player.StartPosition = new Vector2f(i, (-1 - c) * 16);
-                    }
+                    c = -j + 1;
+                    Player.StartPosition = new Vector2f(World.WORLD_WIDTH / 2 * 16, (-1 - c) * 16);
                 }
             }
             //Player.StartPosition = new Vector2f(1500, );
@@ -75,7 +71,7 @@ namespace MyTerraria
             world.Update();
 
             Player.Update();
-            //slime.Update();
+            slime.Update();
 
             foreach (var s in slimes)
                 s.Update();

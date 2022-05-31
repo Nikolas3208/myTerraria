@@ -13,8 +13,8 @@ namespace MyTerraria
         //public int MIN_XShift { get { return 0;/* -((int)windowSize.X / 2 / Tile.TILE_SIZE);*/ } }
 
         // Кол-во плиток по ширине и высоте
-        public const int WORLD_WIDTH = 300;
-        public const int WORLD_HEIGHT = 1000;
+        public const int WORLD_WIDTH = 500;
+        public const int WORLD_HEIGHT = 500;
 
         public static Random Rand { private set; get; }
 
@@ -27,13 +27,19 @@ namespace MyTerraria
         // Конструктор класса
         public World()
         {
-            tiles = new Tile[600, 2000];
+            tiles = new Tile[WORLD_WIDTH * 2, WORLD_HEIGHT * 2];
         }
+
+       
 
         // Генерируем новый мир
         public void GenerateWorld(int seed = -1)
         {
             Rand = seed >= 0 ? new Random(seed) : new Random((int)DateTime.Now.Ticks);
+
+            double num3 = 875.35 * ((double)Rand.Next(90, 110) * 0.01);
+
+            double minValue = num3;
 
             int groundLevelMax = Rand.Next(10, 30);
             int groundLevelMin = groundLevelMax + Rand.Next(10, 50);
@@ -121,13 +127,25 @@ namespace MyTerraria
                 }
             }
 
+            for (int i = 0; i < WORLD_WIDTH; i++)
+            {
+                for (int j = 0; j < WORLD_HEIGHT; j++)
+                {
+                    /*if (num3 > WORLD_HEIGHT)
+                        num3 = WORLD_HEIGHT;
+                    if (num3 < 0)
+                        num3 = 0;*/
+                    SetTile(TileType.STONE, Rand.Next(0, 500), Rand.Next((int)minValue, (int)num3));
+                }
+            }
+
             
 
             //Program.Game.Player.StartPosition = new Vector2f((WORLD_WIDTH / 2) * 16, c);
 
         }
 
-        public string[,] type_Tile = new string[600, 2000];
+        public string[,] type_Tile = new string[WORLD_WIDTH * 2, WORLD_HEIGHT * 2];
 
 
         public TileType tile1;

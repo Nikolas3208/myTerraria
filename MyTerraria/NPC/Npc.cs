@@ -40,8 +40,8 @@ namespace MyTerraria.NPC
             base.Update();
 
             // Если игрок упал в пропасть, то возрождаем его
-            if (Position.Y > 400 * 16)
-                OnKill();
+            //if (Position.Y > 400 * 16)
+                //OnKill();
 
             var vec = vector.X += 5;
 
