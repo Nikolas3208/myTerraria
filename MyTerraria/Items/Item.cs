@@ -38,8 +38,8 @@ namespace MyTerraria.Items
                 else
                 {
                     Vector2f dir = MathHelper.Normalize(playerPos - Position);
-                    float speed = 1f - dist / MOVE_DISTANCE_TO_PLAYER;
-                    velocity += dir * speed * MOVE_SPEED_COEF;
+                    float speed = 5f - dist / MOVE_DISTANCE_TO_PLAYER;
+                    velocity = dir * speed * MOVE_SPEED_COEF;
                 }
             }
 

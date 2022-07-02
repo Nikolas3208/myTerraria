@@ -7,9 +7,15 @@ namespace MyTerraria
         public const string CONTENT_DIR = "..\\Content\\";
         public static readonly string FONT_DIR = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Fonts) + "\\";
 
+        public static Sprite ssBackgroundSky;
+        public static Texture ssTextureBackgroundSky;
+
         public static SpriteSheet ssTileGround; // Ground
         public static SpriteSheet ssTileGrass; // Grass
         public static SpriteSheet ssTileSone; // Stone
+
+        public static SpriteSheet ssTileIronOre;//Iron Ore
+        public static SpriteSheet ssTileItemIronOre;//Iron Ore
 
         public static SpriteSheet ssTileTreeBark; // Tree
         public static SpriteSheet ssTileTreeTops; // Tree
@@ -36,13 +42,19 @@ namespace MyTerraria
 
         public static void Load()
         {
+            ssTextureBackgroundSky = new Texture(CONTENT_DIR + "Textures\\Background_0.png");
+            ssBackgroundSky = new Sprite(ssTextureBackgroundSky);
+
             ssTileGround = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_0.png"));
             ssTileGrass = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_2.png"));
             ssTileSone = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_1.png"));
 
+            ssTileIronOre = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_6.png"));
+            ssTileItemIronOre = new SpriteSheet(1, 1, true, 1, new Texture(CONTENT_DIR + "Textures\\Item_11.png"));
+
             ssTileDesk = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\Item_9.png"));
             ssTileDesk1 = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_30.png"));
-            ssTileTreeBark = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE + 4, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_5.png"));
+            ssTileTreeBark = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_5.png"));
             ssTileTreeTops = new SpriteSheet(3, 1, true, 1, new Texture(CONTENT_DIR + "Textures\\Tree_Tops.png"));
             ssTileVegetation = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\Tiles_3.png"));
 

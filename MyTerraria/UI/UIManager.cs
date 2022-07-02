@@ -30,21 +30,13 @@ namespace MyTerraria.UI
             if (Drag != null)
             {
                 Drag.Position = new SFML.System.Vector2i((int)(Program.Game.Player.Position.X - Program.Window.Size.X / 2), (int)(Program.Game.Player.Position.Y - Program.Window.Size.Y / 2));
-                //Drag.Position = Mouse.GetPosition(Program.Window);
-                /*if (Mouse.IsButtonPressed(Mouse.Button.Left))
-                {
-                    var mousePosLocal = Mouse.GetPosition(Program.Window);
-                    Drag.Position = mousePosLocal - Drag.DragOffset;
-                }
-                else
-                {*/
+
                 if (Over != null)
                         Over.OnDrop(Drag);
                     else
                         Drag.OnCancelDrag();
 
                     Drag = null;
-               // }
             }
 
             foreach (var c in controls)

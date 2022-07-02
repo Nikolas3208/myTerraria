@@ -8,10 +8,6 @@ namespace MyTerraria
 {
     class World : Transformable, Drawable
     {
-        private Vector2u windowSize;
-        //public int MAX_XShift { get { return WORLD_WIDTH;/* - (int)windowSize.X / 2 / Tile.TILE_SIZE;*/ } }
-        //public int MIN_XShift { get { return 0;/* -((int)windowSize.X / 2 / Tile.TILE_SIZE);*/ } }
-
         // Кол-во плиток по ширине и высоте
         public const int WORLD_WIDTH = 500;
         public const int WORLD_HEIGHT = 500;
@@ -30,16 +26,10 @@ namespace MyTerraria
             tiles = new Tile[WORLD_WIDTH * 2, WORLD_HEIGHT * 2];
         }
 
-       
-
         // Генерируем новый мир
         public void GenerateWorld(int seed = -1)
         {
             Rand = seed >= 0 ? new Random(seed) : new Random((int)DateTime.Now.Ticks);
-
-            double num3 = 875.35 * ((double)Rand.Next(90, 110) * 0.01);
-
-            double minValue = num3;
 
             int groundLevelMax = Rand.Next(10, 30);
             int groundLevelMin = groundLevelMax + Rand.Next(10, 50);
@@ -88,6 +78,7 @@ namespace MyTerraria
             }
 
             int c = 0;
+            int c2 = 0;
 
             // Ставим плитки на карту
             for (int i = 0; i < WORLD_WIDTH; i++)
@@ -97,6 +88,59 @@ namespace MyTerraria
                 for (int j = arr[i] + 1; j < WORLD_WIDTH; j++)
                     SetTile(TileType.GROUND, i, j + 100);
             }
+
+           /* for (int i = 0; i < WORLD_WIDTH; i++)
+            {
+                for (int j = 0; j < 300; j++)
+                {
+                    int dir = Rand.Next(0, 6) == 1 ? 1 : 0;
+                    if (dir == 1)
+                    {
+                        if (type_Tile[i, j] == "GRASS")
+                        {
+                            c = j;
+                            c2 = i;
+
+                            for (int a = 0; a < Rand.Next(1500, 1600); a++)
+                            {
+                                SetTile(TileType.STONE, c2 + Rand.Next(6, 30),c + Rand.Next(4, 300));
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < WORLD_WIDTH; i++)
+            {
+                for (int j = 0; j < WORLD_HEIGHT; j++)
+                {
+                    int dir = Rand.Next(0, 3) == 1 ? 1 : 0;
+                    if(dir == 1)
+                    {
+                        for (int a = 0; a < Rand.Next(5, 300); a++)
+                        {
+                            SetTile(TileType.STONE, i + Rand.Next(1, 26), j + 300 + Rand.Next(10, 125));
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < WORLD_WIDTH; i++)
+            {
+                for (int j = 0; j < WORLD_HEIGHT; j++)
+                {
+                    int dir = Rand.Next(0, 30) == 1 ? 1 : 0;
+                    if (dir == 1)
+                    {
+                        for (int a = 0; a < Rand.Next(5, 35); a++) 
+                        {
+                            SetTile(TileType.IRONORE, i + Rand.Next(1,6), j + 160 + Rand.Next(1,6));
+                        }
+                    }
+                }
+
+                i += Rand.Next(6,30);
+            }*/
 
             //Генерация деревьев
             for (int i = 0; i < WORLD_WIDTH; i++)
@@ -121,28 +165,11 @@ namespace MyTerraria
                         SetTile(TileType.TREEBRAK, i, -1 - c);
                         SetTile(TileType.TREEBRAK, i, -0 - c);
                         SetTile(TileType.TREEBRAK, i + f, -0 - c);
-                                                        
+
                         SetTile(TileType.TREETOPS, i, -9 - c);
                     }
                 }
             }
-
-            for (int i = 0; i < WORLD_WIDTH; i++)
-            {
-                for (int j = 0; j < WORLD_HEIGHT; j++)
-                {
-                    /*if (num3 > WORLD_HEIGHT)
-                        num3 = WORLD_HEIGHT;
-                    if (num3 < 0)
-                        num3 = 0;*/
-                    SetTile(TileType.STONE, Rand.Next(0, 500), Rand.Next((int)minValue, (int)num3));
-                }
-            }
-
-            
-
-            //Program.Game.Player.StartPosition = new Vector2f((WORLD_WIDTH / 2) * 16, c);
-
         }
 
         public string[,] type_Tile = new string[WORLD_WIDTH * 2, WORLD_HEIGHT * 2];
@@ -227,6 +254,12 @@ namespace MyTerraria
                 else if (type == TileType.DESK)
                 {
                     var item = new ItemTile(this, InfoItem.ItemTreeBrak);
+                    item.Position = tile.Position;
+                    items.Add(item);
+                }
+                else if (type == TileType.IRONORE)
+                {
+                    var item = new ItemTile(this, InfoItem.ItemIronOre);
                     item.Position = tile.Position;
                     items.Add(item);
                 }

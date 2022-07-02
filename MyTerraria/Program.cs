@@ -40,7 +40,9 @@ namespace MyTerraria
 
                 Window.Clear(Color.Cyan);
 
+                Window.Draw(Content.ssBackgroundSky);
                 Game.Draw();
+                
 
                 Window.Display();
             }

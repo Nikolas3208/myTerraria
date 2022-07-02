@@ -12,7 +12,7 @@ namespace MyTerraria
 
         public Texture Texture;
 
-        int borderSize;     // Толщина рамки между фрагментами
+        float borderSize;     // Толщина рамки между фрагментами
 
         /// <summary>
         /// Конструктор
@@ -23,7 +23,7 @@ namespace MyTerraria
         /// <param name="borderSize">Толщина рамки между фрагментами</param>
         /// <param name="texW">Ширина текстуры</param>
         /// <param name="texH">Высота текстуры</param>
-        public SpriteSheet(int a, int b, bool abIsCount, int borderSize, Texture texture, bool isSmooth = true)
+        public SpriteSheet(int a, int b, bool abIsCount, float borderSize, Texture texture, bool isSmooth = false)
         {
             Texture = texture;
             texture.Smooth = isSmooth;
@@ -62,8 +62,8 @@ namespace MyTerraria
         // Получаем фрагмент текстуры по номеру столбца и строки
         public IntRect GetTextureRect(int i, int j)
         {
-            int x = i * SubWidth + i * borderSize;
-            int y = j * SubHeight + j * borderSize;
+            int x = i * SubWidth + i * (int)borderSize;
+            int y = j * SubHeight + j * (int)borderSize;
             return new IntRect(x, y, SubWidth, SubHeight);
         }
     }

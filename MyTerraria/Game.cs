@@ -62,7 +62,7 @@ namespace MyTerraria
             //UIManager.AddControl(new UIWindow());
 
             // Включаем прорисовку объектов для визуальной отладки
-            DebugRender.Enabled = true;
+            DebugRender.Enabled = false;
         }
 
         // Обновление логики игры
