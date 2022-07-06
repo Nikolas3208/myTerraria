@@ -35,6 +35,22 @@ namespace MyTerraria.NPC
 
         public override void UpdateNPC()
         {
+            if (Position.X < 3 * 16)
+            {
+                Direction *= -1;
+                velocity = new Vector2f(-velocity.X * 0.8f, velocity.Y);
+            }
+            if(Position.X > World.WORLD_WIDTH * 16)
+            {
+                Direction *= -1;
+                velocity = new Vector2f(-velocity.X * 0.8f, velocity.Y);
+            }
+
+            if(MathHelper.GetDistance(Program.Game.Player.Position,Position) > 1200)
+            {
+                OnKill();
+            }
+
             if (!isFly)
             {
                 if (waitTimer >= TIME_WAIT_JUMP)

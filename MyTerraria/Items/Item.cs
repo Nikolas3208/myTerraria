@@ -6,6 +6,7 @@ namespace MyTerraria.Items
 {
     abstract class Item : Entity
     {
+        public int a = 1;
         public const float MOVE_DISTANCE_TO_PLAYER = 100f;  // Дистанция начала движения предмета в сторону игрока
         public const float TAKE_DISTANCE_TO_PLAYER = 20f;   // Дистанция подбора предмета игроком
         public const float MOVE_SPEED_COEF = 1f;          // Коэффицент увеличения скорости движения
@@ -33,7 +34,7 @@ namespace MyTerraria.Items
                     // Подбираем предмет (пока просто уничтожаем его)
                     IsDestroyed = true;
 
-                    Program.Game.Player.Invertory.AddItemStack(new UIItemStack(infoItem, 1));
+                    Program.Game.Player.Invertory.AddItemStack(new UIItemStack(infoItem, a));
                 }
                 else
                 {

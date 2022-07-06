@@ -66,14 +66,21 @@ namespace MyTerraria
                     int j = (int)((stepPos.Y + rect.Size.Y) / Tile.TILE_SIZE);
                     Tile tile = world.GetTile(i, j);
                     Tile tile1 = world.GetTile(i, j - 4);
-                    if (i < 0 || i > World.WORLD_WIDTH)
-                        i = 0;
-                    if (j < 0 || j > World.WORLD_HEIGHT)
-                        j = 0;
-
-                    if (Program.Game.World.type_Tile[i, j] != "TREEBRAK" && Program.Game.World.type_Tile[i, j] != "TREETOPS")
+                    if (i < 0)
                     {
-                        if (tile != null)
+                        i = 0;
+                    }
+                    if (j < 0)
+                    {
+                        j = 0;
+                    }
+                    if (j >= World.WORLD_HEIGHT)
+                        j = World.WORLD_HEIGHT - 1;
+
+                    if (i >= World.WORLD_WIDTH)
+                        i = World.WORLD_WIDTH - 1;
+
+                        if (tile != null && Program.Game.World.GetTileType(i, j) != "TREEBRAK" && Program.Game.World.GetTileType(i, j) != "TREETOPS")
                         {
                             FloatRect tileRect = new FloatRect(tile.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
 
@@ -91,20 +98,10 @@ namespace MyTerraria
                         }
                         else
                             isFly = true;
-                    }
 
-                    if (tile1 != null)
+                    if (Program.Game.World.GetTileType(i, j - 4) != "TREEBRAK" && Program.Game.World.GetTileType(i, j - 4) != "TREETOPS"  && velocity.Y < 0 && Program.Game.World.GetTileType(i, j - 4) != "NOME")
                     {
-                        FloatRect tileRect = new FloatRect(tile1.Position - new Vector2f(0, 5), new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
-
-                        DebugRender.AddRectangle(tileRect, Color.Red);
-
-                        if (updateCollision(stepRect, tileRect, DirectionType.Up, ref stepPos))
-                        {
-
-                        }
-                        else if (isGhost1)
-                            isFly = false;
+                        velocity.Y += 10f;
                     }
 
                     if (updateWallCollision(i, j, -1, ref stepPos, stepRect) || updateWallCollision(i, j, 1, ref stepPos, stepRect))
@@ -131,6 +128,7 @@ namespace MyTerraria
                 world.GetTile(i + iOffset, j - 1),
                 world.GetTile(i + iOffset, j - 2),
                 world.GetTile(i + iOffset, j - 3),
+
             };
 
             i1 = i;// + iOffset;
@@ -142,21 +140,9 @@ namespace MyTerraria
                 if (t == null) continue;
 
                 FloatRect tileRect = new FloatRect(t.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
-
-                if (Program.Game.World.type_Tile[i + iOffset, j] == "TREEBRAK")
-                {
-                    isGhost1 = false;
-                }
-                else
-                    isGhost1 = true;
-
-                if (world.GetTile(i + iOffset, j - 1) != null && world.GetTile(i + iOffset, j - 2) == null && velocity.Y >= 0 && velocity.X < 1 && Program.Game.World.type_Tile[i + iOffset, j - 1] != "TREEBRAK" && Program.Game.World.type_Tile[i + iOffset, j - 1] != "TREETOPS")
-                {
-                    //velocity.Y += -10f;
-                }
-
+                
                 DebugRender.AddRectangle(tileRect, Color.Yellow);
-                if (Program.Game.World.type_Tile[i + iOffset,j - 1] != "TREEBRAK" && Program.Game.World.type_Tile[i + iOffset, j - 1] != "TREETOPS")
+                if (Program.Game.World.GetTileType(i + iOffset,j - 4) != "TREEBRAK" && Program.Game.World.GetTileType(i + iOffset, j - 4) != "TREETOPS" && Program.Game.World.GetTileType(i + iOffset, j - 1) != "TREEBRAK" && Program.Game.World.GetTileType(i + iOffset, j - 1) != "TREETOPS")
                 {
                     if (updateCollision(stepRect, tileRect, dirType, ref stepPos))
                     {
@@ -173,7 +159,7 @@ namespace MyTerraria
             if (rectNPC.Intersects(rectTile))
             {
                     if (direction == DirectionType.Up)
-                        pos = new Vector2f(pos.X, rectTile.Top + rectNPC.Height - 1);
+                        pos = new Vector2f(pos.X, rectTile.Top + rectNPC.Height + 4);
                     else if (direction == DirectionType.Down)
                         pos = new Vector2f(pos.X, rectTile.Top - rectNPC.Height + 1);
                     else if (direction == DirectionType.Left)

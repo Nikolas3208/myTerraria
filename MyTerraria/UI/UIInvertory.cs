@@ -10,10 +10,13 @@ namespace MyTerraria.UI
 {
     class UIInvertory : UIWindow
     {
-        public List<UIInvertoryCell> cells = new List<UIInvertoryCell>();
+        public int a { get; set; }
+        public static List<UIInvertoryCell> cells { get; set; }
+        public UIItemStack UIItemStack { get; set; }
 
         public UIInvertory()
         {
+            cells = new List<UIInvertoryCell>();
             IsVisibleTitleBar = false;
             BodyColor = Color.Transparent;
 
@@ -22,17 +25,25 @@ namespace MyTerraria.UI
             for (int i = 0; i < cellCount; i++)
                 AddCell();
 
-            cells[0].IsSelected = true;
+            //cells[a].IsSelected = true;
 
             Size = new Vector2i((int)Content.texUIInvertoryBack.Size.X * cellCount, (int)Content.texUIInvertoryBack.Size.Y);
         }
 
+        public void A()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                cells[i].IsSelected = false;
+            }
+        }
+
         public void AddCell()
         {
-            var cell = new UIInvertoryCell(this);
-            cell.Position = new Vector2i(cells.Count * cell.Width, 0);
-            cells.Add(cell);
-            Childs.Add(cell);
+            var UIInvertoryCell = new UIInvertoryCell(this);
+            UIInvertoryCell.Position = new Vector2i(cells.Count * UIInvertoryCell.Width, 0);
+            cells.Add(UIInvertoryCell);
+            Childs.Add(UIInvertoryCell);
         }
 
         // Возвращает ячейку со свободным местом по информации о предмете
@@ -47,6 +58,8 @@ namespace MyTerraria.UI
 
         public bool AddItemStack(UIItemStack itemStack)
         {
+            UIItemStack = itemStack;
+            
             var cell = GetNotFullCellByInfoItem(itemStack.InfoItem);
 
             if (cell != null)

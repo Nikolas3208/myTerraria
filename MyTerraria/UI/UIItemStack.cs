@@ -10,7 +10,7 @@ namespace MyTerraria.UI
 {
     class UIItemStack : UIBase
     {
-        public int itemCount = 0;
+        public int itemCount { get; set; }
         public int ItemCount
         {
             get { return itemCount; }
@@ -60,6 +60,13 @@ namespace MyTerraria.UI
             ItemCount = count;
         }
 
+        public void ClearUIInvertory()
+        {
+            rectShapeImage.Texture = null;
+            textCount = null;
+            InfoItem = null;
+        }
+
         public override void OnDragBegin()
         {
             if (Parent != null && Parent is UIInvertoryCell)
@@ -73,8 +80,13 @@ namespace MyTerraria.UI
             base.Draw(target, states);
             states.Transform *= Transform;
 
-            target.Draw(rectShapeImage, states);
-            target.Draw(textCount, states);
+            if(rectShapeImage.Texture != null)
+                target.Draw(rectShapeImage, states);
+            if(textCount != null)
+                target.Draw(textCount, states);
+
+            if(itemCount == 0)
+                ClearUIInvertory();
         }
 
         public override void OnDrop(UIBase ui)

@@ -10,6 +10,7 @@ namespace MyTerraria
         public Player Player { get; private set; }  // Игрок
 
         World world;    // Мир
+        Trees trees;
         NpcFastSlime slime; // Слизень
         
         DebagInfo debag;
@@ -18,8 +19,9 @@ namespace MyTerraria
         List<NpcSlime> slimes = new List<NpcSlime>();
 
         public World World { get { return world; } }
+        public Trees Trees { get { return trees; } }
 
-        int c = 0;
+        public int c = 0;
 
         public Game()
         {
@@ -27,17 +29,20 @@ namespace MyTerraria
             world = new World();
             world.GenerateWorld();
 
+            trees = new Trees();
+
             // Создаём игрока
             Player = new Player(world);
+            Player.Invertory = new UIInvertory();
+            UIManager.AddControl(Player.Invertory);
             for (int j = 0; j < World.WORLD_HEIGHT; j++)
             {
-                if (World.type_Tile[World.WORLD_WIDTH / 2, j] == "GRASS")
+                if (World.GetTileType(World.WORLD_WIDTH / 2, j) == "GRASS")
                 {
                     c = -j + 1;
                     Player.StartPosition = new Vector2f(World.WORLD_WIDTH / 2 * 16, (-1 - c) * 16);
                 }
             }
-            //Player.StartPosition = new Vector2f(1500, );
             Player.Spawn();
 
             // Создаём быстрого слизня
@@ -47,18 +52,16 @@ namespace MyTerraria
 
             debag = new DebagInfo();
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 12; i++)
             {
                 var s = new NpcSlime(world);
-                s.StartPosition = new Vector2f(World.Rand.Next(150, 600), 150);
+                s.StartPosition = new Vector2f(Player.Position.X * 16 + World.Rand.Next(-70, 70), c * 16);              
                 s.Direction = World.Rand.Next(0, 2) == 0 ? 1 : -1;
                 s.Spawn();
                 slimes.Add(s);
             }
 
             // Создаём UI
-            Player.Invertory = new UIInvertory();
-            UIManager.AddControl(Player.Invertory);
             //UIManager.AddControl(new UIWindow());
 
             // Включаем прорисовку объектов для визуальной отладки
@@ -69,6 +72,7 @@ namespace MyTerraria
         public void Update()
         {
             world.Update();
+            //trees.Update();
 
             Player.Update();
             slime.Update();

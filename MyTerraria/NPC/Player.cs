@@ -23,6 +23,9 @@ namespace MyTerraria.NPC
         // UI
         public UIInvertory Invertory;
 
+        Thread thread;
+        Thread thread2;
+
         // Спрайты с анимацией
         AnimSprite asHair;         // Волосы
         AnimSprite asHead;         // Голова
@@ -212,36 +215,20 @@ namespace MyTerraria.NPC
             Spawn();
         }
 
-        
+
         TileType type = TileType.GROUND;
         public Vector2i mousePos;
 
         public float a;
+        public float i = 0;
+        public int i4 = 0;
 
         public override void UpdateNPC()
         {
-            updateMovement();
+            thread = new Thread(Program.Game.Trees.Update);
+            thread.Name = "TREES";
 
-            if (block_Type == "GROUND")
-            {
-                type = TileType.GROUND;
-            }
-            if (block_Type == "GRASS")
-            {
-                type = TileType.GRASS;
-            }
-            if (block_Type == "STONE")
-            {
-                type = TileType.STONE;
-            }
-            if (block_Type == "DESK")
-            {
-                type = TileType.DESK;
-            }
-            if (block_Type == "IRONORE")
-            {
-                type = TileType.IRONORE;
-            }
+            updateMovement();
 
 
             mousePos = Mouse.GetPosition(Program.Window);
@@ -255,60 +242,173 @@ namespace MyTerraria.NPC
                 Tile tile1 = world.GetTileByWorldPos(mousePos.X + (Position.X - Program.Window.Size.X), mousePos.Y + (Position.Y - Program.Window.Size.Y) - 1000 * 16);
                 if (Mouse.IsButtonPressed(Mouse.Button.Left))
                 {
-                    int i = (int)(mousePos.X + (Position.X - Program.Window.Size.X / 2)) / Tile.TILE_SIZE;
-                    int j = (int)(mousePos.Y + (Position.Y - Program.Window.Size.Y / 2)) / Tile.TILE_SIZE;
-
-                    if (Program.Game.World.type_Tile[i, j] == "GROUND")
-                    {
-                        world.DelTile(TileType.GROUND, i, j);
-                    }
-                    if (Program.Game.World.type_Tile[i, j] == "GRASS")
-                    {
-                        world.DelTile(TileType.GRASS, i, j);
-                    }
-                    if (Program.Game.World.type_Tile[i, j] == "STONE")
-                    {
-                        world.DelTile(TileType.STONE, i, j);
-                    }
-                    if (Program.Game.World.type_Tile[i, j] == "TREEBRAK")
-                    {
-                        world.DelTile(TileType.TREEBRAK, i, j);
-                    }
-                    if (Program.Game.World.type_Tile[i, j] == "DESK")
-                    {
-                        world.DelTile(TileType.DESK, i, j);
-                    }
-                    if (Program.Game.World.type_Tile[i, j] == "IRONORE")
-                    {
-                        world.DelTile(TileType.IRONORE, i, j);
-                    }
+                    setBlock();
                 }
                 if (tile1 == null)
                 {
-                    if (Mouse.IsButtonPressed(Mouse.Button.Right))
+                    int i = (int)(mousePos.X + (Position.X - Program.Window.Size.X / 2)) / Tile.TILE_SIZE;
+                    int j = (int)(mousePos.Y + (Position.Y - Program.Window.Size.Y / 2)) / Tile.TILE_SIZE;
+
+                    Tile upTile = Program.Game.World.GetTile(i, j - 1);     // Верхний сосед
+                    Tile downTile = Program.Game.World.GetTile(i, j + 1);   // Нижний сосед
+                    Tile leftTile = Program.Game.World.GetTile(i - 1, j);   // Левый сосед
+                    Tile rightTile = Program.Game.World.GetTile(i + 1, j);  // Правый сосед
+
+                    for (int i2 = 0; i2 < 10; i2++)
                     {
-                        int i = (int)(mousePos.X + (Position.X - Program.Window.Size.X / 2)) / Tile.TILE_SIZE;
-                        int j = (int)(mousePos.Y + (Position.Y - Program.Window.Size.Y / 2)) / Tile.TILE_SIZE;
-                        world.SetTile(type, i, j);
+                        if (UIInvertory.cells[i2].IsSelected)
+                            i4 = i2;
+
+                    }
+                    //if (&& (upTile != null || downTile != null || leftTile != null || rightTile != null) && Program.Game.World.GetTileType(i + 1, j) != "TREETOPS" && Program.Game.World.GetTileType(i, j) != "TREEBRAK" && Program.Game.World.GetTileType(i - 1, j) != "TREETOPS" && Program.Game.World.GetTileType(i, j + 1) != "TREETOPS" && Program.Game.World.GetTileType(i, j - 1) != "TREETOPS" && Program.Game.World.GetTileType(i, j + 1) != "TREEBRAK" && Program.Game.World.GetTileType(i, j - 1) != "TREEBRAK" && Program.Game.World.GetTileType(i + 1, j) != "TREEBRAK" && Program.Game.World.GetTileType(i - 1, j) != "TREEBRAK" && Program.Game.World.GetTileType(i, j) == "NOME")
+                    if (UIInvertory.cells != null && UIInvertory.cells[i4].ItemStack != null && UIInvertory.cells[i4].ItemStack.itemCount != 0 && Mouse.IsButtonPressed(Mouse.Button.Right) && (upTile != null || downTile != null || leftTile != null || rightTile != null) && Program.Game.World.GetTileType(i, j) == "NOME" && i != Position.X && j != Position.Y)
+                    {
+                        if (UIInvertory.cells[i4].ItemStack.InfoItem == InfoItem.ItemGround && UIInvertory.cells[i4].ItemStack.itemCount != 0)
+                        {
+                            //if (UIInvertory.cells[i4].ItemStack != null && !UIInvertory.cells[i4].ItemStack.IsFull)
+                                //if (UIInvertory.cells[i4].ItemStack.ItemCount != 0)
+                                    UIInvertory.cells[i4].ItemStack.ItemCount -= 1;
+
+                            world.SetTile(TileType.GROUND, i, j);
+                            //World.ItemTile.a = -1;
+                        }
+                        else if (UIInvertory.cells[i4].ItemStack.InfoItem == InfoItem.ItemGrass && UIInvertory.cells[i4].ItemStack.itemCount != 0)
+                        {
+                            /*if (UIInvertory.cells[i4].ItemStack != null && UIInvertory.cells[i4].ItemStack.InfoItem == Invertory.UIItemStack.InfoItem && !UIInvertory.cells[i4].ItemStack.IsFull)
+                                if (UIInvertory.cells[i4].ItemStack.ItemCount != 0)*/
+                                    UIInvertory.cells[i4].ItemStack.ItemCount -= 1;
+
+                            world.SetTile(TileType.GRASS, i, j);
+                            //World.ItemTile.a = -1;
+                        }
+                        else if (UIInvertory.cells[i4].ItemStack.InfoItem == InfoItem.ItemStone && UIInvertory.cells[i4].ItemStack.itemCount != 0)
+                        {
+                            /*if (UIInvertory.cells[i4].ItemStack != null && UIInvertory.cells[i4].ItemStack.InfoItem == Invertory.UIItemStack.InfoItem && !UIInvertory.cells[i4].ItemStack.IsFull)
+                                if (UIInvertory.cells[i4].ItemStack.ItemCount != 0)*/
+                                    UIInvertory.cells[i4].ItemStack.ItemCount -= 1;
+
+                            world.SetTile(TileType.STONE, i, j);
+                            //World.ItemTile.a = -1;
+                        }
+                        else if (UIInvertory.cells[i4].ItemStack.InfoItem == InfoItem.ItemTreeBrak && UIInvertory.cells[i4].ItemStack.itemCount != 0)
+                        {
+                            /*if (UIInvertory.cells[i4].ItemStack != null && UIInvertory.cells[i4].ItemStack.InfoItem == Invertory.UIItemStack.InfoItem && !UIInvertory.cells[i4].ItemStack.IsFull)
+                                if (UIInvertory.cells[i4].ItemStack.ItemCount != 0)*/
+                                    UIInvertory.cells[i4].ItemStack.ItemCount -= 1;
+
+                            world.SetTile(TileType.DESK, i, j);
+                            //World.ItemTile.a = -1;
+                        }
+                        else if (UIInvertory.cells[i4].ItemStack.InfoItem == InfoItem.ItemIronOre && UIInvertory.cells[i4].ItemStack.itemCount != 0)
+                        {
+                            /*if (UIInvertory.cells[i4].ItemStack != null && UIInvertory.cells[i4].ItemStack.InfoItem == Invertory.UIItemStack.InfoItem && !UIInvertory.cells[i4].ItemStack.IsFull)
+                                if (UIInvertory.cells[i4].ItemStack.ItemCount != 0)*/
+                                    UIInvertory.cells[i4].ItemStack.ItemCount -= 1;
+
+                            world.SetTile(TileType.IRONORE, i, j);
+                            //World.ItemTile.a = -1;
+                        }
+                    }
+                    if (UIInvertory.cells[i4].ItemStack != null && UIInvertory.cells[i4].ItemStack.ItemCount == 0)
+                    {
+                        UIInvertory.cells[i4].ItemStack = null;
+                        Invertory.UIItemStack.ClearUIInvertory();
                     }
                 }
             }
         }
+
+        public void setBlock()
+        {
+            int i = (int)(mousePos.X + (Position.X - Program.Window.Size.X / 2)) / Tile.TILE_SIZE;
+            int j = (int)(mousePos.Y + (Position.Y - Program.Window.Size.Y / 2)) / Tile.TILE_SIZE;
+
+            if (Program.Game.World.GetTileType(i, j) == "GROUND")
+            {
+                world.DelTile(TileType.GROUND, i, j);
+                if (Program.Game.World.GetTileType(i, j - 1) == "TREEBRAK")
+                    thread.Start();
+            }
+            if (Program.Game.World.GetTileType(i, j) == "GRASS")
+            {
+                world.DelTile(TileType.GRASS, i, j);
+                if (Program.Game.World.GetTileType(i, j - 1) == "TREEBRAK")
+                    thread.Start();
+            }
+            if (Program.Game.World.GetTileType(i, j) == "STONE")
+            {
+                world.DelTile(TileType.STONE, i, j);
+            }
+            if (Program.Game.World.GetTileType(i, j) == "TREEBRAK")
+            {
+                world.DelTile(TileType.TREEBRAK, i, j);
+                thread.Start();
+
+            }
+            if (Program.Game.World.GetTileType(i, j) == "DESK")
+            {
+                world.DelTile(TileType.DESK, i, j);
+            }
+            if (Program.Game.World.GetTileType(i, j) == "IRONORE")
+            {
+                world.DelTile(TileType.IRONORE, i, j);
+            }
+        }
+
         bool isJump;
         private void updateMovement()
         {
+            Invertory.A();
+
             Content.ssBackgroundSky.Position = Position;
             Content.ssBackgroundSky.Origin = new Vector2f(Content.ssTextureBackgroundSky.Size.X / 2, Content.ssTextureBackgroundSky.Size.Y / 2);
             Content.ssBackgroundSky.Scale = new Vector2f(120, 1);
-            
+
+            Content.ssBackgroundMountains.Position = new Vector2f(Position.X, Program.Game.World.BackgroundMin);
+            Content.ssBackgroundMountains.Origin = new Vector2f(Content.ssTextureBackgroundMountains.Size.X / 2, Content.ssTextureBackgroundMountains.Size.Y / 2);
+            Content.ssBackgroundMountains.Scale = new Vector2f(2, 1.3f);
+
 
             bool isMoveLeft = Keyboard.IsKeyPressed(Keyboard.Key.A);
             bool isMoveRight = Keyboard.IsKeyPressed(Keyboard.Key.D);
+            bool isInventory = Keyboard.IsKeyPressed(Keyboard.Key.Escape);
+
             if(!isFly)
                 isJump = Keyboard.IsKeyPressed(Keyboard.Key.Space);
             
             bool isMove = isMoveLeft || isMoveRight;
 
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Num1))
+                i = 0;
+
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Num2))
+                i = 1;
+
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Num3))
+                i = 2;
+
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Num4))
+                i = 3;
+
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Num5))
+                i = 4;
+
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Num6))
+                i = 5;
+
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Num7))
+                i = 6;
+
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Num8))
+                i = 7;
+
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Num9))
+                i = 8;
+
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Num0))
+                i = 9;
+
+            UIInvertory.cells[(int)i].IsSelected = true;
             // Прыжок
             if (isJump && !isFly && velocity.Y >= 0)
             {

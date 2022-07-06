@@ -23,7 +23,7 @@ namespace MyTerraria.UI
             }
         }
 
-        UIItemStack itemStack;
+        public UIItemStack itemStack;// = new UIItemStack(InfoItem.ItemGround,1);
         public UIItemStack ItemStack
         {
             get { return itemStack; }
@@ -53,13 +53,18 @@ namespace MyTerraria.UI
             rectShape = new RectangleShape((Vector2f)Content.texUIInvertoryBack.Size);
             rectShape.Texture = Content.texUIInvertoryBack;
 
-            IsSelected = false;
+            IsSelected = false; 
         }
 
         public override void OnDrop(UIBase ui)
         {
             if (ui is UIItemStack)
                 ItemStack = ui as UIItemStack;
+        }
+
+        internal void DeleteItem(InfoItem infoItem)
+        {
+            
         }
     }
 }

@@ -15,7 +15,7 @@
         public int SpriteI { get; private set; }
         public int SpriteJ { get; private set; }
         // Максимальное кол-во предметов в стеке
-        public int MaxCountInStack { get; internal set; } = 64;
+        public int MaxCountInStack { get; internal set; } = 99;
 
         public InfoItem SetSprite(SpriteSheet ss, int i, int j)
         {

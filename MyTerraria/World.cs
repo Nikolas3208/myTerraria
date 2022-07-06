@@ -8,14 +8,24 @@ namespace MyTerraria
 {
     class World : Transformable, Drawable
     {
+        public string[,] block_type = new string[WORLD_WIDTH, WORLD_HEIGHT];
+
         // Кол-во плиток по ширине и высоте
-        public const int WORLD_WIDTH = 500;
-        public const int WORLD_HEIGHT = 500;
+        public const int WORLD_WIDTH = 1000;
+        public const int WORLD_HEIGHT = 1000;
+
+        public int BackgroundMin = 0;
 
         public static Random Rand { private set; get; }
 
+        public static ItemTile ItemTile { private set; get; }
+
+        public static Perlin2D Perlin2D { private set; get; }
+
         // Плитки
         Tile[,] tiles;
+        Tile tile;
+        List<Tile> tilesList = new List<Tile>();
 
         // Предметы
         List<Item> items = new List<Item>();
@@ -23,22 +33,31 @@ namespace MyTerraria
         // Конструктор класса
         public World()
         {
-            tiles = new Tile[WORLD_WIDTH * 2, WORLD_HEIGHT * 2];
+            Perlin2D = new Perlin2D();
+            tiles = new Tile[WORLD_WIDTH, WORLD_HEIGHT];
         }
 
-        // Генерируем новый мир
-        public void GenerateWorld(int seed = -1)
+        private void GenerateTerrain(int seed = -1)
         {
             Rand = seed >= 0 ? new Random(seed) : new Random((int)DateTime.Now.Ticks);
 
-            int groundLevelMax = Rand.Next(10, 30);
-            int groundLevelMin = groundLevelMax + Rand.Next(10, 50);
+            int groundLevelMax = Rand.Next(1, 10);
+            int groundLevelMin = groundLevelMax + Rand.Next(100, 500);
+            BackgroundMin = groundLevelMin;
+
+            for (int i = 0; i < WORLD_WIDTH; i++)
+            {
+                for (int j = 0; j < WORLD_HEIGHT; j++)
+                {
+                    block_type[i, j] = "NOME";
+                }
+            }
 
             // Генерация уровня ландшафта
             int[] arr = new int[WORLD_WIDTH];
             for (int i = 0; i < WORLD_WIDTH; i++)
             {
-                int dir = Rand.Next(0, 2) == 1 ? 1 : -1;
+                int dir = Rand.Next(0, 2) == 1 ? 2 : -2;
 
                 if (i > 0)
                 {
@@ -56,7 +75,7 @@ namespace MyTerraria
             {
                 float sum = arr[i];
                 int count = 1;
-                for (int k = 1; k <= 5; k++)
+                for (int k = 1; k <= 15; k++)
                 {
                     int i1 = i - k;
                     int i2 = i + k;
@@ -77,105 +96,72 @@ namespace MyTerraria
                 arr[i] = (int)(sum / count);
             }
 
-            int c = 0;
-            int c2 = 0;
-
             // Ставим плитки на карту
             for (int i = 0; i < WORLD_WIDTH; i++)
             {
-                SetTile(TileType.GRASS, i, arr[i] + 100);
+                SetTile(TileType.GRASS, i, arr[i]);
 
-                for (int j = arr[i] + 1; j < WORLD_WIDTH; j++)
-                    SetTile(TileType.GROUND, i, j + 100);
-            }
-
-           /* for (int i = 0; i < WORLD_WIDTH; i++)
-            {
-                for (int j = 0; j < 300; j++)
-                {
-                    int dir = Rand.Next(0, 6) == 1 ? 1 : 0;
-                    if (dir == 1)
-                    {
-                        if (type_Tile[i, j] == "GRASS")
-                        {
-                            c = j;
-                            c2 = i;
-
-                            for (int a = 0; a < Rand.Next(1500, 1600); a++)
-                            {
-                                SetTile(TileType.STONE, c2 + Rand.Next(6, 30),c + Rand.Next(4, 300));
-                            }
-                        }
-                    }
-                }
+                for (int j = arr[i] + 1; j < groundLevelMin; j++)
+                    SetTile(TileType.GROUND, i, j);
             }
 
             for (int i = 0; i < WORLD_WIDTH; i++)
             {
-                for (int j = 0; j < WORLD_HEIGHT; j++)
+                for (int j = groundLevelMin; j < WORLD_HEIGHT; j++)
                 {
-                    int dir = Rand.Next(0, 3) == 1 ? 1 : 0;
-                    if(dir == 1)
+                    float v = Perlin2D.Noise((i + seed) * 0.05f, (j + seed) * 0.05f);
+                    if (v < 0.003)
                     {
-                        for (int a = 0; a < Rand.Next(5, 300); a++)
-                        {
-                            SetTile(TileType.STONE, i + Rand.Next(1, 26), j + 300 + Rand.Next(10, 125));
-                        }
+                        SetTile(TileType.GROUND, i, j);
                     }
-                }
-            }
-
-            for (int i = 0; i < WORLD_WIDTH; i++)
-            {
-                for (int j = 0; j < WORLD_HEIGHT; j++)
-                {
-                    int dir = Rand.Next(0, 30) == 1 ? 1 : 0;
-                    if (dir == 1)
+                    if (GetTile(i, j) == null)
                     {
-                        for (int a = 0; a < Rand.Next(5, 35); a++) 
-                        {
-                            SetTile(TileType.IRONORE, i + Rand.Next(1,6), j + 160 + Rand.Next(1,6));
-                        }
+                        v = Perlin2D.Noise((i + seed) * 0.5f, (j + seed) * 0.5f);
+
+                        if (v < 0.0003)
+                            SetTile(TileType.STONE, i, j);
+
+                        if(Rand.Next(0,6) == 1)
+                            SetTile(TileType.STONE, i, j);
                     }
-                }
-
-                i += Rand.Next(6,30);
-            }*/
-
-            //Генерация деревьев
-            for (int i = 0; i < WORLD_WIDTH; i++)
-            {
-                i += Rand.Next(4, 10);
-                int f1 = Rand.Next(5, 9);
-                for (int j = 0; j < WORLD_HEIGHT; j++)
-                {
-                    if (type_Tile[i, j] == "GRASS")
+                    if (GetTile(i, j) == null)
                     {
-                        c = -j + 1;
-                        int f = Rand.Next(-1, 1);
-
-                        SetTile(TileType.TREEBRAK, i, -9 - c);
-                        SetTile(TileType.TREEBRAK, i, -8 - c);
-                        SetTile(TileType.TREEBRAK, i, -7 - c);
-                        SetTile(TileType.TREEBRAK, i, -6 - c);
-                        SetTile(TileType.TREEBRAK, i, -5 - c);
-                        SetTile(TileType.TREEBRAK, i, -4 - c);
-                        SetTile(TileType.TREEBRAK, i, -3 - c);
-                        SetTile(TileType.TREEBRAK, i, -2 - c);
-                        SetTile(TileType.TREEBRAK, i, -1 - c);
-                        SetTile(TileType.TREEBRAK, i, -0 - c);
-                        SetTile(TileType.TREEBRAK, i + f, -0 - c);
-
-                        SetTile(TileType.TREETOPS, i, -9 - c);
+                        SetTile(TileType.IRONORE, i, j);
                     }
                 }
             }
         }
 
-        public string[,] type_Tile = new string[WORLD_WIDTH * 2, WORLD_HEIGHT * 2];
+        public void GenerateTrees()
+        {
+            for (int x = 0; x < WORLD_WIDTH; x++)
+            {
+                for (int y = 0; y < WORLD_HEIGHT; y++)
+                {
+                    if (GetTileType(x, y) == "GRASS")
+                    {
+                        int a = 0;
+                        for (int i = 1; i < Rand.Next(8, 28); i++)
+                        {
+                            SetTile(TileType.TREEBRAK, x, y - i);
+                            a = i;
+                        }
+                        SetTile(TileType.TREETOPS, x, y - a++);
+                    }
+                }
+                x += Rand.Next(3, 20);
+            }
+        }
 
+        // Генерируем новый мир
+        public void GenerateWorld()
+        {
+            GenerateTerrain();
 
-        public TileType tile1;
+            GenerateTrees();
+        }
+
+        //public string[,] type_Tile;
 
         // Установить плитку
         public void SetTile(TileType type, int i, int j)
@@ -188,21 +174,26 @@ namespace MyTerraria
             {
                 j = 0;
             }
+            if (j >= WORLD_HEIGHT)
+                j = WORLD_HEIGHT - 1;
+
+            if(i >= WORLD_WIDTH)
+                i = WORLD_WIDTH -1;
+
             // Находим соседей
             Tile upTile = GetTile(i, j - 1);     // Верхний сосед
             Tile downTile = GetTile(i, j + 1);   // Нижний сосед
             Tile leftTile = GetTile(i - 1, j);   // Левый сосед
             Tile rightTile = GetTile(i + 1, j);  // Правый сосед
 
-            var tile = new Tile(type, upTile, downTile, leftTile, rightTile);
+            tile = new Tile(type, upTile, downTile, leftTile, rightTile);
 
             if (type != TileType.NONE)
             {
                 tile.Position = new Vector2f(i * Tile.TILE_SIZE, j * Tile.TILE_SIZE) + Position;
                 tiles[i, j] = tile;
-                type_Tile[i, j] = type.ToString();
+                block_type[i, j] = type.ToString();
             }
-            tile1 = type;
         }
 
 
@@ -216,6 +207,11 @@ namespace MyTerraria
             {
                 j = 0;
             }
+            if (j >= WORLD_HEIGHT)
+                j = WORLD_HEIGHT - 1;
+
+            if (i >= WORLD_WIDTH)
+                i = WORLD_WIDTH - 1;
 
             // Находим соседей
             Tile upTile = GetTile(i, j - 1);     // Верхний сосед
@@ -223,51 +219,76 @@ namespace MyTerraria
             Tile leftTile = GetTile(i - 1, j);   // Левый сосед
             Tile rightTile = GetTile(i + 1, j);  // Правый сосед
 
-            var tile = tiles[i, j];
+            tile = tiles[i, j];
 
             if (tile != null)
             {
-                if (type == TileType.GROUND)
+                if (type == TileType.GROUND && GetTileType(i,j) == "GROUND")
                 {
-                    var item = new ItemTile(this, InfoItem.ItemGround);
-                    item.Position = tile.Position;
-                    items.Add(item);
+                    var itemTile = new ItemTile(this, InfoItem.ItemGround);
+                    itemTile.a = 1;
+                    itemTile.Position = tile.Position;
+                    items.Add(itemTile);
+
+                    tiles[i, j] = null;
+                    block_type[i, j] = "NOME";
                 }
-                else if (type == TileType.GRASS)
+                else if (type == TileType.GRASS && GetTileType(i, j) == "GRASS")
                 {
-                    var item = new ItemTile(this, InfoItem.ItemGrass);
-                    item.Position = tile.Position;
-                    items.Add(item);
+                    var itemTile = new ItemTile(this, InfoItem.ItemGrass);
+                    itemTile.Position = tile.Position;
+                    items.Add(itemTile);
+
+                    tiles[i, j] = null;
+                    block_type[i, j] = "NOME";
                 }
-                else if (type == TileType.STONE)
+                else if (type == TileType.STONE && GetTileType(i, j) == "STONE")
                 {
-                    var item = new ItemTile(this, InfoItem.ItemStone);
-                    item.Position = tile.Position;
-                    items.Add(item);
+                    ItemTile = new ItemTile(this, InfoItem.ItemStone);
+                    ItemTile.Position = tile.Position;
+                    items.Add(ItemTile);
+
+                    tiles[i, j] = null;
+                    block_type[i, j] = "NOME";
                 }
-                else if (type == TileType.TREEBRAK)
+                else if (type == TileType.TREEBRAK && GetTileType(i, j) == "TREEBRAK")
                 {
-                    var item = new ItemTile(this, InfoItem.ItemTreeBrak);
-                    item.Position = tile.Position;
-                    items.Add(item);
+                    ItemTile = new ItemTile(this, InfoItem.ItemTreeBrak);
+                    ItemTile.Position = tile.Position;
+                    items.Add(ItemTile);
+
+                    tiles[i, j] = null;
+                    block_type[i, j] = "NOME";
                 }
-                else if (type == TileType.DESK)
+                else if (type == TileType.TREETOPS && GetTileType(i, j) == "TREETOPS")
                 {
-                    var item = new ItemTile(this, InfoItem.ItemTreeBrak);
-                    item.Position = tile.Position;
-                    items.Add(item);
+                    ItemTile = new ItemTile(this, InfoItem.ItemTreeBrak);
+                    ItemTile.Position = tile.Position;
+                    items.Add(ItemTile);
+
+                    tiles[i, j] = null;
+                    block_type[i, j] = "NOME";
                 }
-                else if (type == TileType.IRONORE)
+                else if (type == TileType.DESK && GetTileType(i, j) == "DESK")
                 {
-                    var item = new ItemTile(this, InfoItem.ItemIronOre);
-                    item.Position = tile.Position;
-                    items.Add(item);
+                    ItemTile = new ItemTile(this, InfoItem.ItemTreeBrak);
+                    ItemTile.Position = tile.Position;
+                    items.Add(ItemTile);
+
+                    tiles[i, j] = null;
+                    block_type[i, j] = "NOME";
+                }
+                else if (type == TileType.IRONORE && GetTileType(i, j) == "IRONORE")
+                {
+                    ItemTile = new ItemTile(this, InfoItem.ItemIronOre);
+                    ItemTile.Position = tile.Position;
+                    items.Add(ItemTile);
+
+                    tiles[i, j] = null;
+                    block_type[i, j] = "NOME";
                 }
             }
             
-
-            tiles[i, j] = null;
-
             // Присваиваем соседей, а соседям эту плитку
             if (upTile != null) upTile.DownTile = null;
             if (downTile != null) downTile.UpTile = null;
@@ -301,6 +322,16 @@ namespace MyTerraria
             }
             else
                 return null;
+        }
+
+        public string GetTileType(int i, int j)
+        {
+            if (i >= 0 && j >= 0 && i < WORLD_WIDTH && j < WORLD_HEIGHT)
+            {
+                return block_type[i, j];
+            }
+            else
+                return "NULL";
         }
 
         // Обновить мир

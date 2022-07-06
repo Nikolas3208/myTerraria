@@ -2,14 +2,19 @@
 using SFML.System;
 using SFML.Window; 
 using System;
+using System.Threading;
 
 namespace MyTerraria
 {
     class Program
     {
         public static RenderWindow Window { private set; get; }
+
+        public static Lighting Lighting { private set; get; }
         public static Game Game { private set; get; }
         public static float Delta { private set; get; }
+
+        public static float FPS { private set; get; }
 
         static void Main(string[] args)
         {
@@ -21,16 +26,21 @@ namespace MyTerraria
             Window.Resized += Win_Resized;
             Window.KeyPressed += Win_KeyPressed;
 
+            float lastTime = 0;
+
             // Загрузка контента
             Content.Load();
-            
+
             Game = new Game();      // Создаём новый объект класса игры
             Clock clock = new Clock();
+            Lighting = new Lighting();
 
             //Основной цикл программы
             while (Window.IsOpen)
             {
                 Delta = clock.Restart().AsSeconds();
+                FPS = 1 / (Delta);
+                lastTime = Delta;
 
                 Window.DispatchEvents();
                 
@@ -41,6 +51,7 @@ namespace MyTerraria
                 Window.Clear(Color.Cyan);
 
                 Window.Draw(Content.ssBackgroundSky);
+                //Window.Draw(Content.ssBackgroundMountains);
                 Game.Draw();
                 
 
@@ -61,24 +72,7 @@ namespace MyTerraria
 
         private static void Win_KeyPressed(object sender, KeyEventArgs e)
         {
-            View view;
 
-            switch (e.Code)
-            {
-
-                case Keyboard.Key.Num1:
-                    Game.Player.block_Type = "GROUND";
-                    break;
-                case Keyboard.Key.Num2:
-                    Game.Player.block_Type = "GRASS";
-                    break;
-                case Keyboard.Key.Num3:
-                    Game.Player.block_Type = "STONE";
-                    break;
-                case Keyboard.Key.Num4:
-                    Game.Player.block_Type = "DESK";
-                    break;
-            }
         }
 
         private static void Win_Resized(object sender, SFML.Window.SizeEventArgs e)
