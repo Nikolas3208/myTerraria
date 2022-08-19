@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MyTerraria
 {
-    internal class Trees
+    public class Trees
     {
         Tile downTile;
         //int i = 0;
@@ -22,7 +22,7 @@ namespace MyTerraria
                 {
                     for (int j = 0; j < Program.Game.World.BackgroundMin; j++)
                     {
-                        if (Program.Game.World.GetTileType(i, j) == "TREEBRAK")
+                        if (Program.Game.World.GetTile(i, j) != null && Program.Game.World.GetTile(i, j).type == TileType.TREEBRAK)
                         {
                             downTile = Program.Game.World.GetTile(i, j + 1);
                             if (downTile == null)
@@ -30,7 +30,7 @@ namespace MyTerraria
                                 Program.Game.World.DelTile(TileType.TREEBRAK, i, j);
                             }
                         }
-                        if (Program.Game.World.GetTileType(i, j) == "TREETOPS")
+                        if (Program.Game.World.GetTile(i, j) != null && Program.Game.World.GetTile(i, j).type == TileType.TREETOPS)
                         {
                             downTile = Program.Game.World.GetTile(i, j + 1);
                             if (downTile == null)

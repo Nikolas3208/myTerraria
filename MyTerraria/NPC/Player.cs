@@ -261,7 +261,7 @@ namespace MyTerraria.NPC
 
                     }
                     //if (&& (upTile != null || downTile != null || leftTile != null || rightTile != null) && Program.Game.World.GetTileType(i + 1, j) != "TREETOPS" && Program.Game.World.GetTileType(i, j) != "TREEBRAK" && Program.Game.World.GetTileType(i - 1, j) != "TREETOPS" && Program.Game.World.GetTileType(i, j + 1) != "TREETOPS" && Program.Game.World.GetTileType(i, j - 1) != "TREETOPS" && Program.Game.World.GetTileType(i, j + 1) != "TREEBRAK" && Program.Game.World.GetTileType(i, j - 1) != "TREEBRAK" && Program.Game.World.GetTileType(i + 1, j) != "TREEBRAK" && Program.Game.World.GetTileType(i - 1, j) != "TREEBRAK" && Program.Game.World.GetTileType(i, j) == "NOME")
-                    if (UIInvertory.cells != null && UIInvertory.cells[i4].ItemStack != null && UIInvertory.cells[i4].ItemStack.itemCount != 0 && Mouse.IsButtonPressed(Mouse.Button.Right) && (upTile != null || downTile != null || leftTile != null || rightTile != null) && Program.Game.World.GetTileType(i, j) == "NOME" && i != Position.X && j != Position.Y)
+                    if ((Program.Game.World.GetTile(i, j) == null || (Program.Game.World.GetTile(i, j) != null && Program.Game.World.GetTile(i, j).type == TileType.NONE)) && UIInvertory.cells != null && UIInvertory.cells[i4].ItemStack != null && UIInvertory.cells[i4].ItemStack.itemCount != 0 && Mouse.IsButtonPressed(Mouse.Button.Right) && ((upTile != null && upTile.type != TileType.NONE) || (downTile != null && downTile.type != TileType.NONE) || (leftTile != null && leftTile.type != TileType.NONE) || (rightTile != null && rightTile.type != TileType.NONE)) && i != Position.X && j != Position.Y)
                     {
                         if (UIInvertory.cells[i4].ItemStack.InfoItem == InfoItem.ItemGround && UIInvertory.cells[i4].ItemStack.itemCount != 0)
                         {
@@ -322,36 +322,44 @@ namespace MyTerraria.NPC
         {
             int i = (int)(mousePos.X + (Position.X - Program.Window.Size.X / 2)) / Tile.TILE_SIZE;
             int j = (int)(mousePos.Y + (Position.Y - Program.Window.Size.Y / 2)) / Tile.TILE_SIZE;
-
-            if (Program.Game.World.GetTileType(i, j) == "GROUND")
+            if (Program.Game.World.GetTile(i, j) != null && Program.Game.World.GetTile(i, j).type != TileType.NONE)
             {
-                world.DelTile(TileType.GROUND, i, j);
-                if (Program.Game.World.GetTileType(i, j - 1) == "TREEBRAK")
+                if (Program.Game.World.GetTile(i, j).type == TileType.GROUND)
+                {
+                    world.DelTile(TileType.GROUND, i, j);
+                    //if (Program.Game.World.GetTile(i, j).type == TileType.TREEBRAK)
+                    //    thread.Start();
+                }
+                else if (Program.Game.World.GetTile(i, j).type == TileType.GRASS)
+                {
+                    if (Program.Game.World.tiles[i, j - 1] != null)
+                    {
+                        if (Program.Game.World.tiles[i, j - 1].type != TileType.TREEBRAK)
+                            world.DelTile(TileType.GRASS, i, j);
+                    }
+                    else
+                        world.DelTile(TileType.GRASS, i, j);
+                    //if (Program.Game.World.tiles[i, j - 1].type == TileType.TREEBRAK)
+                    //    thread.Start();
+                }
+                else if (Program.Game.World.GetTile(i, j).type == TileType.STONE)
+                {
+                    world.DelTile(TileType.STONE, i, j);
+                }
+                else if (Program.Game.World.GetTile(i, j).type == TileType.TREEBRAK)
+                {
+                    world.DelTile(TileType.TREEBRAK, i, j);
                     thread.Start();
-            }
-            if (Program.Game.World.GetTileType(i, j) == "GRASS")
-            {
-                world.DelTile(TileType.GRASS, i, j);
-                if (Program.Game.World.GetTileType(i, j - 1) == "TREEBRAK")
-                    thread.Start();
-            }
-            if (Program.Game.World.GetTileType(i, j) == "STONE")
-            {
-                world.DelTile(TileType.STONE, i, j);
-            }
-            if (Program.Game.World.GetTileType(i, j) == "TREEBRAK")
-            {
-                world.DelTile(TileType.TREEBRAK, i, j);
-                thread.Start();
 
-            }
-            if (Program.Game.World.GetTileType(i, j) == "DESK")
-            {
-                world.DelTile(TileType.DESK, i, j);
-            }
-            if (Program.Game.World.GetTileType(i, j) == "IRONORE")
-            {
-                world.DelTile(TileType.IRONORE, i, j);
+                }
+                else if (Program.Game.World.GetTile(i, j).type == TileType.DESK)
+                {
+                    world.DelTile(TileType.DESK, i, j);
+                }
+                else if (Program.Game.World.GetTile(i, j).type == TileType.IRONORE)
+                {
+                    world.DelTile(TileType.IRONORE, i, j);
+                }
             }
         }
 
@@ -364,9 +372,9 @@ namespace MyTerraria.NPC
             Content.ssBackgroundSky.Origin = new Vector2f(Content.ssTextureBackgroundSky.Size.X / 2, Content.ssTextureBackgroundSky.Size.Y / 2);
             Content.ssBackgroundSky.Scale = new Vector2f(120, 1);
 
-            Content.ssBackgroundMountains.Position = new Vector2f(Position.X, Program.Game.World.BackgroundMin);
-            Content.ssBackgroundMountains.Origin = new Vector2f(Content.ssTextureBackgroundMountains.Size.X / 2, Content.ssTextureBackgroundMountains.Size.Y / 2);
-            Content.ssBackgroundMountains.Scale = new Vector2f(2, 1.3f);
+            Content.ssBackgroundMountains.Position = new Vector2f(Position.X, Position.Y - Program.Window.Size.Y / 2);
+            Content.ssBackgroundMountains.Origin = new Vector2f(Content.ssTextureBackgroundMountains.Size.X / 2, -Content.ssTextureBackgroundMountains.Size.Y + 10 * 16);
+            Content.ssBackgroundMountains.Scale = new Vector2f(2.5f, 1.6f);
 
 
             bool isMoveLeft = Keyboard.IsKeyPressed(Keyboard.Key.A);

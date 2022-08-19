@@ -37,7 +37,7 @@ namespace MyTerraria
             UIManager.AddControl(Player.Invertory);
             for (int j = 0; j < World.WORLD_HEIGHT; j++)
             {
-                if (World.GetTileType(World.WORLD_WIDTH / 2, j) == "GRASS")
+                if (World.GetTile(World.WORLD_WIDTH / 2, j) != null && World.GetTile(World.WORLD_WIDTH / 2, j).type == TileType.GRASS)
                 {
                     c = -j + 1;
                     Player.StartPosition = new Vector2f(World.WORLD_WIDTH / 2 * 16, (-1 - c) * 16);

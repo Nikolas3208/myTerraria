@@ -8,11 +8,14 @@ namespace MyTerraria
 {
     class World : Transformable, Drawable
     {
-        public string[,] block_type = new string[WORLD_WIDTH, WORLD_HEIGHT];
-
         // Кол-во плиток по ширине и высоте
-        public const int WORLD_WIDTH = 1000;
-        public const int WORLD_HEIGHT = 1000;
+        public const int WORLD_WIDTH = 500;
+        public const int WORLD_HEIGHT = 500;
+
+        /*public Tile upTile = GetTile(i, j - 1);     // Верхний сосед
+        public Tile downTile = GetTile(i, j + 1);   // Нижний сосед
+        public Tile leftTile = GetTile(i - 1, j);   // Левый сосед
+        public Tile rightTile = GetTile(i + 1, j);  // Правый сосед*/
 
         public int BackgroundMin = 0;
 
@@ -23,7 +26,7 @@ namespace MyTerraria
         public static Perlin2D Perlin2D { private set; get; }
 
         // Плитки
-        Tile[,] tiles;
+        public Tile[,] tiles;
         Tile tile;
         List<Tile> tilesList = new List<Tile>();
 
@@ -49,7 +52,7 @@ namespace MyTerraria
             {
                 for (int j = 0; j < WORLD_HEIGHT; j++)
                 {
-                    block_type[i, j] = "NOME";
+                    tiles[i, j] = new Tile(TileType.NONE, null, null, null, null);
                 }
             }
 
@@ -114,7 +117,7 @@ namespace MyTerraria
                     {
                         SetTile(TileType.GROUND, i, j);
                     }
-                    if (GetTile(i, j) == null)
+                    if (GetTile(i, j).type == TileType.NONE)
                     {
                         v = Perlin2D.Noise((i + seed) * 0.5f, (j + seed) * 0.5f);
 
@@ -124,7 +127,7 @@ namespace MyTerraria
                         if(Rand.Next(0,6) == 1)
                             SetTile(TileType.STONE, i, j);
                     }
-                    if (GetTile(i, j) == null)
+                    if (GetTile(i, j).type == TileType.NONE)
                     {
                         SetTile(TileType.IRONORE, i, j);
                     }
@@ -138,7 +141,7 @@ namespace MyTerraria
             {
                 for (int y = 0; y < WORLD_HEIGHT; y++)
                 {
-                    if (GetTileType(x, y) == "GRASS")
+                    if (GetTile(x, y) != null && GetTile(x, y).type == TileType.GRASS)
                     {
                         int a = 0;
                         for (int i = 1; i < Rand.Next(8, 28); i++)
@@ -181,18 +184,21 @@ namespace MyTerraria
                 i = WORLD_WIDTH -1;
 
             // Находим соседей
-            Tile upTile = GetTile(i, j - 1);     // Верхний сосед
-            Tile downTile = GetTile(i, j + 1);   // Нижний сосед
-            Tile leftTile = GetTile(i - 1, j);   // Левый сосед
-            Tile rightTile = GetTile(i + 1, j);  // Правый сосед
+            Tile upTile = GetTile(i, j - 1);     // верхний сосед
+            Tile downTile = GetTile(i, j + 1);   // нижний сосед
+            Tile leftTile = GetTile(i - 1, j);   // левый сосед
+            Tile rightTile = GetTile(i + 1, j);  // правый сосед
 
             tile = new Tile(type, upTile, downTile, leftTile, rightTile);
 
             if (type != TileType.NONE)
             {
                 tile.Position = new Vector2f(i * Tile.TILE_SIZE, j * Tile.TILE_SIZE) + Position;
+                /*tile.upTile = upTile;
+                tile.downTile = downTile;
+                tile.leftTile = leftTile;
+                tile.rightTile = rightTile;*/
                 tiles[i, j] = tile;
-                block_type[i, j] = type.ToString();
             }
         }
 
@@ -223,69 +229,69 @@ namespace MyTerraria
 
             if (tile != null)
             {
-                if (type == TileType.GROUND && GetTileType(i,j) == "GROUND")
+                if (type == TileType.GROUND)
                 {
                     var itemTile = new ItemTile(this, InfoItem.ItemGround);
                     itemTile.a = 1;
                     itemTile.Position = tile.Position;
                     items.Add(itemTile);
 
+                    tiles[i, j].type = TileType.NONE;
                     tiles[i, j] = null;
-                    block_type[i, j] = "NOME";
                 }
-                else if (type == TileType.GRASS && GetTileType(i, j) == "GRASS")
+                else if (type == TileType.GRASS)
                 {
                     var itemTile = new ItemTile(this, InfoItem.ItemGrass);
                     itemTile.Position = tile.Position;
                     items.Add(itemTile);
 
+                    tiles[i, j].type = TileType.NONE;
                     tiles[i, j] = null;
-                    block_type[i, j] = "NOME";
                 }
-                else if (type == TileType.STONE && GetTileType(i, j) == "STONE")
+                else if (type == TileType.STONE)
                 {
                     ItemTile = new ItemTile(this, InfoItem.ItemStone);
                     ItemTile.Position = tile.Position;
                     items.Add(ItemTile);
 
+                    tiles[i, j].type = TileType.NONE;
                     tiles[i, j] = null;
-                    block_type[i, j] = "NOME";
                 }
-                else if (type == TileType.TREEBRAK && GetTileType(i, j) == "TREEBRAK")
+                else if (type == TileType.TREEBRAK)
                 {
                     ItemTile = new ItemTile(this, InfoItem.ItemTreeBrak);
                     ItemTile.Position = tile.Position;
                     items.Add(ItemTile);
 
+                    tiles[i, j].type = TileType.NONE;
                     tiles[i, j] = null;
-                    block_type[i, j] = "NOME";
                 }
-                else if (type == TileType.TREETOPS && GetTileType(i, j) == "TREETOPS")
+                else if (type == TileType.TREETOPS)
                 {
                     ItemTile = new ItemTile(this, InfoItem.ItemTreeBrak);
                     ItemTile.Position = tile.Position;
                     items.Add(ItemTile);
 
+                    tiles[i, j].type = TileType.NONE;
                     tiles[i, j] = null;
-                    block_type[i, j] = "NOME";
                 }
-                else if (type == TileType.DESK && GetTileType(i, j) == "DESK")
+                else if (type == TileType.DESK)
                 {
                     ItemTile = new ItemTile(this, InfoItem.ItemTreeBrak);
                     ItemTile.Position = tile.Position;
                     items.Add(ItemTile);
 
+                    tiles[i, j].type = TileType.NONE;
                     tiles[i, j] = null;
-                    block_type[i, j] = "NOME";
                 }
-                else if (type == TileType.IRONORE && GetTileType(i, j) == "IRONORE")
+                else if (type == TileType.IRONORE)
                 {
                     ItemTile = new ItemTile(this, InfoItem.ItemIronOre);
                     ItemTile.Position = tile.Position;
                     items.Add(ItemTile);
 
+                    tiles[i, j].type = TileType.NONE;
                     tiles[i, j] = null;
-                    block_type[i, j] = "NOME";
                 }
             }
             
@@ -322,16 +328,6 @@ namespace MyTerraria
             }
             else
                 return null;
-        }
-
-        public string GetTileType(int i, int j)
-        {
-            if (i >= 0 && j >= 0 && i < WORLD_WIDTH && j < WORLD_HEIGHT)
-            {
-                return block_type[i, j];
-            }
-            else
-                return "NULL";
         }
 
         // Обновить мир

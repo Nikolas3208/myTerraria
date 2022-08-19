@@ -24,14 +24,14 @@ namespace MyTerraria
 
         public SpriteSheet SpriteSheet { get; set; }    // Набор спрайтов плитки
 
-        TileType type = TileType.GROUND;    // Тип плитки
+        public TileType type = TileType.GROUND;    // Тип плитки
         RectangleShape rectShape;           // Прямоугольная форма плитки
 
         // Соседи
-        Tile upTile = null;     // Верхний сосед
-        Tile downTile = null;   // Нижний сосед
-        Tile leftTile = null;   // Левый сосед
-        Tile rightTile = null;  // Правый сосед
+        public Tile upTile = null;     // Верхний сосед
+        public Tile downTile = null;   // Нижний сосед
+        public Tile leftTile = null;   // Левый сосед
+        public Tile rightTile = null;  // Правый сосед
 
         // Верхний сосед
         public Tile UpTile
@@ -120,6 +120,9 @@ namespace MyTerraria
 
             switch (type)
             {
+                case TileType.NONE:
+                    rectShape.Texture = null;
+                    break;
                 case TileType.GROUND:
                     SpriteSheet = Content.ssTileGround;    // Почва
                     break;
@@ -143,7 +146,8 @@ namespace MyTerraria
                     break;
             }
 
-            rectShape.Texture = SpriteSheet.Texture;
+            if(type != TileType.NONE)
+                rectShape.Texture = SpriteSheet.Texture;
 
             // Обновляем внешний вид плитки в зависимости от соседей
             UpdateView();
@@ -289,7 +293,7 @@ namespace MyTerraria
                     else if (upTile == null && downTile != null && leftTile != null && rightTile != null)
                     {
                         int i = World.Rand.Next(0, 3); // Случайное число от 0 до 2
-                        rectShape.TextureRect = SpriteSheet.GetTextureRect(1 + i, 0);
+                        rectShape.TextureRect = SpriteSheet.GetTextureRect(1, 0);
                     }
                     // Если у плитки отсутствует только нижний сосед
                     else if (upTile != null && downTile == null && leftTile != null && rightTile != null)

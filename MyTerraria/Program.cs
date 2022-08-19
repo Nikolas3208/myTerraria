@@ -51,7 +51,7 @@ namespace MyTerraria
                 Window.Clear(Color.Cyan);
 
                 Window.Draw(Content.ssBackgroundSky);
-                //Window.Draw(Content.ssBackgroundMountains);
+                Window.Draw(Content.ssBackgroundMountains);
                 Game.Draw();
                 
 

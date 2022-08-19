@@ -80,7 +80,7 @@ namespace MyTerraria
                     if (i >= World.WORLD_WIDTH)
                         i = World.WORLD_WIDTH - 1;
 
-                        if (tile != null && Program.Game.World.GetTileType(i, j) != "TREEBRAK" && Program.Game.World.GetTileType(i, j) != "TREETOPS")
+                        if (tile != null && Program.Game.World.GetTile(i, j).type != TileType.TREEBRAK && Program.Game.World.GetTile(i, j).type != TileType.TREETOPS)
                         {
                             FloatRect tileRect = new FloatRect(tile.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
 
@@ -99,7 +99,7 @@ namespace MyTerraria
                         else
                             isFly = true;
 
-                    if (Program.Game.World.GetTileType(i, j - 4) != "TREEBRAK" && Program.Game.World.GetTileType(i, j - 4) != "TREETOPS"  && velocity.Y < 0 && Program.Game.World.GetTileType(i, j - 4) != "NOME")
+                    if (Program.Game.World.GetTile(i, j - 3) != null && Program.Game.World.GetTile(i, j - 3) != null && Program.Game.World.GetTile(i, j - 3).type != TileType.TREEBRAK && Program.Game.World.GetTile(i, j - 3).type != TileType.TREETOPS && velocity.Y < 0 && Program.Game.World.GetTile(i, j - 3).type != TileType.NONE)
                     {
                         velocity.Y += 10f;
                     }
@@ -131,9 +131,6 @@ namespace MyTerraria
 
             };
 
-            i1 = i;// + iOffset;
-            j1 = j;
-
             bool isWallCollided = false;
             foreach (Tile t in walls)
             {
@@ -142,7 +139,8 @@ namespace MyTerraria
                 FloatRect tileRect = new FloatRect(t.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
                 
                 DebugRender.AddRectangle(tileRect, Color.Yellow);
-                if (Program.Game.World.GetTileType(i + iOffset,j - 4) != "TREEBRAK" && Program.Game.World.GetTileType(i + iOffset, j - 4) != "TREETOPS" && Program.Game.World.GetTileType(i + iOffset, j - 1) != "TREEBRAK" && Program.Game.World.GetTileType(i + iOffset, j - 1) != "TREETOPS")
+                //if (Program.Game.World.GetTile(a, b) != null && Program.Game.World.GetTile(i + iOffset, j - 1) != null && Program.Game.World.GetTile(a, b).type != TileType.TREEBRAK && Program.Game.World.GetTile(i + iOffset, j - 4).type != TileType.TREETOPS && Program.Game.World.GetTile(i + iOffset, j - 1).type != TileType.TREEBRAK && Program.Game.World.GetTile(i + iOffset, j - 1).type != TileType.TREETOPS)
+                if ((Program.Game.World.GetTile(i + iOffset, j - 3) != null && Program.Game.World.GetTile(i + iOffset, j - 3).type != TileType.TREEBRAK && Program.Game.World.GetTile(i + iOffset, j - 3).type != TileType.NONE) || (Program.Game.World.GetTile(i + iOffset, j - 2) != null && Program.Game.World.GetTile(i + iOffset, j - 2).type != TileType.TREEBRAK && Program.Game.World.GetTile(i + iOffset, j - 2).type != TileType.NONE) || (Program.Game.World.GetTile(i + iOffset, j - 1) != null && Program.Game.World.GetTile(i + iOffset, j - 1).type != TileType.TREEBRAK && Program.Game.World.GetTile(i + iOffset, j - 1).type != TileType.NONE))
                 {
                     if (updateCollision(stepRect, tileRect, dirType, ref stepPos))
                     {
@@ -159,7 +157,7 @@ namespace MyTerraria
             if (rectNPC.Intersects(rectTile))
             {
                     if (direction == DirectionType.Up)
-                        pos = new Vector2f(pos.X, rectTile.Top + rectNPC.Height + 4);
+                        pos = new Vector2f(pos.X, rectTile.Top + rectNPC.Height + 1);
                     else if (direction == DirectionType.Down)
                         pos = new Vector2f(pos.X, rectTile.Top - rectNPC.Height + 1);
                     else if (direction == DirectionType.Left)
