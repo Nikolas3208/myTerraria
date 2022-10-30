@@ -1,4 +1,5 @@
-﻿using MyTerraria.NPC;
+﻿using MyTerraria.Items;
+using MyTerraria.NPC;
 using MyTerraria.UI;
 using SFML.System;
 using System.Collections.Generic;
@@ -35,7 +36,7 @@ namespace MyTerraria
             Player = new Player(world);
             Player.Invertory = new UIInvertory();
             UIManager.AddControl(Player.Invertory);
-            for (int j = 0; j < World.WORLD_HEIGHT; j++)
+            for (int j = World.WORLD_HEIGHT; j > 0; j--)
             {
                 if (World.GetTile(World.WORLD_WIDTH / 2, j) != null && World.GetTile(World.WORLD_WIDTH / 2, j).type == TileType.GRASS)
                 {
@@ -44,6 +45,21 @@ namespace MyTerraria
                 }
             }
             Player.Spawn();
+            var itemTile = new ItemTile(World, InfoItem.ItemSword);
+            itemTile.Position = Player.Position;
+            World.items.Add(itemTile);
+            itemTile = new ItemTile(World, InfoItem.ItemPick);
+            itemTile.Position = Player.Position;
+            World.items.Add(itemTile);
+            itemTile = new ItemTile(World, InfoItem.ItemAxe);
+            itemTile.Position = Player.Position;
+            World.items.Add(itemTile);
+            for (int i = 0; i < 99; i++)
+            {
+                itemTile = new ItemTile(World, InfoItem.ItemGround);
+                itemTile.Position = Player.Position;
+                World.items.Add(itemTile);
+            }
 
             // Создаём быстрого слизня
             slime = new NpcFastSlime(world);
@@ -55,7 +71,7 @@ namespace MyTerraria
             for (int i = 0; i < 12; i++)
             {
                 var s = new NpcSlime(world);
-                s.StartPosition = new Vector2f(Player.Position.X * 16 + World.Rand.Next(-70, 70), c * 16);              
+                s.StartPosition = new Vector2f(Player.Position.X, Player.Position.Y);              
                 s.Direction = World.Rand.Next(0, 2) == 0 ? 1 : -1;
                 s.Spawn();
                 slimes.Add(s);

@@ -26,7 +26,7 @@ namespace MyTerraria
             Window.Resized += Win_Resized;
             Window.KeyPressed += Win_KeyPressed;
 
-            float lastTime = 0;
+            float lastTime = 1;
 
             // Загрузка контента
             Content.Load();
@@ -43,7 +43,7 @@ namespace MyTerraria
                 lastTime = Delta;
 
                 Window.DispatchEvents();
-                
+
                 Game.Update();
 
                 CenterScreen();
@@ -51,28 +51,76 @@ namespace MyTerraria
                 Window.Clear(Color.Cyan);
 
                 Window.Draw(Content.ssBackgroundSky);
-                Window.Draw(Content.ssBackgroundMountains);
+
                 Game.Draw();
-                
+                //Content.bacgroundMusic.Play();
 
                 Window.Display();
             }
         }
-        public static Vector2f pos = new Vector2f();
+        public static Vector2f pos2;
+        public static float scrol = 1;
+
+        static bool a = true;
 
         private static void CenterScreen()
         {
             //Позиция игрока
-            var pos = Game.Player.Position;
+            //var pos = Game.Player.Position;
+            Vector2f pos;
+            if (pos2 == null)
+                pos2 = Game.Player.Position;
+            if (a)
+            {
+                pos = pos2;
+            }
+            else
+            {
+                pos = Game.Player.Position;
+                pos2 = Game.Player.Position;
+            }
             //Получаем цент относительно персонажа
             var newPos = (pos.X - Window.Size.X / 2, pos.Y - Window.Size.Y / 2);
+
+            View view = new View(new FloatRect(newPos.Item1, newPos.Item2, Window.Size.X, Window.Size.Y));
+            view.Zoom(scrol);
+
             //Установка центра
-            Window.SetView(new View(new FloatRect(newPos.Item1, newPos.Item2, Window.Size.X, Window.Size.Y)));
+            //if (pos.X <= World.WORLD_WIDTH * 16 - Window.Size.X / 2) 
+                Window.SetView(view);
         }
 
         private static void Win_KeyPressed(object sender, KeyEventArgs e)
         {
-
+            switch (e.Code)
+            {
+                case Keyboard.Key.Up:
+                    pos2.Y -= 1000 * Delta;
+                    break;
+                case Keyboard.Key.Down:
+                    pos2.Y += 1000 * Delta;
+                    break;
+                case Keyboard.Key.Left:
+                    pos2.X += 1000 * Delta;
+                    break;
+                case Keyboard.Key.Right:
+                    pos2.X -= 1000 * Delta;
+                    break;
+                case Keyboard.Key.E:
+                    scrol++;
+                    break;
+                case Keyboard.Key.Q:
+                    scrol--;
+                    break;
+                case Keyboard.Key.C:
+                    if (a)
+                    {
+                        a = false;
+                    }
+                    else
+                        a = true;
+                    break;
+            }
         }
 
         private static void Win_Resized(object sender, SFML.Window.SizeEventArgs e)

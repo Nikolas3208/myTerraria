@@ -10,6 +10,10 @@ namespace MyTerraria.NPC
         SpriteSheet spriteSheet;
         float waitTimer = 0f;
 
+        public static float health { get; set; } = 10;
+
+
+
         public NpcSlime(World world) : base(world)
         {
             spriteSheet = Content.ssNpcSlime;
@@ -24,6 +28,8 @@ namespace MyTerraria.NPC
 
         public override void OnKill()
         {
+            health = 10;
+            StartPosition = Program.Game.Player.Position;
             Spawn();
         }
 
@@ -68,6 +74,9 @@ namespace MyTerraria.NPC
             }
             else
                 rect.TextureRect = spriteSheet.GetTextureRect(0, 1);
+
+            if (health <= 0)
+                OnKill();
         }
 
         public override void DrawNPC(RenderTarget target, RenderStates states)

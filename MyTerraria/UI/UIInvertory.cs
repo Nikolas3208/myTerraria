@@ -30,7 +30,7 @@ namespace MyTerraria.UI
             Size = new Vector2i((int)Content.texUIInvertoryBack.Size.X * cellCount, (int)Content.texUIInvertoryBack.Size.Y);
         }
 
-        public void A()
+        public void ResetSelected()
         {
             for (int i = 0; i < 10; i++)
             {

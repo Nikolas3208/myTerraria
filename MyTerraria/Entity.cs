@@ -80,24 +80,24 @@ namespace MyTerraria
                     if (i >= World.WORLD_WIDTH)
                         i = World.WORLD_WIDTH - 1;
 
-                        if (tile != null && Program.Game.World.GetTile(i, j).type != TileType.TREEBRAK && Program.Game.World.GetTile(i, j).type != TileType.TREETOPS)
+                    if (tile != null && Program.Game.World.GetTile(i, j).type != TileType.TREEBRAK && Program.Game.World.GetTile(i, j).type != TileType.TREETOPS && Program.Game.World.GetTile(i, j).type != TileType.VEGETATION)
+                    {
+                        FloatRect tileRect = new FloatRect(tile.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
+
+                        DebugRender.AddRectangle(tileRect, Color.Red);
+
+                        if (updateCollision(stepRect, tileRect, DirectionType.Down, ref stepPos))
                         {
-                            FloatRect tileRect = new FloatRect(tile.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
+                            velocity.Y = 0;
+                            isFly = false;
 
-                            DebugRender.AddRectangle(tileRect, Color.Red);
-
-                            if (updateCollision(stepRect, tileRect, DirectionType.Down, ref stepPos))
-                            {
-                                velocity.Y = 0;
-                                isFly = false;
-
-                                isBreakStep = false;
-                            }
-                            else
-                                isFly = true;
+                            isBreakStep = false;
                         }
                         else
                             isFly = true;
+                    }
+                    else
+                        isFly = true;
 
                     if (Program.Game.World.GetTile(i, j - 3) != null && Program.Game.World.GetTile(i, j - 3) != null && Program.Game.World.GetTile(i, j - 3).type != TileType.TREEBRAK && Program.Game.World.GetTile(i, j - 3).type != TileType.TREETOPS && velocity.Y < 0 && Program.Game.World.GetTile(i, j - 3).type != TileType.NONE)
                     {
@@ -117,7 +117,9 @@ namespace MyTerraria
                 Position = stepPos + rect.Origin;
             }
             else
+            {
                 Position += velocity + movement;
+            }
         }
 
         bool updateWallCollision(int i, int j, int iOffset, ref Vector2f stepPos, FloatRect stepRect)
@@ -140,11 +142,14 @@ namespace MyTerraria
                 
                 DebugRender.AddRectangle(tileRect, Color.Yellow);
                 //if (Program.Game.World.GetTile(a, b) != null && Program.Game.World.GetTile(i + iOffset, j - 1) != null && Program.Game.World.GetTile(a, b).type != TileType.TREEBRAK && Program.Game.World.GetTile(i + iOffset, j - 4).type != TileType.TREETOPS && Program.Game.World.GetTile(i + iOffset, j - 1).type != TileType.TREEBRAK && Program.Game.World.GetTile(i + iOffset, j - 1).type != TileType.TREETOPS)
-                if ((Program.Game.World.GetTile(i + iOffset, j - 3) != null && Program.Game.World.GetTile(i + iOffset, j - 3).type != TileType.TREEBRAK && Program.Game.World.GetTile(i + iOffset, j - 3).type != TileType.NONE) || (Program.Game.World.GetTile(i + iOffset, j - 2) != null && Program.Game.World.GetTile(i + iOffset, j - 2).type != TileType.TREEBRAK && Program.Game.World.GetTile(i + iOffset, j - 2).type != TileType.NONE) || (Program.Game.World.GetTile(i + iOffset, j - 1) != null && Program.Game.World.GetTile(i + iOffset, j - 1).type != TileType.TREEBRAK && Program.Game.World.GetTile(i + iOffset, j - 1).type != TileType.NONE))
+                if ((t != null && t.type != TileType.TREEBRAK && t.type != TileType.TREETOPS && t.type != TileType.NONE) || (t != null && t.type != TileType.TREEBRAK && t.type != TileType.TREETOPS && t.type != TileType.NONE))
                 {
-                    if (updateCollision(stepRect, tileRect, dirType, ref stepPos))
+                    if ((t != null && t.type != TileType.VEGETATION && t.type != TileType.NONE))
                     {
-                        isWallCollided = true;
+                        if (updateCollision(stepRect, tileRect, dirType, ref stepPos))
+                        {
+                            isWallCollided = true;
+                        }
                     }
                 }
             }

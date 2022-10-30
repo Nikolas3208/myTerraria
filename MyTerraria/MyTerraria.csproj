@@ -83,6 +83,7 @@
     <Compile Include="Tile.cs" />
     <Compile Include="Trees.cs" />
     <Compile Include="UI\UIBase.cs" />
+    <Compile Include="UI\UIHealth.cs" />
     <Compile Include="UI\UIInvertory.cs" />
     <Compile Include="UI\UIInvertoryCell.cs" />
     <Compile Include="UI\UIItemStack.cs" />

@@ -29,11 +29,12 @@ namespace MyTerraria
             if (Program.Game.World.GetTile(i, j) != null)
             {
                 text.DisplayedString = "Player: " + "X: " + (Program.Game.Player.Position.X / 16).ToString() + "Y: " + (Program.Game.Player.Position.Y / 16).ToString() + "\n" +
-                                       "Mouse: " + "X: " + (Program.Game.Player.mousePos.X / 16).ToString() + "Y: " + (Program.Game.Player.mousePos.Y / 16).ToString() + "\n" +
+                                       "Mouse: " + "X: " + (i).ToString() + "Y: " + (j).ToString() + "\n" +
                                        "Block Type: " + (Program.Game.Player.block_Type).ToString() + "\n" +
-                                       "Path to mouse " + (Program.Game.Player.a) + "\n" +
+                                       "Path to mouse " + (Program.Game.Player.DistanceToMouse) + "\n" +
                                        //"Block: " + Program.Game.World.GetTile(i, j).type + "\n" +
-                                       "FPS: " + Program.FPS.ToString();
+                                       "FPS: " + Program.FPS.ToString() + "\n" +
+                                       "BlocHealth: " + Program.Game.World.GetTile(i, j).HealthTile;
             }
 
             text.Draw(target, states);
