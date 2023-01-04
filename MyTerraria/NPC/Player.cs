@@ -6,9 +6,17 @@ using SFML.Window;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace MyTerraria.NPC
 {
+    public enum AnimType
+    {
+        Idle,
+        Run,
+        Jump,
+        Tool
+    }
     class Player : Npc
     {
         //Максимальная скорость
@@ -62,8 +70,11 @@ namespace MyTerraria.NPC
             asHair.Position = new Vector2f(0, 19);
             asHair.Color = HairColor;
             asHair.AddAnimation("idle", new Animation(
-                new AnimationFrame(0, 0, 0.1f)
-            ));
+                new AnimationFrame(0, 0, 0.1f)));
+            asHair.AddAnimation("tool", new Animation(
+                new AnimationFrame(0, 0, 1f)));
+            asHair.AddAnimation("jump", new Animation(
+                new AnimationFrame(0, 5, 0.1f)));
             asHair.AddAnimation("run", new Animation(
                 new AnimationFrame(0, 0, 0.1f),
                 new AnimationFrame(0, 1, 0.1f),
@@ -86,8 +97,11 @@ namespace MyTerraria.NPC
             asHead.Position = new Vector2f(0, 19);
             asHead.Color = BodyColor;
             asHead.AddAnimation("idle", new Animation(
-                new AnimationFrame(0, 0, 0.1f)
-            ));
+                new AnimationFrame(0, 0, 0.1f)));
+            asHead.AddAnimation("tool", new Animation(
+                new AnimationFrame(0, 0, 1f)));
+            asHead.AddAnimation("jump", new Animation(
+                new AnimationFrame(0, 5, 0.1f)));
             asHead.AddAnimation("run", new Animation(
                 new AnimationFrame(0, 6, 0.1f),
                 new AnimationFrame(0, 7, 0.1f),
@@ -110,8 +124,15 @@ namespace MyTerraria.NPC
             asShirt.Position = new Vector2f(0, 19);
             asShirt.Color = ShirtColor;
             asShirt.AddAnimation("idle", new Animation(
-                new AnimationFrame(0, 0, 0.1f)
-            ));
+                new AnimationFrame(0, 0, 0.1f)));
+            asShirt.AddAnimation("tool", new Animation(
+                new AnimationFrame(0, 0, 0.5f),
+                new AnimationFrame(0, 1, 0.5f),
+                new AnimationFrame(0, 2, 0.5f),
+                new AnimationFrame(0, 3, 0.5f),
+                new AnimationFrame(0, 4, 0.5f)));
+            asShirt.AddAnimation("jump", new Animation(
+                new AnimationFrame(0, 5, 0.1f)));
             asShirt.AddAnimation("run", new Animation(
                 new AnimationFrame(0, 6, 0.1f),
                 new AnimationFrame(0, 7, 0.1f),
@@ -133,8 +154,15 @@ namespace MyTerraria.NPC
             asUndershirt = new AnimSprite(Content.ssPlayerUndershirt);
             asUndershirt.Position = new Vector2f(0, 19);
             asUndershirt.AddAnimation("idle", new Animation(
-                new AnimationFrame(0, 0, 1f)
-            ));
+                new AnimationFrame(0, 0, 1f)));
+            asUndershirt.AddAnimation("tool", new Animation(
+                new AnimationFrame(0, 0, 0.5f),
+                new AnimationFrame(0, 1, 0.5f),
+                new AnimationFrame(0, 2, 0.5f),
+                new AnimationFrame(0, 3, 0.5f),
+                new AnimationFrame(0, 4, 0.5f)));
+            asUndershirt.AddAnimation("jump", new Animation(
+                new AnimationFrame(0, 5, 0.1f)));
             asUndershirt.AddAnimation("run", new Animation(
                 new AnimationFrame(0, 6, 0.1f),
                 new AnimationFrame(0, 7, 0.1f),
@@ -157,8 +185,15 @@ namespace MyTerraria.NPC
             asHands.Position = new Vector2f(0, 19);
             asHands.Color = BodyColor;
             asHands.AddAnimation("idle", new Animation(
-                new AnimationFrame(0, 0, 0.1f)
-            ));
+                new AnimationFrame(0, 0, 0.1f)));
+            asHands.AddAnimation("tool", new Animation(
+                new AnimationFrame(0, 0, 0.5f),
+                new AnimationFrame(0, 1, 0.5f),
+                new AnimationFrame(0, 2, 0.5f),
+                new AnimationFrame(0, 3, 0.5f),
+                new AnimationFrame(0, 4, 0.5f)));
+            asHands.AddAnimation("jump", new Animation(
+                new AnimationFrame(0, 5, 0.1f)));
             asHands.AddAnimation("run", new Animation(
                 new AnimationFrame(0, 6, 0.1f),
                 new AnimationFrame(0, 7, 0.1f),
@@ -180,8 +215,11 @@ namespace MyTerraria.NPC
             asLegs.Color = LegsColor;
             asLegs.Position = new Vector2f(0, 19);
             asLegs.AddAnimation("idle", new Animation(
-                new AnimationFrame(0, 0, 0.1f)
-            ));
+                new AnimationFrame(0, 0, 0.1f)));
+            asLegs.AddAnimation("tool", new Animation(
+                new AnimationFrame(0, 0, 0.1f)));
+            asLegs.AddAnimation("jump", new Animation(
+                new AnimationFrame(0, 5, 0.1f)));
             asLegs.AddAnimation("run", new Animation(
                 new AnimationFrame(0, 6, 0.1f),
                 new AnimationFrame(0, 7, 0.1f),
@@ -203,8 +241,11 @@ namespace MyTerraria.NPC
             asShoes = new AnimSprite(Content.ssPlayerShoes);
             asShoes.Position = new Vector2f(0, 19);
             asShoes.AddAnimation("idle", new Animation(
-                new AnimationFrame(0, 0, 1f)
-            ));
+                new AnimationFrame(0, 0, 1f)));
+            asShoes.AddAnimation("tool", new Animation(
+                new AnimationFrame(0, 0, 1f)));
+            asShoes.AddAnimation("jump", new Animation(
+                new AnimationFrame(0, 5, 1f)));
             asShoes.AddAnimation("run", new Animation(
                 new AnimationFrame(0, 6, 0.1f),
                 new AnimationFrame(0, 7, 0.1f),
@@ -288,10 +329,12 @@ namespace MyTerraria.NPC
                         if (InfoItemType.Tooltype == ToolType.Pick && tile.type != TileType.TREEBARK && tile.type != TileType.TREETOPS)
                         {
                             world.SetTile(tile.type, mousePos.X / 16, mousePos.Y / 16, true);
+                            AnimationUpdate(AnimType.Tool);
                         }
                         else if(InfoItemType.Tooltype == ToolType.Axe && tile.type == TileType.TREEBARK || tile.type == TileType.TREETOPS)
                         {
                             world.TreeFelling(mousePos.X / 16, mousePos.Y / 16);
+                            AnimationUpdate(AnimType.Tool);
                         }
                     }
                     else
@@ -301,37 +344,59 @@ namespace MyTerraria.NPC
                         Tile leftTile = Program.Game.World.GetTile(mousePos.X / 16 - 1, mousePos.Y / 16);   // Левый сосед
                         Tile rightTile = Program.Game.World.GetTile(mousePos.X / 16 + 1, mousePos.Y / 16);  // Правый сосед
 
-                        if (InfoItemType.Tiletype != TileType.NONE && (upTile != null || downTile != null || leftTile != null || rightTile != null))
+                        if (InfoItemType.Tooltype == ToolType.None && InfoItemType.Weapontype == WeaponType.None && (upTile != null || downTile != null || leftTile != null || rightTile != null))
                         {
                             world.SetTile(InfoItemType.Tiletype, mousePos.X / 16, mousePos.Y / 16, false);
                             UIInvertory.cells[uiIsSelected].ItemStack.ItemCount--;
+
+                            AnimationUpdate(AnimType.Tool);
                         }
                     }
                 }   
             }
         }
 
-        public void AnimationUpdate(string Animname)
+        public void AnimationUpdate(AnimType type)
         {
-            if(Animname == "run")
+            if(type == AnimType.Run)
             {
-                asHair.Play(Animname);
-                asHead.Play(Animname);
-                asShirt.Play(Animname);
-                asUndershirt.Play(Animname);
-                asHands.Play(Animname);
-                asLegs.Play(Animname);
-                asShoes.Play(Animname);
+                asHair.Play("run");
+                asHead.Play("run");
+                asShirt.Play("run");
+                asUndershirt.Play("run");
+                asHands.Play("run");
+                asLegs.Play("run");
+                asShoes.Play("run");
             }
-            else if(Animname == "idle")
+            else if(type == AnimType.Idle)
             {
-                asHair.Play(Animname);
-                asHead.Play(Animname);
-                asShirt.Play(Animname);
-                asUndershirt.Play(Animname);
-                asHands.Play(Animname);
-                asLegs.Play(Animname);
-                asShoes.Play(Animname);
+                asHair.Play("idle");
+                asHead.Play("idle");
+                asShirt.Play("idle");
+                asUndershirt.Play("idle");
+                asHands.Play("idle");
+                asLegs.Play("idle");
+                asShoes.Play("idle");
+            }
+            else if(type == AnimType.Jump)
+            {
+                asHair.Play("jump");
+                asHead.Play("jump");
+                asShirt.Play("jump");
+                asUndershirt.Play("jump");
+                asHands.Play("jump");
+                asLegs.Play("jump");
+                asShoes.Play("jump");
+            }
+            else if(type == AnimType.Tool)
+            {
+                asHair.Play("tool");
+                asHead.Play("tool");
+                asShirt.Play("tool");
+                asUndershirt.Play("tool");
+                asHands.Play("tool");
+                asLegs.Play("tool");
+                asShoes.Play("tool");
             }
         }
 
@@ -350,15 +415,7 @@ namespace MyTerraria.NPC
             if (!isFly)
                 isJump = Keyboard.IsKeyPressed(Keyboard.Key.Space);
 
-            bool isMove = isMoveLeft || isMoveRight;
-
-            // Прыжок
-            if (isJump && !isFly && timerA == 0)
-            {
-                //velocity.Y += -10f;
-            }
-
-            
+            bool isMove = isMoveLeft || isMoveRight;            
 
             int jump = 0;
             float jumpSpeed = 10.01f;
@@ -368,6 +425,8 @@ namespace MyTerraria.NPC
 
             if (isJump && timerA == 0)
             {
+                AnimationUpdate(AnimType.Jump);
+
                 if (jump > 0)
                 {
                     if (velocity.Y > (-jumpSpeed + (gravity * 2f)))
@@ -427,15 +486,22 @@ namespace MyTerraria.NPC
                 else if (movement.X < -PLAYER_MOVE_SPEED)
                     movement.X = -PLAYER_MOVE_SPEED;
 
-                // Анимация
-                AnimationUpdate("run");
+                // Анимация ходьбы
+                AnimationUpdate(AnimType.Run);
             }
             else
             {
                 movement = new Vector2f();
 
-                // Анимация
-                AnimationUpdate("idle");
+                // Анимация спокойствия
+                if (!isFly && !Mouse.IsButtonPressed(Mouse.Button.Left))
+                    AnimationUpdate(AnimType.Idle);
+
+                if(velocity.Y < 0)
+                    AnimationUpdate(AnimType.Jump);
+
+                if(Mouse.IsButtonPressed(Mouse.Button.Left))
+                    AnimationUpdate(AnimType.Tool);
             }
         }
 
@@ -452,7 +518,7 @@ namespace MyTerraria.NPC
 
         public override void OnWallCollided()
         {
-            velocity.X = 0;
+            //velocity.X = 0;
         }
 
         public void AddTools()
