@@ -4,9 +4,9 @@ using SFML.System;
 
 namespace MyTerraria.Items
 {
-    abstract class Item : Entity
+    public abstract class Item : Entity
     {
-        public int a = 1;
+        public int Count = 1; //Количество подбираемых предметов
         public const float MOVE_DISTANCE_TO_PLAYER = 100f;  // Дистанция начала движения предмета в сторону игрока
         public const float TAKE_DISTANCE_TO_PLAYER = 20f;   // Дистанция подбора предмета игроком
         public const float MOVE_SPEED_COEF = 1f;          // Коэффицент увеличения скорости движения
@@ -31,10 +31,9 @@ namespace MyTerraria.Items
             {
                 if (dist < TAKE_DISTANCE_TO_PLAYER)
                 {
-                    // Подбираем предмет (пока просто уничтожаем его)
-                    IsDestroyed = true;
+                    Program.Game.Player.Invertory.AddItemStack(new UIItemStack(infoItem, 1));
 
-                    Program.Game.Player.Invertory.AddItemStack(new UIItemStack(infoItem, a));
+                    IsDestroyed = true;
                 }
                 else
                 {

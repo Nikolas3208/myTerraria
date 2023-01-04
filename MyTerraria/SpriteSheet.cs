@@ -3,7 +3,7 @@ using System;
 
 namespace MyTerraria
 {
-    class SpriteSheet
+    public class SpriteSheet
     {
         public int SubWidth { get; private set; }
         public int SubHeight { get; private set; }

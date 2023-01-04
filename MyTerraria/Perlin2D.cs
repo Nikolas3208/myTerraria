@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace MyTerraria
 {
-    class Perlin2D
+    public class Perlin2D
     {
         byte[] permutationTable;
 
         public Perlin2D(int seed = -1)
         {
-            Random rand = seed == 1 ? new Random(seed) : new Random(DateTime.Now.Millisecond);
+            Random rand = seed == 1 ? new Random(seed) : new Random((int)DateTime.Now.Ticks);
             permutationTable = new byte[1024];
             rand.NextBytes(permutationTable);
         }
@@ -78,7 +78,7 @@ namespace MyTerraria
             return tb;
         }
 
-        public float Noise(float fx, float fy, int octaves, float persistence = 0.5f)
+        public float Noise(float fx, float fy, int octaves, float persistence = 2.5f)
         {
             float amplitude = 1;
             float max = 0;

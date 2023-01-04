@@ -42,7 +42,6 @@ namespace MyTerraria.UI
         public UIItemStack(InfoItem infoItem, int count)
         {
             InfoItem = infoItem;
-            IsAllowDrag = true;
 
             var rectSize = (Vector2f)Content.texUIInvertoryBack.Size;
             rectShape = new RectangleShape(rectSize);

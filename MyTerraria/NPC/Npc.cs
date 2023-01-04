@@ -1,9 +1,10 @@
 ﻿using SFML.Graphics;
 using SFML.System;
+using System.Threading.Tasks;
 
 namespace MyTerraria.NPC
 {
-    abstract class Npc : Entity
+    public abstract class Npc : Entity
     {
         public Vector2f StartPosition;
         public Vector2f vector;
@@ -40,13 +41,24 @@ namespace MyTerraria.NPC
             base.Update();
 
             // Если игрок упал в пропасть, то возрождаем его
-            if (Position.Y > 700 * 16)
+            if (Position.Y > World.WORLD_HEIGHT * 16)
                 OnKill();
 
-            var vec = vector.X += 5;
+            if (Position.X < 4 * 16)
+            {
+                Direction *= -1;
+                velocity = new Vector2f(-velocity.X * 0.8f, velocity.Y);
+            }
+            if (Position.X > World.WORLD_WIDTH * 16)
+            {
+                Direction *= -1;
+                velocity = new Vector2f(-velocity.X * 0.8f, velocity.Y);
+            }
 
-            View viev = new View();
-            viev.Move(new Vector2f(vec,6));
+            if (MathHelper.GetDistance(Program.Game.Player.Position, Position) > 1200)
+            {
+                OnKill();
+            }
         }
 
         public override void Draw(RenderTarget target, RenderStates states)

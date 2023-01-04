@@ -35,7 +35,7 @@ namespace MyTerraria.UI
             if (IsVisibleTitleBar)
             {
                 var localMousePos = mousePos - GlobalPosition + GlobalOrigin;
-                IsAllowDrag = UIManager.Drag == this || rectShapeTitleBar.GetLocalBounds().Contains(localMousePos.X, localMousePos.Y);
+                //IsAllowDrag = UIManager.Drag == this || rectShapeTitleBar.GetLocalBounds().Contains(localMousePos.X, localMousePos.Y);
             }
         }
 

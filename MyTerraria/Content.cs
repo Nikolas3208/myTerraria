@@ -1,5 +1,6 @@
 ﻿using SFML.Graphics;
 using SFML.Audio;
+using System.Collections.Generic;
 
 namespace MyTerraria
 {
@@ -11,16 +12,29 @@ namespace MyTerraria
         public static Sprite ssBackgroundSky;
         public static Sprite ssBackgroundMountains;
         public static Texture ssTextureBackgroundSky;
-
+        //Tile
         public static SpriteSheet ssTileGround; // Ground
+        public static SpriteSheet ssTileSand; // Sand
         public static SpriteSheet ssTileGrass; // Grass
-        public static SpriteSheet ssTileSone; // Stone
+        public static SpriteSheet ssTileGrassDistortion; // Grass
+        public static SpriteSheet ssTileStone; // Stone
+        public static SpriteSheet ssTileStoneDistortion; // Stone
         public static SpriteSheet ssTileIronOre;//Iron Ore
         public static SpriteSheet ssTileTreeBark; // Tree
         public static SpriteSheet ssTileTreeTops; // Tree
+        public static SpriteSheet ssTileTreeTopsDistortion; // Tree
         public static SpriteSheet ssTileVegetation; // Vegetation
         public static SpriteSheet ssTileBoard; // Board
-
+        public static SpriteSheet ssTileTorch; // Board
+        //Wall
+        public static SpriteSheet ssWallGround; // Ground
+        public static SpriteSheet ssWallGrass; // Grass
+        public static SpriteSheet ssWallStone; // Stone
+        public static SpriteSheet ssWallIronOre;//Iron Ore
+        public static SpriteSheet ssWallTreeBark; // Tree
+        public static SpriteSheet ssWallTreeTops; // Tree
+        public static SpriteSheet ssWallVegetation; // Vegetation
+        public static SpriteSheet ssWallBoard; // Board
         //Items
         public static SpriteSheet ssTileItemPick;//Pick
         public static SpriteSheet ssTileItemGround;//Ground
@@ -45,6 +59,7 @@ namespace MyTerraria
 
         // NPC
         public static SpriteSheet ssNpcSlime; // Слизень
+        public static SpriteSheet ssNpcFlyingEye; // Глаз
 
         // Игрок
         public static SpriteSheet ssPlayerHead;        // Голова
@@ -58,11 +73,7 @@ namespace MyTerraria
         // UI
         public static Texture texUIInvertoryBack;      // Инвертарь
 
-        //Sound
-        public static SoundBuffer bacgroundMusicBuffer; //Фоновые звуки
-        public static Sound bacgroundMusic; //Фоновые звуки
-
-        public static Font font;       // Шрифт
+        public static Font font = new Font(FONT_DIR + "arial.ttf");    // Шрифт
 
         public static void Load()
         {
@@ -71,16 +82,25 @@ namespace MyTerraria
             ssBackgroundSky = new Sprite(ssTextureBackgroundSky);
 
             //TilleBlock
-            ssTileGround = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_0.png"));
-            ssTileSone = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_1.png"));
+            ssTileGround = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false,1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_0.png"));
+            ssTileSand = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_53.png"));
+            ssTileStone = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_1.png"));
+            ssTileStoneDistortion = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_22.png"));
             ssTileGrass = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_2.png"));
+            ssTileGrassDistortion = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_23.png"));
             ssTileVegetation = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_3.png"));
-            ssTileTreeBark = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_5.png"));
+            ssTileTreeBark = new SpriteSheet(20, 20, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_5.png"));
             ssTileIronOre = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_6.png"));
             ssTileBoard = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_30.png"));
+            ssTileTorch = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_4.png"));
+            //Wall
+            ssWallGround = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\walls\\Wall_2.png"));
+            ssWallStone = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\walls\\Wall_1.png"));
+            ssWallBoard = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\walls\\Wall_4.png"));
 
             //Верхущка дерева
-            ssTileTreeTops = new SpriteSheet(3, 1, true, 1, new Texture(CONTENT_DIR + "Textures\\trees\\Tree_Tops.png"));
+            ssTileTreeTops = new SpriteSheet(80, 80, false, 1, new Texture(CONTENT_DIR + "Textures\\trees\\Tree_Tops.png"));
+            ssTileTreeTopsDistortion = new SpriteSheet(3, 1, true, 1, new Texture(CONTENT_DIR + "Textures\\trees\\Tree_Tops_1.png"));
 
             //Items
             ssTileItemPick = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_1.png"));
@@ -103,6 +123,7 @@ namespace MyTerraria
 
             // NPC
             ssNpcSlime = new SpriteSheet(1, 2, true, 0, new Texture(CONTENT_DIR + "Textures\\npc\\NPC_1.png"));
+            ssNpcFlyingEye = new SpriteSheet(1, 2, true, 0, new Texture(CONTENT_DIR + "Textures\\npc\\NPC_2.png"));
 
             // Игрок
             ssPlayerHead = new SpriteSheet(1, 20, true, 0, new Texture(CONTENT_DIR + "Textures\\player\\Player_Head.png"));
@@ -117,11 +138,8 @@ namespace MyTerraria
             texUIInvertoryBack = new Texture(CONTENT_DIR + "Textures\\ui\\Inventory_Back.png");
 
             //Sound
-            //bacgroundMusicBuffer = new SoundBuffer("terrariya-den.wav");
-            //bacgroundMusic = new Sound(bacgroundMusicBuffer);
 
-            // Шрифт
-            font = new Font(FONT_DIR + "arial.ttf");
+            
         }
     }
 }

@@ -1,121 +1,111 @@
 ﻿using MyTerraria.Items;
 using MyTerraria.NPC;
 using MyTerraria.UI;
+using SFML.Graphics;
 using SFML.System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace MyTerraria
 {
-    class Game
+    class Game   
     {
         public Player Player { get; private set; }  // Игрок
+        public World World { get; private set; } // Мир
 
-        World world;    // Мир
-        Trees trees;
-        NpcFastSlime slime; // Слизень
-        
-        DebagInfo debag;
+        List<Npc> Npc = new List<Npc>(); // Слизни
 
-        // Слизни
-        List<NpcSlime> slimes = new List<NpcSlime>();
+        public DebagInfo debag; // Дебаг информация
 
-        public World World { get { return world; } }
-        public Trees Trees { get { return trees; } }
-
-        public int c = 0;
+        Stopwatch stopwatch1 = new Stopwatch(); // Счетчик затрат времени
 
         public Game()
         {
             // Создаём новый мир и выполняем его генерацию
-            world = new World();
-            world.GenerateWorld();
-
-            trees = new Trees();
+            World = new World();
+            Task.Run(() => World.GenerateWorld());
 
             // Создаём игрока
-            Player = new Player(world);
-            Player.Invertory = new UIInvertory();
-            UIManager.AddControl(Player.Invertory);
-            for (int j = World.WORLD_HEIGHT; j > 0; j--)
-            {
-                if (World.GetTile(World.WORLD_WIDTH / 2, j) != null && World.GetTile(World.WORLD_WIDTH / 2, j).type == TileType.GRASS)
-                {
-                    c = -j + 1;
-                    Player.StartPosition = new Vector2f(World.WORLD_WIDTH / 2 * 16, (-1 - c) * 16);
-                }
-            }
+            Player = new Player(World);
             Player.Spawn();
-            var itemTile = new ItemTile(World, InfoItem.ItemSword);
-            itemTile.Position = Player.Position;
-            World.items.Add(itemTile);
-            itemTile = new ItemTile(World, InfoItem.ItemPick);
-            itemTile.Position = Player.Position;
-            World.items.Add(itemTile);
-            itemTile = new ItemTile(World, InfoItem.ItemAxe);
-            itemTile.Position = Player.Position;
-            World.items.Add(itemTile);
-            for (int i = 0; i < 99; i++)
-            {
-                itemTile = new ItemTile(World, InfoItem.ItemGround);
-                itemTile.Position = Player.Position;
-                World.items.Add(itemTile);
-            }
+            Player.AddTools();
+
+            //Персонаж
+            Npc.Add(Player);
 
             // Создаём быстрого слизня
-            slime = new NpcFastSlime(world);
-            slime.StartPosition = new Vector2f(500, 150);
-            slime.Spawn();
+            Npc.Add(new NpcFastSlime(World));
+            //Обычный слизень
+            Npc.Add(new NpcSlime(World));
+            //Летаюший глаз
+            Npc.Add(new NpcFlyingEye(World));
 
-            debag = new DebagInfo();
+            Player.Invertory = new UI.UIInvertory();
+            UIManager.AddControl(Player.Invertory);
 
-            for (int i = 0; i < 12; i++)
-            {
-                var s = new NpcSlime(world);
-                s.StartPosition = new Vector2f(Player.Position.X, Player.Position.Y);              
-                s.Direction = World.Rand.Next(0, 2) == 0 ? 1 : -1;
-                s.Spawn();
-                slimes.Add(s);
-            }
-
-            // Создаём UI
-            //UIManager.AddControl(new UIWindow());
+            //DebagInfo
+            debag = new DebagInfo(Content.font);
 
             // Включаем прорисовку объектов для визуальной отладки
             DebugRender.Enabled = false;
         }
 
+
         // Обновление логики игры
         public void Update()
         {
-            world.Update();
-            //trees.Update();
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
 
-            Player.Update();
-            slime.Update();
+            //Player.Update();
 
-            foreach (var s in slimes)
-                s.Update();
 
-            // Обновляем UI
+                World.Update();
+
+                foreach (var s in Npc)
+                    s.Update();
+
             UIManager.UpdateOver();
             UIManager.Update();
+
+            stopwatch.Stop();
+
+            debag.SetPosition(Player.GetGlobalPosition());
+
+            //DebageInfo
+            debag.ClearText();
+            debag.SetMessageLine(Program.FPS.ToString());
+            //debag.SetMessageLine((Program.GetGlobalMousePosition() / 16).ToString());
+            //debag.SetMessageLine((Player.GetGlobalPosition() / 16).ToString());
+            /*if (World.GetTileByWorldPos(Program.GetGlobalMousePosition()) != null)
+                debag.SetMessageLine(World.GetTileByWorldPos(Program.GetGlobalMousePosition()).type.ToString());*/
+
+            debag.SetMessageLine("Phisics time: " + stopwatch.Elapsed.ToString());
+            //debag.SetMessageLine("Render time on ms: " + stopwatch1.Elapsed.Milliseconds.ToString());
+
         }
 
         // Прорисовка игры
         public void Draw()
         {
-            Program.Window.Draw(world);
-            Program.Window.Draw(Player);
-            Program.Window.Draw(slime);
-            Program.Window.Draw(debag);
+            stopwatch1.Restart();
+            stopwatch1.Start();
 
-            foreach (var s in slimes)
+            Program.Window.Draw(World);
+            //Program.Window.Draw(Player);
+
+            foreach (var s in Npc)
                 Program.Window.Draw(s);
 
             DebugRender.Draw(Program.Window);
 
-            // Рисуем UI
+            Program.Window.Draw(debag);
+
             UIManager.Draw();
+
+            stopwatch1.Stop();
+
         }
     }
 }

@@ -7,12 +7,16 @@ namespace MyTerraria.NPC
     {
         public NpcFastSlime(World world) : base(world)
         {
-            rect.FillColor = new Color(255, 0, 0, 200);
+            spriteSheet = Content.ssNpcSlime;
+
+            rect.FillColor = new Color(0, 0, 255, 200);
+
+            rect.Texture = spriteSheet.Texture;
         }
 
         public override Vector2f GetJumpVelocity()
         {
-            return new Vector2f(Direction * World.Rand.Next(15, 100), -World.Rand.Next(8, 15));
+            return new Vector2f(Direction * World.Rand.Next(10, 150), -World.Rand.Next(8, 15));
         }
     }
 }

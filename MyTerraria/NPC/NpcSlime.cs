@@ -3,15 +3,12 @@ using SFML.System;
 
 namespace MyTerraria.NPC
 {
-    class NpcSlime : Npc
+    public class NpcSlime : Npc
     {
         const float TIME_WAIT_JUMP = 1f;
 
-        SpriteSheet spriteSheet;
+        public SpriteSheet spriteSheet;
         float waitTimer = 0f;
-
-        public static float health { get; set; } = 10;
-
 
 
         public NpcSlime(World world) : base(world)
@@ -28,7 +25,6 @@ namespace MyTerraria.NPC
 
         public override void OnKill()
         {
-            health = 10;
             StartPosition = Program.Game.Player.Position;
             Spawn();
         }
@@ -41,7 +37,8 @@ namespace MyTerraria.NPC
 
         public override void UpdateNPC()
         {
-            if (Position.X < 3 * 16)
+            //rect.FillColor = color;
+            if (Position.X < 4 * 16)
             {
                 Direction *= -1;
                 velocity = new Vector2f(-velocity.X * 0.8f, velocity.Y);
@@ -74,13 +71,11 @@ namespace MyTerraria.NPC
             }
             else
                 rect.TextureRect = spriteSheet.GetTextureRect(0, 1);
-
-            if (health <= 0)
-                OnKill();
         }
 
         public override void DrawNPC(RenderTarget target, RenderStates states)
         {
+            target.Draw(rect, states);
         }
 
         public virtual Vector2f GetJumpVelocity()

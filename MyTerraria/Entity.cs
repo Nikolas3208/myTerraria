@@ -1,5 +1,8 @@
 ﻿using SFML.Graphics;
 using SFML.System;
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace MyTerraria
 {
@@ -8,20 +11,23 @@ namespace MyTerraria
         Left, Right, Up, Down
     }
 
-    abstract class Entity : Transformable, Drawable
+    public abstract class Entity : Transformable, Drawable
     {
         public bool IsDestroyed = false;        // Объект уничтожен?
 
-        int i1, j1;
-
         protected RectangleShape rect;
+        protected Color color;
         protected Vector2f velocity;
         protected Vector2f movement;
         protected World world;
         protected bool isFly = true;
+        protected bool isFlyer = false;
         protected bool isRectVisible = true;
         protected bool isGhost = false;         // Режим призрака?
-        protected bool isGhost1 = true;         // Режим призрака?
+
+        protected float gravity = 0.4f; 
+
+
 
         public Entity(World world)
         {
@@ -37,9 +43,9 @@ namespace MyTerraria
         {
             velocity.X *= 0.99f;
 
-            if (!isGhost)
+            if (!isGhost && !isFlyer)
             {
-                velocity.Y += 0.55f;
+                this.velocity.Y += gravity;
 
                 var offset = velocity + movement;
                 float dist = MathHelper.GetDistance(offset);
@@ -62,99 +68,113 @@ namespace MyTerraria
 
                     DebugRender.AddRectangle(stepRect, Color.Blue);
 
-                    int i = (int)((stepPos.X + rect.Size.X / 2) / Tile.TILE_SIZE);
-                    int j = (int)((stepPos.Y + rect.Size.Y) / Tile.TILE_SIZE);
-                    Tile tile = world.GetTile(i, j);
-                    Tile tile1 = world.GetTile(i, j - 4);
-                    if (i < 0)
+                    for (int x = 0; x <= (rect.Size.X - rect.Origin.X); x += Tile.TILE_SIZE)
                     {
-                        i = 0;
-                    }
-                    if (j < 0)
-                    {
-                        j = 0;
-                    }
-                    if (j >= World.WORLD_HEIGHT)
-                        j = World.WORLD_HEIGHT - 1;
 
-                    if (i >= World.WORLD_WIDTH)
-                        i = World.WORLD_WIDTH - 1;
+                        int i = (int)((stepPos.X + 8 + x) / Tile.TILE_SIZE);
+                        int j = (int)((stepPos.Y + rect.Size.Y) / Tile.TILE_SIZE);
+                        Tile tile = world.GetTile(i, j);
+                        Tile tileTop = world.GetTile(i, j - (int)rect.Size.Y / Tile.TILE_SIZE - 1);
 
-                    if (tile != null && Program.Game.World.GetTile(i, j).type != TileType.TREEBRAK && Program.Game.World.GetTile(i, j).type != TileType.TREETOPS && Program.Game.World.GetTile(i, j).type != TileType.VEGETATION)
-                    {
-                        FloatRect tileRect = new FloatRect(tile.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
+                        if (i < 0 || i >= World.WORLD_WIDTH || j < 0 || j >= World.WORLD_HEIGHT)
+                            return;
 
-                        DebugRender.AddRectangle(tileRect, Color.Red);
 
-                        if (updateCollision(stepRect, tileRect, DirectionType.Down, ref stepPos))
+                        if (tile != null && tile.type != TileType.TREEBARK && tile.type != TileType.TREETOPS && tile.type != TileType.VEGETATION && tile.type != TileType.TORCH)
                         {
-                            velocity.Y = 0;
-                            isFly = false;
+                            FloatRect tileRect = new FloatRect(tile.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
 
+                            DebugRender.AddRectangle(tileRect, Color.Red);
+
+                            if (updateCollision(stepRect, tileRect, DirectionType.Down, ref stepPos))
+                            {
+                                velocity.Y = 0;
+                                isFly = false;
+
+                                isBreakStep = false;
+                            }
+                            else
+                                isFly = true;
+
+                        }
+                        else if(world.GetTile((int)(stepPos.X + x) / Tile.TILE_SIZE, j) == null && world.GetTile((int)(stepPos.X - x) / Tile.TILE_SIZE, j) == null)
+                            isFly = true;
+
+
+                        if (tileTop != null && tileTop.type != TileType.TREEBARK && tileTop.type != TileType.TREETOPS && tileTop.type != TileType.NONE)
+                        {
+                            FloatRect tiletop = new FloatRect(tileTop.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
+                            DebugRender.AddRectangle(tiletop, Color.Red);
+
+                            updateCollision(stepRect, tiletop, DirectionType.Up, ref stepPos);
+
+                            velocity.Y += 2f;
+                        }
+
+
+                        if (updateWallCollision(i, j, -1, ref stepPos, stepRect) || updateWallCollision(i, j, 1, ref stepPos, stepRect))
+                        {
+                            OnWallCollided();
                             isBreakStep = false;
                         }
-                        else
-                            isFly = true;
-                    }
-                    else
-                        isFly = true;
 
-                    if (Program.Game.World.GetTile(i, j - 3) != null && Program.Game.World.GetTile(i, j - 3) != null && Program.Game.World.GetTile(i, j - 3).type != TileType.TREEBRAK && Program.Game.World.GetTile(i, j - 3).type != TileType.TREETOPS && velocity.Y < 0 && Program.Game.World.GetTile(i, j - 3).type != TileType.NONE)
-                    {
-                        velocity.Y += 10f;
-                    }
+                        if (isBreakStep)
+                            break;
 
-                    if (updateWallCollision(i, j, -1, ref stepPos, stepRect) || updateWallCollision(i, j, 1, ref stepPos, stepRect))
-                    {
-                        OnWallCollided();
-                        isBreakStep = false;
                     }
-
-                    if (isBreakStep)
-                        break;
                 }
+
 
                 Position = stepPos + rect.Origin;
             }
-            else
+            else if(!isGhost && isFlyer)
             {
+                //rect.Rotation = World.Rand.Next(0, 360);
+
+                //velocity.Y += 0.44f;
+
                 Position += velocity + movement;
             }
+            else
+                Position += velocity + movement;
         }
 
         bool updateWallCollision(int i, int j, int iOffset, ref Vector2f stepPos, FloatRect stepRect)
         {
             var dirType = iOffset > 0 ? DirectionType.Right : DirectionType.Left;
 
-            Tile[] walls = new Tile[] {
-                world.GetTile(i + iOffset, j - 1),
-                world.GetTile(i + iOffset, j - 2),
-                world.GetTile(i + iOffset, j - 3),
-
-            };
-
             bool isWallCollided = false;
-            foreach (Tile t in walls)
-            {
-                if (t == null) continue;
 
-                FloatRect tileRect = new FloatRect(t.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
-                
-                DebugRender.AddRectangle(tileRect, Color.Yellow);
-                //if (Program.Game.World.GetTile(a, b) != null && Program.Game.World.GetTile(i + iOffset, j - 1) != null && Program.Game.World.GetTile(a, b).type != TileType.TREEBRAK && Program.Game.World.GetTile(i + iOffset, j - 4).type != TileType.TREETOPS && Program.Game.World.GetTile(i + iOffset, j - 1).type != TileType.TREEBRAK && Program.Game.World.GetTile(i + iOffset, j - 1).type != TileType.TREETOPS)
-                if ((t != null && t.type != TileType.TREEBRAK && t.type != TileType.TREETOPS && t.type != TileType.NONE) || (t != null && t.type != TileType.TREEBRAK && t.type != TileType.TREETOPS && t.type != TileType.NONE))
+            for (int y = 1; y <= rect.Size.Y / Tile.TILE_SIZE; y++)
+            {
+
+                Tile[] walls = new Tile[] {
+                    world.GetTile(i + iOffset, j - y),
+                };
+
+
+                isWallCollided = false;
+                foreach (Tile t in walls)
                 {
-                    if ((t != null && t.type != TileType.VEGETATION && t.type != TileType.NONE))
+                    if (t == null) continue;
+
+                    FloatRect tileRect = new FloatRect(t.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
+
+                    DebugRender.AddRectangle(tileRect, Color.Yellow);
+                    if (t != null && t.type != TileType.TREEBARK && t.type != TileType.TREETOPS && t.type != TileType.TORCH)
                     {
-                        if (updateCollision(stepRect, tileRect, dirType, ref stepPos))
+                        if (t != null && t.type != TileType.VEGETATION && t.type != TileType.NONE)
                         {
-                            isWallCollided = true;
+                            if (updateCollision(stepRect, tileRect, dirType, ref stepPos))
+                            {
+                                isWallCollided = true;
+                            }
                         }
                     }
                 }
             }
 
-            return isWallCollided;
+                return isWallCollided;
         }
 
         bool updateCollision(FloatRect rectNPC, FloatRect rectTile, DirectionType direction, ref Vector2f pos)
@@ -166,7 +186,7 @@ namespace MyTerraria
                     else if (direction == DirectionType.Down)
                         pos = new Vector2f(pos.X, rectTile.Top - rectNPC.Height + 1);
                     else if (direction == DirectionType.Left)
-                        pos = new Vector2f(rectTile.Left + rectTile.Width - 1, pos.Y);
+                        pos = new Vector2f(rectTile.Left + rectTile.Width + 1, pos.Y);
                     else if (direction == DirectionType.Right)
                         pos = new Vector2f(rectTile.Left - rectNPC.Width + 1, pos.Y);
                 return true;

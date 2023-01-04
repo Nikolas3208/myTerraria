@@ -1,25 +1,26 @@
-﻿using SFML.Graphics;
+﻿using MyTerraria.NPC;
+using SFML.Graphics;
 using SFML.System;
 using SFML.Window; 
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace MyTerraria
 {
     class Program
     {
         public static RenderWindow Window { private set; get; }
-
-        public static Lighting Lighting { private set; get; }
         public static Game Game { private set; get; }
         public static float Delta { private set; get; }
 
         public static float FPS { private set; get; }
+        public static bool Phisics { get; internal set; } = true;
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             //Создание окна
-            Window = new RenderWindow(new VideoMode(1920, 1080), "My Terraria!");
+            Window = new RenderWindow(VideoMode.DesktopMode, "My Terraria!");
             Window.SetVerticalSyncEnabled(true);
 
             Window.Closed += Win_Closed;
@@ -33,61 +34,80 @@ namespace MyTerraria
 
             Game = new Game();      // Создаём новый объект класса игры
             Clock clock = new Clock();
-            Lighting = new Lighting();
+
+            /*Game.Sounds[0] = new Sound(TypeSound.BACKGROUN);
+            Game.Sounds[1] = new Sound(TypeSound.GRAB);
+            Game.Sounds[2] = new Sound(TypeSound.RUN);*/
 
             //Основной цикл программы
             while (Window.IsOpen)
             {
                 Delta = clock.Restart().AsSeconds();
-                FPS = 1 / (Delta);
+                FPS = 1 / Delta;
                 lastTime = Delta;
+
+                Window.SetTitle("Terraria FPS: " + FPS.ToString());
 
                 Window.DispatchEvents();
 
-                Game.Update();
+                if (World.worldGen)
+                    Game.Update();
+                    //Task.Run(() => Game.Update());
 
-                CenterScreen();
+                if (World.worldGen)
+                    CenterScreen();
 
                 Window.Clear(Color.Cyan);
 
-                Window.Draw(Content.ssBackgroundSky);
+                if (World.worldGen)
+                    Window.Draw(Content.ssBackgroundSky);
 
-                Game.Draw();
+                if (World.worldGen)
+                    Game.Draw();
+
                 //Content.bacgroundMusic.Play();
 
                 Window.Display();
             }
         }
         public static Vector2f pos2;
-        public static float scrol = 1;
+        public static float zoom = 1;
 
-        static bool a = true;
+        public static bool debagCamera = false;
+        public static bool debagDraw = false;
+        public static (float, float) newPos;
 
-        private static void CenterScreen()
+        public static Vector2f pos = new Vector2f();
+
+
+        public static void CenterScreen()
         {
             //Позиция игрока
             //var pos = Game.Player.Position;
-            Vector2f pos;
-            if (pos2 == null)
-                pos2 = Game.Player.Position;
-            if (a)
-            {
-                pos = pos2;
-            }
+            if (!debagCamera)
+                pos = Program.Game.Player.Position;
             else
-            {
-                pos = Game.Player.Position;
-                pos2 = Game.Player.Position;
-            }
+                pos = pos2;
+
             //Получаем цент относительно персонажа
-            var newPos = (pos.X - Window.Size.X / 2, pos.Y - Window.Size.Y / 2);
+            newPos = (pos.X - Window.Size.X / 2, pos.Y - Window.Size.Y / 2);
 
             View view = new View(new FloatRect(newPos.Item1, newPos.Item2, Window.Size.X, Window.Size.Y));
-            view.Zoom(scrol);
+            view.Zoom(zoom);
 
             //Установка центра
             //if (pos.X <= World.WORLD_WIDTH * 16 - Window.Size.X / 2) 
                 Window.SetView(view);
+        }
+
+        public static Vector2i GetMousePosition()
+        {
+            return Mouse.GetPosition(Window);
+        }
+
+        public static Vector2i GetGlobalMousePosition()
+        {
+            return new Vector2i(GetMousePosition().X + (int)(Game.Player.Position.X - Window.Size.X / 2), GetMousePosition().Y + (int)(Game.Player.Position.Y - Window.Size.Y / 2));
         }
 
         private static void Win_KeyPressed(object sender, KeyEventArgs e)
@@ -107,19 +127,36 @@ namespace MyTerraria
                     pos2.X -= 1000 * Delta;
                     break;
                 case Keyboard.Key.E:
-                    scrol++;
+                    zoom += 0.2f;
                     break;
                 case Keyboard.Key.Q:
-                    scrol--;
+                    zoom -= 0.2f;
                     break;
                 case Keyboard.Key.C:
-                    if (a)
+                    if (debagCamera)
                     {
-                        a = false;
+                        debagCamera = false;
                     }
                     else
-                        a = true;
+                        debagCamera = true;
                     break;
+                case Keyboard.Key.X:
+                    if (debagDraw)
+                    {
+                        debagDraw = false;
+                    }
+                    else
+                        debagDraw = true;
+                    break;
+                case Keyboard.Key.P:
+                    if(Phisics)
+                        Phisics = false;
+                    else
+                        Phisics = true;
+                    break;
+                case Keyboard.Key.G:
+                    break;
+
             }
         }
 

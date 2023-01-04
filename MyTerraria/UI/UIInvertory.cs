@@ -10,7 +10,6 @@ namespace MyTerraria.UI
 {
     class UIInvertory : UIWindow
     {
-        public int a { get; set; }
         public static List<UIInvertoryCell> cells { get; set; }
         public UIItemStack UIItemStack { get; set; }
 

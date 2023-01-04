@@ -9,33 +9,46 @@ using System.Threading.Tasks;
 
 namespace MyTerraria
 {
-    internal class DebagInfo : UI.UIBase, Drawable
+    internal class DebagInfo : Transformable, Drawable
     {
-        int i, j;
-        Text text;
-        public DebagInfo()
+        private Text text;
+
+        public DebagInfo(Font font)
         {
-            text = new Text("0", Content.font, 25);
-            text.Color = Color.Black;
+            text = new Text();
+            text.Font = font;
+            text.FillColor = Color.Black;
         }
 
+        public void ClearText()
+        {
+            text.DisplayedString = null;
+        }
+
+        public void SetMessage(string mess)
+        {
+            text.DisplayedString += mess;
+        }
+
+        public void SetMessageLine(string mess)
+        {
+            text.DisplayedString += "\n" + mess;
+        }
+
+        public void SetPosition(Vector2f pos)
+        {
+            text.Position = pos;
+        }
+
+        public void TextSettings(Vector2f scale, Color color)
+        {
+            text.Scale = scale;
+            text.FillColor = color;
+        }
+        
         public void Draw(RenderTarget target, RenderStates states)
         {
-            int i = (int)(Program.Game.Player.mousePos.X + (Program.Game.Player.Position.X - Program.Window.Size.X / 2)) / Tile.TILE_SIZE;
-            int j = (int)(Program.Game.Player.mousePos.Y + (Program.Game.Player.Position.Y - Program.Window.Size.Y / 2)) / Tile.TILE_SIZE;
-
-            text.Position = new Vector2f(Program.Game.Player.Position.X - Program.Window.Size.X / 2, 50 + Program.Game.Player.Position.Y - Program.Window.Size.Y / 2);
-            //text.Position = new Vector2f(Program.Game.Player.Position.X, Program.Game.Player.Position.Y);
-            if (Program.Game.World.GetTile(i, j) != null)
-            {
-                text.DisplayedString = "Player: " + "X: " + (Program.Game.Player.Position.X / 16).ToString() + "Y: " + (Program.Game.Player.Position.Y / 16).ToString() + "\n" +
-                                       "Mouse: " + "X: " + (i).ToString() + "Y: " + (j).ToString() + "\n" +
-                                       "Block Type: " + (Program.Game.Player.block_Type).ToString() + "\n" +
-                                       "Path to mouse " + (Program.Game.Player.DistanceToMouse) + "\n" +
-                                       //"Block: " + Program.Game.World.GetTile(i, j).type + "\n" +
-                                       "FPS: " + Program.FPS.ToString() + "\n" +
-                                       "BlocHealth: " + Program.Game.World.GetTile(i, j).HealthTile;
-            }
+            states.Transform *= Transform;
 
             text.Draw(target, states);
         }

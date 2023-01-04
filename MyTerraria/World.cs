@@ -2,324 +2,225 @@
 using MyTerraria.NPC;
 using SFML.Graphics;
 using SFML.System;
-using SFML.Window;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MyTerraria
 {
-    class World : Transformable, Drawable
+    public class World : Transformable, Drawable
     {
         // Кол-во плиток по ширине и высоте
-        public const int WORLD_WIDTH = 500;
-        public const int WORLD_HEIGHT = 500;
+        public static int WORLD_WIDTH = 1000;
+        public static int WORLD_HEIGHT = 1000;
 
-        /*public Tile upTile = GetTile(i, j - 1);     // Верхний сосед
-        public Tile downTile = GetTile(i, j + 1);   // Нижний сосед
-        public Tile leftTile = GetTile(i - 1, j);   // Левый сосед
-        public Tile rightTile = GetTile(i + 1, j);  // Правый сосед*/
+        public static int GroundLavelMax;
 
-        public int BackgroundMin = 0;
+        public static bool worldGen = false;
 
         public static Random Rand { private set; get; }
-
-        public static ItemTile ItemTile { set; get; }
-
         public static Perlin2D Perlin2D { private set; get; }
+        public static bool PlayerCameraMove { get; private set; }
+
+        public static float[] PerlinCave = new float[WORLD_WIDTH * WORLD_HEIGHT];
 
         // Плитки
-        public Tile[,] tiles;
-        Tile tile;
-        //List<Tile> tilesList = new List<Tile>();
+        public Tile[] tiles = new Tile[WORLD_WIDTH * WORLD_HEIGHT];
+        public Tile tile;
 
         // Предметы
         public List<Item> items = new List<Item>();
 
-        // Конструктор класса
-        public World()
-        {
-            Perlin2D = new Perlin2D();
-            tiles = new Tile[WORLD_WIDTH, WORLD_HEIGHT];
+        private float[] height = new float[WORLD_WIDTH];
 
-            //ItemTile = new ItemTile(this, null);
+        private float caveFreq = 0.08f;
+        private float terrainFreq = 0.04f;
+
+        // Конструктор класса
+        public World(int seed = -1)
+        {
+            Rand = seed > 0 ? new Random(seed) : new Random((int)DateTime.Now.Ticks);
+            Perlin2D = new Perlin2D();
+            InfoItem.Colectionsgen();
         }
 
-        int[] arr = new int[WORLD_WIDTH];
-
-        private async Task GenerateTerrain(int seed = -1)
+        private void GenerateTerrain(int seed = -1)
         {
             Rand = seed >= 0 ? new Random(seed) : new Random((int)DateTime.Now.Ticks);
 
-            int groundLevelMax = Rand.Next(100, 200);
-            int groundLevelMin = groundLevelMax + Rand.Next(200, 300);
-            BackgroundMin = groundLevelMin;
+            GroundLavelMax = Rand.Next(20, 50);
+            int GroundLevelMin = GroundLavelMax + Rand.Next(10, 15);
 
-            for (int i = WORLD_WIDTH - 1; i > 0; i--)
-            {
-                for (int j = WORLD_HEIGHT -1; j > 0; j--)
-                {
-                    tiles[i, j] = new Tile(TileType.NONE, null, null, null, null);
-                }
-            }
-
-            // Генерация уровня ландшафта
-            for (int i = 0; i < WORLD_WIDTH; i++)
-            {
-                int dir = Rand.Next(0, 2) == 1 ? 2 : -2;
-
-                if (i > 0)
-                {
-                    if (arr[i - 1] + dir < groundLevelMax || arr[i - 1] + dir > groundLevelMin)
-                        dir = -dir;
-
-                    arr[i] = arr[i - 1] + dir;
-                }
-                else
-                    arr[i] = groundLevelMin;
-            }
-
-            // Сглаживание
-            for (int i = 0; i < WORLD_WIDTH - 1; i++)
-            {
-                float sum = arr[i];
-                int count = 1;
-                for (int k = 1; k <= 15; k++)
-                {
-                    int i1 = i - k;
-                    int i2 = i + k;
-
-                    if (i1 > 0)
-                    {
-                        sum += arr[i1];
-                        count++;
-                    }
-
-                    if (i2 < WORLD_WIDTH)
-                    {
-                        sum += arr[i2];
-                        count++;
-                    }
-                }
-
-                arr[i] = (int)(sum / count);
-            }
-
-            // Ставим плитки на карту
-            for (int i = 0; i < WORLD_WIDTH; i++)
-            {
-                SetTile(TileType.GRASS, i, arr[i]);
-            }
-
-            for (int i = WORLD_WIDTH - 1; i > 1; i--)
-            {
-                for (int j = arr[i]; j < WORLD_HEIGHT; j++)
-                {
-                    float v = Perlin2D.Noise((i + seed) * 0.098f, (j + seed) * 0.098f);
-                    if (v > 0.9)
-                    {
-                        SetTile(TileType.NONE, i, j);
-                    }
-                    if (GetTile(i, j).type == TileType.NONE && v < 0.16)
-                    {
-                        SetTile(TileType.GROUND, i, j);
-                    }
-                    if (GetTile(i, j).type == TileType.NONE && v < 0.2)
-                    {
-                        SetTile(TileType.GRASS, i, j);
-                    }
-                    if (GetTile(i, j).type == TileType.NONE && v < 0.2)
-                    {
-                        SetTile(TileType.STONE, i, j);
-                    }
-                    if (GetTile(i, j).type == TileType.NONE && v > 0.02)
-                    {
-                        SetTile(TileType.IRONORE, i, j);
-                    }
-                }
-            }
-        }
-
-        public async Task GenerateVeGetation()
-        {
+            //await Task.Run(() =>
+            //{
             for (int x = 0; x < WORLD_WIDTH; x++)
             {
-                for (int y = 0; y < BackgroundMin; y++)
+                height[x] = Perlin2D.Noise((x + seed) * terrainFreq, (seed) * terrainFreq) * 6 + GroundLavelMax;
+                for (int y = (int)height[x]; y < WORLD_HEIGHT; y++)
                 {
-                    if (GetTile(x, y) != null && GetTile(x, y).type == TileType.GRASS && GetTile(x, y - 1).type == TileType.NONE)
+                    PerlinCave[x + y * WORLD_WIDTH] = Perlin2D.Noise((x + seed) * caveFreq, (y + seed) * caveFreq);
+                    if (y < GroundLavelMax + 40)
                     {
-                        await SetTile(TileType.VEGETATION, x, y - 1);
+                        if (PerlinCave[x + y * WORLD_WIDTH] < 0.3f)
+                            if (GetTile(x, y - 1) != null)
+                                SetTile(TileType.GROUND, x, y, false);
+                            else
+                                SetTile(TileType.GRASS, x, y, false);
+
+                        if (PerlinCave[x + y * WORLD_WIDTH] < 0.001f)
+                            SetTile(TileType.STONE, x, y, false);
+                    }
+                    else
+                    {
+                        if (PerlinCave[x + y * WORLD_WIDTH] < 0.3f)
+                            SetTile(TileType.GROUND, x, y, false);
+
+                        if (PerlinCave[x + y * WORLD_WIDTH] < 0.1f)
+                            SetTile(TileType.STONE, x, y, false);
                     }
                 }
-                x += Rand.Next(1, 10);
             }
+            //});
         }
 
-        public async Task GenerateTrees()
+        private void GenerateTree()
         {
+            bool tree = true;
+
             for (int x = 0; x < WORLD_WIDTH; x++)
             {
-                for (int y = 0; y < WORLD_HEIGHT; y++)
+                for (int y = (int)height[x]; y < WORLD_HEIGHT; y++)
                 {
-                    if (GetTile(x, y) != null && GetTile(x, y).type == TileType.GRASS && y == arr[x])
+                    int maxHeight = Rand.Next(4, 30);
+                    int x2 = Rand.Next(-1, 2);
+
+                    if (GetTile(x, y) != null && GetTile(x, y).type == TileType.GRASS)
                     {
-                        int a = 0;
-                        for (int i = 1; i < Rand.Next(8, 28); i++)
+                        for (int y1 = 1; y1 < maxHeight; y1++)
                         {
-                            SetTile(TileType.TREEBRAK, x, y - i);
-                            a = i;
-
-                            //SetTile(TileType.VEGETATION, x, y);
+                            if (GetTile(x, y - y1) != null)
+                                tree = false;
+                            else if (GetTile(x, y - y1) == null && y1 == maxHeight - 1 && tree)
+                                tree = true;
                         }
-                        SetTile(TileType.TREETOPS, x, y - a++);
+
+                        if (tree)
+                            for (int y1 = 1; y1 < maxHeight; y1++)
+                            {
+                                if (GetTile(x, y - y1) == null)
+                                {
+                                    //if (GetTile(x + x2, y) != null && GetTile(x + x2, y).type == TileType.GRASS)
+                                        //SetTile(TileType.TREEBARK, x + x2, y - 1, false);
+
+                                    SetTile(TileType.TREEBARK, x, y - y1, false);
+
+                                    if (maxHeight > 6)
+                                        SetTile(TileType.TREETOPS, x, y - maxHeight, false);
+                                    else
+                                        SetTile(TileType.TREEBARK, x, y - maxHeight, false);
+                                }
+                            }
+
+                        tree = true;
                     }
                 }
-                x += Rand.Next(3, 20);
+
+                x += Rand.Next(2, 15);
             }
         }
 
         // Генерируем новый мир
-        public async void GenerateWorld()
+        public void GenerateWorld()
         {
-            await GenerateTerrain();
+            GenerateTerrain();
 
-            await GenerateTrees();
+            GenerateTree();
 
-            await GenerateVeGetation();
+            worldGen = true;
         }
 
-        //public string[,] type_Tile;
-
-        // Установить плитку
-        public async Task SetTile(TileType type, int i, int j)
+        public void TreeFelling(int x, int y)
         {
-            if (i < 0)
+            Task.Run(() =>
             {
-                i = 0;
-            }
-            if (j < 0)
-            {
-                j = 0;
-            }
-            if (j >= WORLD_HEIGHT)
-                j = WORLD_HEIGHT - 1;
+                for (int y1 = 0; ; y1++)
+                {
+                    Tile tile = GetTile(x, y - y1);
+                    Tile tileLeft = GetTile(x - 1, y - y1);
+                    Tile tileRight = GetTile(x + 1, y - y1);
 
-            if(i >= WORLD_WIDTH)
-                i = WORLD_WIDTH -1;
+                    if (tile != null && tile.type == TileType.TREEBARK)
+                    {
+                        SetTile(TileType.TREEBARK, x, y - y1, true);
+                        if (tileLeft != null && tileLeft.type == TileType.TREEBARK)
+                            SetTile(TileType.TREEBARK, x - 1, y - y1, true);
+                        if (tileRight != null && tileRight.type == TileType.TREEBARK)
+                            SetTile(TileType.TREEBARK, x + 1, y - y1, true);
+                    }
+                    else if (tile != null && tile.type == TileType.TREETOPS)
+                        SetTile(TileType.TREETOPS, x, y - y1, true);
+                    else
+                        return;
 
-            // Находим соседей
-            Tile upTile = GetTile(i, j - 1);     // верхний сосед
-            Tile downTile = GetTile(i, j + 1);   // нижний сосед
-            Tile leftTile = GetTile(i - 1, j);   // левый сосед
-            Tile rightTile = GetTile(i + 1, j);  // правый сосед
-
-            tile = new Tile(type, upTile, downTile, leftTile, rightTile);
-
-            if (type != TileType.NONE)
-            {
-                tile.Position = new Vector2f(i * Tile.TILE_SIZE, j * Tile.TILE_SIZE) + Position;
-                tiles[i, j] = tile;
-            }
+                    Thread.Sleep(60);
+                }
+            });
         }
 
-
-        public void DelTile(TileType type, int i, int j)
+        public void SetTile(TileType type, int x, int y, bool destroy)
         {
-            if (i < 0)
-            {
-                i = 0;
-            }
-            if (j < 0)
-            {
-                j = 0;
-            }
-            if (j >= WORLD_HEIGHT)
-                j = WORLD_HEIGHT - 1;
-
-            if (i >= WORLD_WIDTH)
-                i = WORLD_WIDTH - 1;
+            if (x < 0 || x > WORLD_WIDTH || y < 0 || y > WORLD_HEIGHT)
+                return;
 
             // Находим соседей
-            Tile upTile = GetTile(i, j - 1);     // Верхний сосед
-            Tile downTile = GetTile(i, j + 1);   // Нижний сосед
-            Tile leftTile = GetTile(i - 1, j);   // Левый сосед
-            Tile rightTile = GetTile(i + 1, j);  // Правый сосед
+            Tile upTile = GetTile(x, y - 1);     // верхний сосед
+            Tile downTile = GetTile(x, y + 1);   // нижний сосед
+            Tile leftTile = GetTile(x - 1, y);   // левый сосед
+            Tile rightTile = GetTile(x + 1, y);  // правый сосед
 
-            tile = tiles[i, j];
+            int index = x + y * WORLD_WIDTH;
 
-            if (tile != null)
+            if (!destroy)
             {
-                if (type == TileType.GROUND)
+                if (type != TileType.NONE)
                 {
-                    var itemTile = new ItemTile(this, InfoItem.ItemGround);
-                    itemTile.Position = tile.Position;
-                    items.Add(itemTile);
-
-                    tiles[i, j].type = TileType.NONE;
-                    tiles[i, j] = null;
-                }
-                else if (type == TileType.GRASS)
-                {
-                    var itemTile = new ItemTile(this, InfoItem.ItemGround);
-                    itemTile.Position = tile.Position;
-                    items.Add(itemTile);
-
-                    tiles[i, j].type = TileType.NONE;
-                    tiles[i, j] = null;
-                }
-                else if (type == TileType.STONE)
-                {
-                    ItemTile = new ItemTile(this, InfoItem.ItemStone);
-                    ItemTile.Position = tile.Position;
-                    items.Add(ItemTile);
-
-                    tiles[i, j].type = TileType.NONE;
-                    tiles[i, j] = null;
-                }
-                else if (type == TileType.TREEBRAK)
-                {
-                    ItemTile = new ItemTile(this, InfoItem.ItemBoard);
-                    ItemTile.Position = tile.Position;
-                    items.Add(ItemTile);
-
-                    tiles[i, j].type = TileType.NONE;
-                    tiles[i, j] = null;
-                }
-                else if (type == TileType.TREETOPS)
-                {
-                    ItemTile = new ItemTile(this, InfoItem.ItemBoard);
-                    ItemTile.Position = tile.Position;
-                    items.Add(ItemTile);
-
-                    tiles[i, j].type = TileType.NONE;
-                    tiles[i, j] = null;
-                }
-                else if (type == TileType.BOARD)
-                {
-                    ItemTile = new ItemTile(this, InfoItem.ItemBoard);
-                    ItemTile.Position = tile.Position;
-                    items.Add(ItemTile);
-
-                    tiles[i, j].type = TileType.NONE;
-                    tiles[i, j] = null;
-                }
-                else if (type == TileType.IRONORE)
-                {
-                    ItemTile = new ItemTile(this, InfoItem.ItemIronOre);
-                    ItemTile.Position = tile.Position;
-                    items.Add(ItemTile);
-
-                    tiles[i, j].type = TileType.NONE;
-                    tiles[i, j] = null;
+                    tile = new Tile(type, Color.White, upTile, downTile, leftTile, rightTile);
+                    tile.Position = new Vector2f(x * Tile.TILE_SIZE, y * Tile.TILE_SIZE) + Position;
+                    tiles[index] = tile;
                 }
             }
-            
-            // Присваиваем соседей, а соседям эту плитку
-            if (upTile != null) upTile.DownTile = null;
-            if (downTile != null) downTile.UpTile = null;
-            if (leftTile != null) leftTile.RightTile = null;
-            if (rightTile != null) rightTile.LeftTile = null;
+            else
+            {
+                if (type != TileType.NONE)
+                {
+                    tile = tiles[index];
 
+                    foreach (InfoItem item in InfoItem.InfoItems)
+                    {
+                        if (item.Tiletype == type)
+                        {
+                            InfoItem infoItem = item;
+
+                            if (infoItem != null)
+                            {
+                                var itemTile = new ItemTile(this, infoItem);
+                                itemTile.Position = tile.Position;
+                                items.Add(itemTile);
+
+                                tiles[index] = null;
+                            }
+                        }
+                    }
+
+                }
+                // Присваиваем соседей, а соседям эту плитку
+                if (upTile != null) upTile.DownTile = null;
+                if (downTile != null) downTile.UpTile = null;
+                if (leftTile != null) leftTile.RightTile = null;
+                if (rightTile != null) rightTile.LeftTile = null;
+            }
         }
 
         // Получить плитку по мировым координатам
@@ -338,19 +239,11 @@ namespace MyTerraria
             return GetTileByWorldPos(pos.X, pos.Y);
         }
 
-        // Получить плитку
-        public Tile GetTile(int i, int j)
+        public Tile GetTile(int x, int y)
         {
-            if (i >= 0 && j >= 0 && i < WORLD_WIDTH && j < WORLD_HEIGHT)
-            {
-                return tiles[i, j];
-            }
-            else
-                return null;
-        }
+            if (x >= 0 && y >= 0 && x < WORLD_WIDTH && y < WORLD_HEIGHT)
+                return tiles[x + y * WORLD_WIDTH];
 
-        public NPC.Npc GetNPC()
-        {
             return null;
         }
 
@@ -370,44 +263,78 @@ namespace MyTerraria
             }
 
         }
-        Vector2f pos;
-        //int screanX = WORLD_WIDTH - (int)Program.Window.Size.X / 16;
+
         // Нарисовать мир
         public void Draw(RenderTarget target, RenderStates states)
         {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
 
-            pos = Program.Game.Player.Position;
-            var tilesPos = (pos.X / Tile.TILE_SIZE, pos.Y / Tile.TILE_SIZE);
+
+            states.Transform *= Transform;
+
+            Vector2f pos = Program.pos;
+
+            var tilePos = (pos.X / Tile.TILE_SIZE, pos.Y / Tile.TILE_SIZE);
             var tilesPerScreen = (Program.Window.Size.X / Tile.TILE_SIZE, Program.Window.Size.Y / Tile.TILE_SIZE);
-            var LeftMostTilesPos = (int)(tilesPos.Item1 - tilesPerScreen.Item1 / 2);
-            var TopMostTilesPos = (int)(tilesPos.Item2 - tilesPerScreen.Item2 / 2);
+            var LeftMostTilesPos = (int)(tilePos.Item1 - tilesPerScreen.Item1 / 2);
+            var TopMostTilesPos = (int)(tilePos.Item2 - tilesPerScreen.Item2 / 2);
 
-            //if (Program.Game.Player.Position.X <= WORLD_WIDTH * 16 - Program.Window.Size.X / 2)
-            //{
-                for (int i = LeftMostTilesPos; i < LeftMostTilesPos + tilesPerScreen.Item1 + 1; i++)
-                {
-                    for (int j = TopMostTilesPos; j < TopMostTilesPos + tilesPerScreen.Item2 + 1; j++)
-                    {
-                        if (i > -1 && j > -1 && i < WORLD_WIDTH && j < WORLD_HEIGHT && tiles[i, j] != null)
-                            target.Draw(tiles[i, j]);
-                    }
-                }
-            //}
-            /*else if (Program.Game.Player.Position.X >= WORLD_WIDTH * 16 - Program.Window.Size.X / 2)
+
+
+            if (!Program.debagDraw)
             {
-                for (int i = (int)screanX; i < LeftMostTilesPos + tilesPerScreen.Item1 + 1; i++)
+                for (int x = LeftMostTilesPos; x < LeftMostTilesPos + tilesPerScreen.Item1 + 1; x++)
                 {
-                    for (int j = TopMostTilesPos; j < TopMostTilesPos + tilesPerScreen.Item2 + 10; j++)
+                    for (int y = TopMostTilesPos; y < TopMostTilesPos + tilesPerScreen.Item2 + 1; y++)
                     {
-                        if (i > -1 && j > -1 && i < WORLD_WIDTH && j < WORLD_HEIGHT && tiles[i, j] != null)
-                            target.Draw(tiles[i, j]);
+                        if (x > -1 && y > -1 && x < WORLD_WIDTH && y < WORLD_HEIGHT && tiles[x + y * WORLD_WIDTH] != null)
+                        {
+                            var downTile = GetTile(x, y + 1);
+                            var rightTile = GetTile(x - 1, y);
+                            var leftTile = GetTile(x + 1, y);
+                            if (downTile == null && rightTile == null && leftTile == null)
+                                TreeFelling(x, y);
+                            else if (GetTile(x, y) != null && GetTile(x, y).type == TileType.GRASS && GetTile(x, y - 1) != null && GetTile(x, y - 1).type == TileType.TREEBARK)
+                                TreeFelling(x, y);
+
+                            if (tiles[x + y * WORLD_WIDTH] != null)
+                            { 
+                                //tiles[x + y * WORLD_WIDTH].SetVisible(true);
+                                target.Draw(tiles[x + y * WORLD_WIDTH], states);
+                                //tiles[x + y * WORLD_WIDTH].SetVisible(false);
+                            }
+                        }
                     }
                 }
-            }*/
+            }
+            else
+            {
+                for (int x = 0; x < WORLD_WIDTH; x++)
+                {
+                    for (int y = 0; y < WORLD_HEIGHT; y++)
+                    {
+                        if (x > -1 && y > -1 && x < WORLD_WIDTH && y < WORLD_HEIGHT && tiles[x + y * WORLD_WIDTH] != null)
+                        {
+                            //tiles[x + y * WORLD_WIDTH].SetVisible(true);
+                            target.Draw(tiles[x + y * WORLD_WIDTH], states);
+                            //tiles[x + y * WORLD_WIDTH].SetVisible(false);
+                        }
+                    }
+                }
 
+
+            }
             // Рисуем вещи
             foreach (var item in items)
-                target.Draw(item);
+                if (item.Position.X / 16 > LeftMostTilesPos && item.Position.X / 16 < LeftMostTilesPos + tilesPerScreen.Item1 + 1)
+                    if (item.Position.Y / 16 > TopMostTilesPos && item.Position.Y / 16 < TopMostTilesPos + tilesPerScreen.Item2 + 1)
+                        target.Draw(item);
+
+            stopwatch.Stop();
+
+
+            Program.Game.debag.SetMessageLine("Render time world on ms: " + stopwatch.Elapsed.Milliseconds.ToString());
         }
     }
 }
