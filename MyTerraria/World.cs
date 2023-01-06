@@ -13,8 +13,8 @@ namespace MyTerraria
     public class World : Transformable, Drawable
     {
         // Кол-во плиток по ширине и высоте
-        public static int WORLD_WIDTH = 1000;
-        public static int WORLD_HEIGHT = 1000;
+        public static int WORLD_WIDTH = 100;
+        public static int WORLD_HEIGHT = 100;
 
         public static int GroundLavelMax;
 
@@ -53,8 +53,6 @@ namespace MyTerraria
             GroundLavelMax = Rand.Next(20, 50);
             int GroundLevelMin = GroundLavelMax + Rand.Next(10, 15);
 
-            //await Task.Run(() =>
-            //{
             for (int x = 0; x < WORLD_WIDTH; x++)
             {
                 height[x] = Perlin2D.Noise((x + seed) * terrainFreq, (seed) * terrainFreq) * 6 + GroundLavelMax;
@@ -67,10 +65,15 @@ namespace MyTerraria
                             if (GetTile(x, y - 1) != null)
                                 SetTile(TileType.GROUND, x, y, false);
                             else
+                            {
                                 SetTile(TileType.GRASS, x, y, false);
+                            }
 
                         if (PerlinCave[x + y * WORLD_WIDTH] < 0.001f)
                             SetTile(TileType.STONE, x, y, false);
+
+                        if (Rand.Next(0, 10) == 1)
+                            SetTree(x, y);
                     }
                     else
                     {
@@ -82,52 +85,40 @@ namespace MyTerraria
                     }
                 }
             }
-            //});
         }
 
-        private void GenerateTree()
+        private void SetTree(int x, int y)
         {
             bool tree = true;
 
-            for (int x = 0; x < WORLD_WIDTH; x++)
+            int maxHeight = Rand.Next(4, 30);
+            int x2 = Rand.Next(-1, 2);
+
+            if (GetTile(x, y) != null && GetTile(x, y).type == TileType.GRASS)
             {
-                for (int y = (int)height[x]; y < WORLD_HEIGHT; y++)
+                for (int y1 = 1; y1 < maxHeight + 6; y1++)
                 {
-                    int maxHeight = Rand.Next(4, 30);
-                    int x2 = Rand.Next(-1, 2);
-
-                    if (GetTile(x, y) != null && GetTile(x, y).type == TileType.GRASS)
-                    {
-                        for (int y1 = 1; y1 < maxHeight; y1++)
-                        {
-                            if (GetTile(x, y - y1) != null)
-                                tree = false;
-                            else if (GetTile(x, y - y1) == null && y1 == maxHeight - 1 && tree)
-                                tree = true;
-                        }
-
-                        if (tree)
-                            for (int y1 = 1; y1 < maxHeight; y1++)
-                            {
-                                if (GetTile(x, y - y1) == null)
-                                {
-                                    //if (GetTile(x + x2, y) != null && GetTile(x + x2, y).type == TileType.GRASS)
-                                        //SetTile(TileType.TREEBARK, x + x2, y - 1, false);
-
-                                    SetTile(TileType.TREEBARK, x, y - y1, false);
-
-                                    if (maxHeight > 6)
-                                        SetTile(TileType.TREETOPS, x, y - maxHeight, false);
-                                    else
-                                        SetTile(TileType.TREEBARK, x, y - maxHeight, false);
-                                }
-                            }
-
+                    if (GetTile(x, y - y1) != null)
+                        tree = false;
+                    else if (GetTile(x, y - y1) == null && y1 == maxHeight - 1 && tree)
                         tree = true;
-                    }
                 }
 
-                x += Rand.Next(2, 15);
+                if (tree)
+                    for (int y1 = 1; y1 < maxHeight; y1++)
+                    {
+                        if (GetTile(x, y - y1) == null)
+                        {
+                            SetTile(TileType.TREEBARK, x, y - y1, false);
+
+                            if (maxHeight > 6)
+                                SetTile(TileType.TREETOPS, x, y - maxHeight, false);
+                            else
+                                SetTile(TileType.TREEBARK, x, y - maxHeight, false);
+                        }
+                    }
+
+                tree = true;
             }
         }
 
@@ -135,8 +126,6 @@ namespace MyTerraria
         public void GenerateWorld()
         {
             GenerateTerrain();
-
-            GenerateTree();
 
             worldGen = true;
         }
@@ -153,14 +142,23 @@ namespace MyTerraria
 
                     if (tile != null && tile.type == TileType.TREEBARK)
                     {
-                        SetTile(TileType.TREEBARK, x, y - y1, true);
+                        SetTile(TileType.BOARD, x, y - y1, true);
                         if (tileLeft != null && tileLeft.type == TileType.TREEBARK)
-                            SetTile(TileType.TREEBARK, x - 1, y - y1, true);
+                            SetTile(TileType.BOARD, x - 1, y - y1, true);
                         if (tileRight != null && tileRight.type == TileType.TREEBARK)
-                            SetTile(TileType.TREEBARK, x + 1, y - y1, true);
+                            SetTile(TileType.BOARD, x + 1, y - y1, true);
                     }
                     else if (tile != null && tile.type == TileType.TREETOPS)
-                        SetTile(TileType.TREETOPS, x, y - y1, true);
+                    {
+                        SetTile(TileType.BOARD, x, y - y1, true);
+
+                        for (int i = 0; i < Rand.Next(6, 18); i++)
+                        {
+                            var itemTile = new ItemTile(this, InfoItem.ItemTreeSapling);
+                            itemTile.Position = tile.Position;
+                            items.Add(itemTile);
+                        }
+                    }
                     else
                         return;
 
@@ -213,8 +211,10 @@ namespace MyTerraria
                             }
                         }
                     }
-
                 }
+                else
+                    tiles[index] = null;
+
                 // Присваиваем соседей, а соседям эту плитку
                 if (upTile != null) upTile.DownTile = null;
                 if (downTile != null) downTile.UpTile = null;
@@ -262,6 +262,57 @@ namespace MyTerraria
                 }
             }
 
+            Task.Run(() =>
+            {
+                for (int x = 0; x < WORLD_WIDTH; x++)
+                {
+                    for (int y = 0; y < WORLD_HEIGHT; y++)
+                    {
+                        var saplingTile = GetTile(x, y);
+                        var groundTile = GetTile(x, y);
+
+                        Tile upTile = GetTile(x, y - 1);
+                        Tile downTile = GetTile(x, y + 1);
+                        Tile leftTile = GetTile(x - 1, y);
+                        Tile rightTile = GetTile(x + 1, y);
+
+                        if (groundTile != null && groundTile.type == TileType.GROUND && Rand.Next(0, 5000) == 2)
+                        {
+                            /*if (upTile == null || (upTile != null && (leftTile == null || rightTile == null || downTile == null)) && Rand.Next(0, 10) == 2)
+                                //if ((leftTile != null && leftTile.type == TileType.GRASS) || (rightTile != null && rightTile.type == TileType.GRASS) || (GetTile(x + 1, y - 1) != null && GetTile(x + 1, y - 1).type == TileType.GRASS) || (GetTile(x - 1, y - 1) != null && GetTile(x - 1, y - 1).type == TileType.GRASS) || (GetTile(x + 1, y + 1) != null && GetTile(x + 1, y + 1).type == TileType.GRASS) || (GetTile(x - 1, y + 1) != null && GetTile(x - 1, y + 1).type == TileType.GRASS))
+                                    if ((upTile != null && upTile.type == TileType.GRASS) || (downTile != null && downTile.type == TileType.GRASS) || (leftTile != null && leftTile.type == TileType.GRASS) || (rightTile != null && rightTile.type == TileType.GRASS))*/
+
+                            if (upTile != null && upTile.type == TileType.GRASS && (leftTile == null || rightTile == null || downTile == null))
+                            {
+                                SetTile(TileType.GRASS, x, y, false);
+                            }
+                            else if (downTile != null && downTile.type == TileType.GRASS && (leftTile == null || rightTile == null || upTile == null))
+                            {
+                                SetTile(TileType.GRASS, x, y, false);
+                            }
+                            else if (leftTile != null && leftTile.type == TileType.GRASS && (downTile == null || rightTile == null || upTile == null))
+                            {
+                                SetTile(TileType.GRASS, x, y, false);
+                            }
+                            else if (rightTile != null && rightTile.type == TileType.GRASS && (downTile == null || leftTile == null || upTile == null))
+                            {
+                                SetTile(TileType.GRASS, x, y, false);
+                            }
+                            if (upTile == null || (upTile != null && (leftTile == null || rightTile == null || downTile == null)))
+                                if ((leftTile != null && leftTile.type == TileType.GRASS) || (rightTile != null && rightTile.type == TileType.GRASS) || (GetTile(x + 1, y - 1) != null && GetTile(x + 1, y - 1).type == TileType.GRASS) || (GetTile(x - 1, y - 1) != null && GetTile(x - 1, y - 1).type == TileType.GRASS) || (GetTile(x + 1, y + 1) != null && GetTile(x + 1, y + 1).type == TileType.GRASS) || (GetTile(x - 1, y + 1) != null && GetTile(x - 1, y + 1).type == TileType.GRASS))
+                                    SetTile(TileType.GRASS, x, y, false);
+                        }
+
+
+                        if (saplingTile != null && saplingTile.type == TileType.TREESAPLING)
+                            if (Rand.Next(0, 30) == 5)
+                            {
+                                SetTile(TileType.NONE, x, y, true);
+                                SetTree(x, y + 1);
+                            }
+                    }
+                }
+            });
         }
 
         // Нарисовать мир

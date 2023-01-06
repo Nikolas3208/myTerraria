@@ -23,19 +23,17 @@ namespace MyTerraria
         public static InfoItem ItemGround = new InfoItem(TileType.GROUND).SetSprite(Content.ssTileItemGround, 0, 0);
         public static InfoItem ItemGrass = new InfoItem(TileType.GRASS).SetSprite(Content.ssTileItemGround , 0, 0);
         public static InfoItem ItemStone = new InfoItem(TileType.STONE).SetSprite(Content.ssTileItemStone, 0, 0);
-        public static InfoItem ItemMushroom = new InfoItem(TileType.NONE).SetSprite(Content.ssTileItemMushroom, 0, 0);
+        public static InfoItem ItemMushroom = new InfoItem(TileType.MUSHROOM).SetSprite(Content.ssTileItemMushroom, 0, 0);
+        public static InfoItem ItemVegetation = new InfoItem(TileType.VEGETATION).SetSprite(Content.ssTileItemMushroom, 0, 0);
         public static InfoItem ItemTorch = new InfoItem(TileType.TORCH).SetSprite(Content.ssTileItemTorch, 0, 0);
-        public static InfoItem ItemBoard = new InfoItem(TileType.TREEBARK).SetSprite(Content.ssTileItemBoard, 0, 0);
-        public static InfoItem ItemBoardTops = new InfoItem(TileType.TREETOPS).SetSprite(Content.ssTileItemBoard, 0, 0);
-        public static InfoItem ItemIronOre = new InfoItem(TileType.NONE).SetSprite(Content.ssTileItemIronOre, 0, 0);
-        public static InfoItem ItemCopperOre = new InfoItem(TileType.NONE).SetSprite(Content.ssTileItemCopperOre, 0, 0);
-        public static InfoItem ItemGoldOre = new InfoItem(TileType.NONE).SetSprite(Content.ssTileItemGoldOre, 0, 0);
-        public static InfoItem ItemSilverOre = new InfoItem(TileType.NONE).SetSprite(Content.ssTileItemSilverOre, 0, 0);
-        public static InfoItem ItemGoldIngot = new InfoItem(TileType.NONE).SetSprite(Content.ssTileItemGoldIngot, 0, 0);
-        public static InfoItem ItemCopperIngot = new InfoItem(TileType.NONE).SetSprite(Content.ssTileItemCopperIngot, 0, 0);
-        public static InfoItem ItemSilverIngot = new InfoItem(TileType.NONE).SetSprite(Content.ssTileItemSilverIngot, 0, 0);
-        public static InfoItem ItemIronIngot = new InfoItem(TileType.NONE).SetSprite(Content.ssTileItemIronIngot, 0, 0);
-        public static InfoItem ItemSlime = new InfoItem(TileType.NONE).SetSprite(Content.ssTileItemSlime, 0, 0);
+        public static InfoItem ItemBoard = new InfoItem(TileType.BOARD).SetSprite(Content.ssTileItemBoard, 0, 0);
+
+        public static InfoItem ItemTreeSapling = new InfoItem(TileType.TREESAPLING).SetSprite(Content.ssTileItemAcorn, 0, 0);
+        
+        public static InfoItem ItemIronOre = new InfoItem(TileType.IRONORE).SetSprite(Content.ssTileItemIronOre, 0, 0);
+        public static InfoItem ItemCopperOre = new InfoItem(TileType.COPERORE).SetSprite(Content.ssTileItemCopperOre, 0, 0);
+        public static InfoItem ItemGoldOre = new InfoItem(TileType.GOLDORE).SetSprite(Content.ssTileItemGoldOre, 0, 0);
+        public static InfoItem ItemSilverOre = new InfoItem(TileType.SILVERORE).SetSprite(Content.ssTileItemSilverOre, 0, 0);
 
         //-----------------------
 
@@ -75,17 +73,12 @@ namespace MyTerraria
             InfoItems.Add(ItemMushroom);
             InfoItems.Add(ItemTorch);
             InfoItems.Add(ItemBoard);
-            InfoItems.Add(ItemBoardTops);
+            InfoItems.Add(ItemTreeSapling);
             InfoItems.Add(ItemAxe);
             InfoItems.Add(ItemIronOre);
             InfoItems.Add(ItemCopperOre);
             InfoItems.Add(ItemGoldOre);
             InfoItems.Add(ItemSilverOre);
-            InfoItems.Add(ItemGoldIngot);
-            InfoItems.Add(ItemCopperIngot);
-            InfoItems.Add(ItemSilverIngot);
-            InfoItems.Add(ItemIronIngot);
-            InfoItems.Add(ItemSlime);
             InfoItems.Add(ItemSword);
         }
 
@@ -93,7 +86,7 @@ namespace MyTerraria
         public int SpriteI { get; private set; }
         public int SpriteJ { get; private set; }
         // Максимальное кол-во предметов в стеке
-        public int MaxCountInStack { get; internal set; } = 99;
+        public int MaxCountInStack { get; private set; } = 99;
 
         public InfoItem SetSprite(SpriteSheet ss, int i, int j)
         {

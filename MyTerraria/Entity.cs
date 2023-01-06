@@ -76,11 +76,11 @@ namespace MyTerraria
                         Tile tile = world.GetTile(i, j);
                         Tile tileTop = world.GetTile(i, j - (int)rect.Size.Y / Tile.TILE_SIZE - 1);
 
-                        if (i < 0 || i >= World.WORLD_WIDTH || j < 0 || j >= World.WORLD_HEIGHT)
-                            return;
+                        /*if (i < 0 || i >= World.WORLD_WIDTH || j < 0 || j >= World.WORLD_HEIGHT)
+                            return;*/
 
 
-                        if (tile != null && tile.type != TileType.TREEBARK && tile.type != TileType.TREETOPS && tile.type != TileType.VEGETATION && tile.type != TileType.TORCH)
+                        if (tile != null && tile.activityPhithics)
                         {
                             FloatRect tileRect = new FloatRect(tile.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
 
@@ -101,7 +101,7 @@ namespace MyTerraria
                             isFly = true;
 
 
-                        if (tileTop != null && tileTop.type != TileType.TREEBARK && tileTop.type != TileType.TREETOPS && tileTop.type != TileType.NONE)
+                        if (tileTop != null && tileTop.activityPhithics)
                         {
                             FloatRect tiletop = new FloatRect(tileTop.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
                             DebugRender.AddRectangle(tiletop, Color.Red);
@@ -161,14 +161,11 @@ namespace MyTerraria
                     FloatRect tileRect = new FloatRect(t.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
 
                     DebugRender.AddRectangle(tileRect, Color.Yellow);
-                    if (t != null && t.type != TileType.TREEBARK && t.type != TileType.TREETOPS && t.type != TileType.TORCH)
+                    if (t != null && t.activityPhithics)
                     {
-                        if (t != null && t.type != TileType.VEGETATION && t.type != TileType.NONE)
+                        if (updateCollision(stepRect, tileRect, dirType, ref stepPos))
                         {
-                            if (updateCollision(stepRect, tileRect, dirType, ref stepPos))
-                            {
-                                isWallCollided = true;
-                            }
+                            isWallCollided = true;
                         }
                     }
                 }

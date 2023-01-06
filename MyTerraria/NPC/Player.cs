@@ -311,6 +311,8 @@ namespace MyTerraria.NPC
             UIInvertory.cells[uiIsSelected].IsSelected = true;
         }
 
+        Sprite tool;
+
         private void UpdateMouse()
         {
             mousePos = Program.GetGlobalMousePosition();
@@ -328,6 +330,9 @@ namespace MyTerraria.NPC
                     {
                         if (InfoItemType.Tooltype == ToolType.Pick && tile.type != TileType.TREEBARK && tile.type != TileType.TREETOPS)
                         {
+                            if (tile.type == TileType.GRASS)
+                                tile.type = TileType.GROUND;
+
                             world.SetTile(tile.type, mousePos.X / 16, mousePos.Y / 16, true);
                             AnimationUpdate(AnimType.Tool);
                         }
@@ -336,6 +341,7 @@ namespace MyTerraria.NPC
                             world.TreeFelling(mousePos.X / 16, mousePos.Y / 16);
                             AnimationUpdate(AnimType.Tool);
                         }
+
                     }
                     else
                     {
@@ -346,20 +352,48 @@ namespace MyTerraria.NPC
 
                         if (InfoItemType.Tooltype == ToolType.None && InfoItemType.Weapontype == WeaponType.None && (upTile != null || downTile != null || leftTile != null || rightTile != null))
                         {
-                            world.SetTile(InfoItemType.Tiletype, mousePos.X / 16, mousePos.Y / 16, false);
-                            UIInvertory.cells[uiIsSelected].ItemStack.ItemCount--;
+                            if (InfoItemType.Tiletype == TileType.TREESAPLING && downTile != null && downTile.type == TileType.GRASS)
+                            {
+                                world.SetTile(TileType.TREESAPLING, mousePos.X / 16, mousePos.Y / 16, false);
+                                UIInvertory.cells[uiIsSelected].ItemStack.ItemCount--;
+                            }
+                            else if (InfoItemType.Tiletype != TileType.TREESAPLING)
+                            {
+                                world.SetTile(InfoItemType.Tiletype, mousePos.X / 16, mousePos.Y / 16, false);
+                                UIInvertory.cells[uiIsSelected].ItemStack.ItemCount--;
+                            }
 
                             AnimationUpdate(AnimType.Tool);
                         }
                     }
-                }   
+                    ToolUpdate();
+
+                }
             }
+        }
+
+        float angle = -90;
+        float speed = 5f;
+
+        private void ToolUpdate()
+        {
+            tool = new Sprite(UIInvertory.cells[uiIsSelected].ItemStack.InfoItem.SpriteSheet.Texture);
+            tool.Origin = new Vector2f(0, tool.Texture.Size.Y);
+            tool.Rotation = angle;
+            tool.Transform.Translate(0, 16);
+
+            angle += 3.23f * speed;
+
+            if (angle >= 360)
+                angle = -90;
         }
 
         public void AnimationUpdate(AnimType type)
         {
             if(type == AnimType.Run)
             {
+                tool = null;
+
                 asHair.Play("run");
                 asHead.Play("run");
                 asShirt.Play("run");
@@ -370,6 +404,8 @@ namespace MyTerraria.NPC
             }
             else if(type == AnimType.Idle)
             {
+                tool = null;
+
                 asHair.Play("idle");
                 asHead.Play("idle");
                 asShirt.Play("idle");
@@ -380,6 +416,8 @@ namespace MyTerraria.NPC
             }
             else if(type == AnimType.Jump)
             {
+                tool = null;
+
                 asHair.Play("jump");
                 asHead.Play("jump");
                 asShirt.Play("jump");
@@ -451,16 +489,10 @@ namespace MyTerraria.NPC
                 jump = 0;
                 releaseJump = true;
             }
-            //this.velocity.Y += gravity;
             if (this.velocity.Y > maxFallSpeed)
             {
                 this.velocity.Y = maxFallSpeed;
             }
-
-            if (isJump)
-                timerA += 1 * Program.Delta;
-            else
-                timerA = 0;
 
             if (isMove)
             {
@@ -487,7 +519,10 @@ namespace MyTerraria.NPC
                     movement.X = -PLAYER_MOVE_SPEED;
 
                 // Анимация ходьбы
-                AnimationUpdate(AnimType.Run);
+                if(isJump && timerA == 0)
+                    AnimationUpdate(AnimType.Jump);
+                else if (!isJump)
+                    AnimationUpdate(AnimType.Run);
             }
             else
             {
@@ -497,12 +532,17 @@ namespace MyTerraria.NPC
                 if (!isFly && !Mouse.IsButtonPressed(Mouse.Button.Left))
                     AnimationUpdate(AnimType.Idle);
 
-                if(velocity.Y < 0)
+                if(isJump)
                     AnimationUpdate(AnimType.Jump);
 
                 if(Mouse.IsButtonPressed(Mouse.Button.Left))
                     AnimationUpdate(AnimType.Tool);
             }
+
+            if (isJump)
+                timerA += 1 * Program.Delta;
+            else
+                timerA = 0;
         }
 
         public override void DrawNPC(RenderTarget target, RenderStates states)
@@ -514,6 +554,9 @@ namespace MyTerraria.NPC
             target.Draw(asHands, states);
             target.Draw(asLegs, states);
             target.Draw(asShoes, states);
+
+            if (tool != null)
+                target.Draw(tool, states);
         }
 
         public override void OnWallCollided()
@@ -532,6 +575,17 @@ namespace MyTerraria.NPC
             itemTile = new ItemTile(world, InfoItem.ItemAxe);
             itemTile.Position = Position;
             world.items.Add(itemTile);
+
+            //Сажены дерева
+            for (int i = 0; i < 10; i++)
+            {
+                itemTile = new ItemTile(world, InfoItem.ItemTreeSapling);
+                itemTile.Position = Position;
+                world.items.Add(itemTile);
+                itemTile = new ItemTile(world, InfoItem.ItemMushroom);
+                itemTile.Position = Position;
+                world.items.Add(itemTile);
+            }
         }
     }
 }

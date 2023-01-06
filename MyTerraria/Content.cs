@@ -13,19 +13,23 @@ namespace MyTerraria
         public static Sprite ssBackgroundMountains;
         public static Texture ssTextureBackgroundSky;
         //Tile
-        public static SpriteSheet ssTileGround; // Ground
-        public static SpriteSheet ssTileSand; // Sand
-        public static SpriteSheet ssTileGrass; // Grass
-        public static SpriteSheet ssTileGrassDistortion; // Grass
-        public static SpriteSheet ssTileStone; // Stone
-        public static SpriteSheet ssTileStoneDistortion; // Stone
-        public static SpriteSheet ssTileIronOre;//Iron Ore
-        public static SpriteSheet ssTileTreeBark; // Tree
-        public static SpriteSheet ssTileTreeTops; // Tree
-        public static SpriteSheet ssTileTreeTopsDistortion; // Tree
-        public static SpriteSheet ssTileVegetation; // Vegetation
-        public static SpriteSheet ssTileBoard; // Board
-        public static SpriteSheet ssTileTorch; // Board
+        public static SpriteSheet ssTileGround; 
+        public static SpriteSheet ssTileSand; 
+        public static SpriteSheet ssTileGrass; 
+        public static SpriteSheet ssTileGrassDistortion; 
+        public static SpriteSheet ssTileStone; 
+        public static SpriteSheet ssTileStoneDistortion; 
+        public static SpriteSheet ssTileIronOre;
+        public static SpriteSheet ssTileCoperOre;
+        public static SpriteSheet ssTileGoldOre;
+        public static SpriteSheet ssTileSilverOre;
+        public static SpriteSheet ssTileTreeBark; 
+        public static SpriteSheet ssTileTreeTops; 
+        public static SpriteSheet ssTileTreeTopsDistortion; 
+        public static SpriteSheet ssTileVegetation; 
+        public static SpriteSheet ssTileBoard; 
+        public static SpriteSheet ssTileSaplingTree; 
+        public static SpriteSheet ssTileTorch; 
         //Wall
         public static SpriteSheet ssWallGround; // Ground
         public static SpriteSheet ssWallGrass; // Grass
@@ -42,6 +46,7 @@ namespace MyTerraria
         public static SpriteSheet ssTileItemMushroom;//Mushroom
         public static SpriteSheet ssTileItemTorch;//Torch
         public static SpriteSheet ssTileItemBoard; // Board
+        public static SpriteSheet ssTileItemAcorn; // Board
         public static SpriteSheet ssTileItemAxe;//Axe
         public static SpriteSheet ssTileItemIronOre;//Iron Ore
         public static SpriteSheet ssTileItemCopperOre;//Copper Ore
@@ -83,16 +88,17 @@ namespace MyTerraria
 
             //TilleBlock
             ssTileGround = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false,1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_0.png"));
-            ssTileSand = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_53.png"));
             ssTileStone = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_1.png"));
-            ssTileStoneDistortion = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_22.png"));
             ssTileGrass = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_2.png"));
-            ssTileGrassDistortion = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_23.png"));
             ssTileVegetation = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_3.png"));
+            ssTileTorch = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_4.png"));
             ssTileTreeBark = new SpriteSheet(20, 20, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_5.png"));
             ssTileIronOre = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_6.png"));
+            ssTileCoperOre = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_7.png"));
+            ssTileGoldOre = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_8.png"));
+            ssTileSilverOre = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_9.png"));
+            ssTileSaplingTree = new SpriteSheet(540 / 30, 38, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_20.png"));
             ssTileBoard = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_30.png"));
-            ssTileTorch = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_4.png"));
             //Wall
             ssWallGround = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\walls\\Wall_2.png"));
             ssWallStone = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\walls\\Wall_1.png"));
@@ -120,6 +126,7 @@ namespace MyTerraria
             ssTileItemIronIngot = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_22.png"));
             ssTileItemSlime = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_23.png"));
             ssTileItemSword = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_24.png"));
+            ssTileItemAcorn = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_27.png"));
 
             // NPC
             ssNpcSlime = new SpriteSheet(1, 2, true, 0, new Texture(CONTENT_DIR + "Textures\\npc\\NPC_1.png"));
