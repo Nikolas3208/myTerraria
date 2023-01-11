@@ -1,8 +1,10 @@
-﻿using MyTerraria.Items;
+﻿using MyTerraria.GUI;
+using MyTerraria.GUI.Menu;
 using MyTerraria.NPC;
 using MyTerraria.UI;
 using SFML.Graphics;
 using SFML.System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -14,25 +16,33 @@ namespace MyTerraria
         public Player Player { get; private set; }  // Игрок
         public World World { get; private set; } // Мир
 
-        List<Npc> Npc = new List<Npc>(); // Слизни
+        public MainMenu menu { get; private set; }
 
-        public DebagInfo debag; // Дебаг информация
+        private List<Npc> Npc = new List<Npc>(); // Слизни
 
-        Stopwatch stopwatch1 = new Stopwatch(); // Счетчик затрат времени
+        private Stopwatch worldSaveTimer = new Stopwatch(); //Авто сохранение мира
 
+        //Клас игры
         public Game()
         {
+            //Init();
+        }
+
+        private void InitMenu()
+        {
+            MainMenu.AddButton(Color.Green, new Vector2f(300, 400), "play");
+        }
+
+        public void Init()
+        {
             // Создаём новый мир и выполняем его генерацию
-            World = new World();
-            Task.Run(() => World.GenerateWorld());
+            CreateWorld();
 
             // Создаём игрока
-            Player = new Player(World);
-            Player.Spawn();
-            Player.AddTools();
+            CreatePlayer();
 
-            //Персонаж
-            Npc.Add(Player);
+            //Влючаем или отключаем отображеие прямоугольников)
+            NPC.Npc.debag = false;
 
             // Создаём быстрого слизня
             Npc.Add(new NpcFastSlime(World));
@@ -41,71 +51,81 @@ namespace MyTerraria
             //Летаюший глаз
             Npc.Add(new NpcFlyingEye(World));
 
-            Player.Invertory = new UI.UIInvertory();
+            //UI инвентарь
             UIManager.AddControl(Player.Invertory);
 
-            //DebagInfo
-            debag = new DebagInfo(Content.font);
-
             // Включаем прорисовку объектов для визуальной отладки
-            DebugRender.Enabled = false;
+            DebugRender.Enabled = true;
         }
 
+        private void CreatePlayer()
+        {
+            Player = new Player(World);
+            Player.Spawn();
+            Player.AddTools();
+
+            Player.Invertory = new UI.UIInvertory();
+        }
+
+        private void CreateWorld()
+        {
+            World = new World();
+            World.GenerateWorld("Level");
+            World.LoadWorld("Level");
+            World.worldGen = true;
+        }
 
         // Обновление логики игры
         public void Update()
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+            worldSaveTimer.Start();
 
-            //Player.Update();
+            Player.Update();
 
+            World.Update();
 
-                World.Update();
-
-                foreach (var s in Npc)
-                    s.Update();
+            foreach (var s in Npc)
+                s.Update();
 
             UIManager.UpdateOver();
             UIManager.Update();
 
-            stopwatch.Stop();
+            worldSaveTimer.Stop();
 
-            debag.SetPosition(Player.GetGlobalPosition());
+            TimerUpdate();
+        }
 
-            //DebageInfo
-            debag.ClearText();
-            debag.SetMessageLine(Program.FPS.ToString());
-            //debag.SetMessageLine((Program.GetGlobalMousePosition() / 16).ToString());
-            //debag.SetMessageLine((Player.GetGlobalPosition() / 16).ToString());
-            /*if (World.GetTileByWorldPos(Program.GetGlobalMousePosition()) != null)
-                debag.SetMessageLine(World.GetTileByWorldPos(Program.GetGlobalMousePosition()).type.ToString());*/
-
-            debag.SetMessageLine("Phisics time: " + stopwatch.Elapsed.ToString());
-            //debag.SetMessageLine("Render time on ms: " + stopwatch1.Elapsed.Milliseconds.ToString());
-
+        private void TimerUpdate()
+        {
+            if (worldSaveTimer.Elapsed.TotalMinutes > 0 && !World.worldSave)
+            {
+                World.worldSave = true;
+                worldSaveTimer.Restart();
+            }
         }
 
         // Прорисовка игры
         public void Draw()
         {
-            stopwatch1.Restart();
-            stopwatch1.Start();
+            if (!World.worldGen)
+            {
+                InitMenu();
 
-            Program.Window.Draw(World);
-            //Program.Window.Draw(Player);
+                MainMenu.Draw(Program.Window);
+            }
 
-            foreach (var s in Npc)
-                Program.Window.Draw(s);
+            if (World.worldGen)
+            {
+                Program.Window.Draw(World);
+                Program.Window.Draw(Player);
 
-            DebugRender.Draw(Program.Window);
+                foreach (var s in Npc)
+                    Program.Window.Draw(s);
 
-            Program.Window.Draw(debag);
+                DebugRender.Draw(Program.Window);
 
-            UIManager.Draw();
-
-            stopwatch1.Stop();
-
+                UIManager.Draw();
+            }
         }
     }
 }

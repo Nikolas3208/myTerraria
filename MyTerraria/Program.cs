@@ -21,7 +21,9 @@ namespace MyTerraria
         {
             //Создание окна
             Window = new RenderWindow(VideoMode.DesktopMode, "My Terraria!");
-            Window.SetVerticalSyncEnabled(true);
+            //Window.SetVerticalSyncEnabled(true);
+            Window.SetFramerateLimit(75);
+            //Window.SetMouseCursorVisible(false);
 
             Window.Closed += Win_Closed;
             Window.Resized += Win_Resized;
@@ -34,10 +36,6 @@ namespace MyTerraria
 
             Game = new Game();      // Создаём новый объект класса игры
             Clock clock = new Clock();
-
-            /*Game.Sounds[0] = new Sound(TypeSound.BACKGROUN);
-            Game.Sounds[1] = new Sound(TypeSound.GRAB);
-            Game.Sounds[2] = new Sound(TypeSound.RUN);*/
 
             //Основной цикл программы
             while (Window.IsOpen)
@@ -52,24 +50,21 @@ namespace MyTerraria
 
                 if (World.worldGen)
                     Game.Update();
-                    //Task.Run(() => Game.Update());
 
                 if (World.worldGen)
                     CenterScreen();
 
                 Window.Clear(Color.Cyan);
 
-                if (World.worldGen)
-                    Window.Draw(Content.ssBackgroundSky);
+                Window.Draw(Content.ssBackgroundSky);
 
-                if (World.worldGen)
-                    Game.Draw();
+                Game.Draw();
 
-                //Content.bacgroundMusic.Play();
 
                 Window.Display();
             }
         }
+
         public static Vector2f pos2;
         public static float zoom = 1;
 
@@ -114,6 +109,9 @@ namespace MyTerraria
         {
             switch (e.Code)
             {
+                case Keyboard.Key.Escape:
+
+                    break;
                 case Keyboard.Key.Up:
                     pos2.Y -= 1000 * Delta;
                     break;

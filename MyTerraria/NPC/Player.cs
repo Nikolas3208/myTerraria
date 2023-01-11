@@ -317,9 +317,15 @@ namespace MyTerraria.NPC
         {
             mousePos = Program.GetGlobalMousePosition();
 
-            DebugRender.AddRectangle(mousePos.X, mousePos.Y, Tile.TILE_SIZE, Tile.TILE_SIZE, Color.Green);
 
-            if(Mouse.IsButtonPressed(Mouse.Button.Left))
+            if (UIInvertory.cells != null && UIInvertory.cells[uiIsSelected].ItemStack != null && UIInvertory.cells[uiIsSelected].ItemStack.InfoItem != null)
+                DebugRender.AddRectangle(mousePos.X, mousePos.Y, UIInvertory.cells[uiIsSelected].ItemStack.InfoItem.SpriteSheet.Texture.Size.X, UIInvertory.cells[uiIsSelected].ItemStack.InfoItem.SpriteSheet.Texture.Size.Y, UIInvertory.cells[uiIsSelected].ItemStack.InfoItem.SpriteSheet.Texture);
+
+            FloatRect rect = new FloatRect(new Vector2f(mousePos.X, mousePos.Y), new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
+
+            DebugRender.AddRectangle(rect, Color.Green);
+
+            if (Mouse.IsButtonPressed(Mouse.Button.Left))
             {
                 Tile tile = world.GetTile(mousePos.X / 16, mousePos.Y / 16);
 
@@ -380,7 +386,7 @@ namespace MyTerraria.NPC
             tool = new Sprite(UIInvertory.cells[uiIsSelected].ItemStack.InfoItem.SpriteSheet.Texture);
             tool.Origin = new Vector2f(0, tool.Texture.Size.Y);
             tool.Rotation = angle;
-            tool.Transform.Translate(0, 16);
+            //tool.Position = GetGlobalPosition();
 
             angle += 3.23f * speed;
 

@@ -7,7 +7,7 @@ namespace MyTerraria
     class Content
     {
         public const string CONTENT_DIR = "..\\Content\\";
-        public static readonly string FONT_DIR = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Fonts) + "\\";
+        //public static readonly string FONT_DIR = 
 
         public static Sprite ssBackgroundSky;
         public static Sprite ssBackgroundMountains;
@@ -78,7 +78,7 @@ namespace MyTerraria
         // UI
         public static Texture texUIInvertoryBack;      // Инвертарь
 
-        public static Font font = new Font(FONT_DIR + "arial.ttf");    // Шрифт
+        public static Font font = new Font(CONTENT_DIR + "Fonts\\arial.ttf");    // Шрифт
 
         public static void Load()
         {

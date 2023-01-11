@@ -2,11 +2,16 @@
 using MyTerraria.NPC;
 using SFML.Graphics;
 using SFML.System;
+using SFML.Window;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Xml.Linq;
 
 namespace MyTerraria
 {
@@ -18,13 +23,12 @@ namespace MyTerraria
 
         public static int GroundLavelMax;
 
+        public static bool PlayerCameraMove { get; private set; }
         public static bool worldGen = false;
+        public bool worldSave { get; set; }
 
         public static Random Rand { private set; get; }
         public static Perlin2D Perlin2D { private set; get; }
-        public static bool PlayerCameraMove { get; private set; }
-
-        public static float[] PerlinCave = new float[WORLD_WIDTH * WORLD_HEIGHT];
 
         // Плитки
         public Tile[] tiles = new Tile[WORLD_WIDTH * WORLD_HEIGHT];
@@ -33,10 +37,18 @@ namespace MyTerraria
         // Предметы
         public List<Item> items = new List<Item>();
 
+        private Vector2f CamPos;
+
+        public  float[] PerlinCave = new float[WORLD_WIDTH * WORLD_HEIGHT];
+
         private float[] height = new float[WORLD_WIDTH];
 
         private float caveFreq = 0.08f;
         private float terrainFreq = 0.04f;
+
+        private string name;
+        private string[] cells;
+        private char[] world = new char[WORLD_WIDTH * WORLD_HEIGHT];
 
         // Конструктор класса
         public World(int seed = -1)
@@ -48,11 +60,10 @@ namespace MyTerraria
 
         private void GenerateTerrain(int seed = -1)
         {
-            Rand = seed >= 0 ? new Random(seed) : new Random((int)DateTime.Now.Ticks);
 
             GroundLavelMax = Rand.Next(20, 50);
             int GroundLevelMin = GroundLavelMax + Rand.Next(10, 15);
-
+ 
             for (int x = 0; x < WORLD_WIDTH; x++)
             {
                 height[x] = Perlin2D.Noise((x + seed) * terrainFreq, (seed) * terrainFreq) * 6 + GroundLavelMax;
@@ -83,6 +94,17 @@ namespace MyTerraria
                         if (PerlinCave[x + y * WORLD_WIDTH] < 0.1f)
                             SetTile(TileType.STONE, x, y, false);
                     }
+                }
+            }
+
+            for (int x = 0; x < WORLD_WIDTH; x++)
+            {
+                for (int y = 0; y < WORLD_HEIGHT; y++)
+                {
+                    if (GetTile(x, y) == null)
+                        SaveWorld(TileType.NONE, x, y);
+                    else
+                        SaveWorld(GetTile(x, y).type, x, y);
                 }
             }
         }
@@ -123,9 +145,19 @@ namespace MyTerraria
         }
 
         // Генерируем новый мир
-        public void GenerateWorld()
+        public void GenerateWorld(string name)
         {
+            this.name = name;
+
             GenerateTerrain();
+
+            tiles = new Tile[WORLD_WIDTH * WORLD_HEIGHT];
+
+            File.WriteAllText("Worlds\\" + name + ".world", " ");
+
+            StreamWriter sw = new StreamWriter("Worlds\\" + name + ".world", true, Encoding.UTF8);
+            sw.Write(world);
+            sw.Close();
 
             worldGen = true;
         }
@@ -152,7 +184,7 @@ namespace MyTerraria
                     {
                         SetTile(TileType.BOARD, x, y - y1, true);
 
-                        for (int i = 0; i < Rand.Next(6, 18); i++)
+                        for (int i = 0; i < Rand.Next(1, 8); i++)
                         {
                             var itemTile = new ItemTile(this, InfoItem.ItemTreeSapling);
                             itemTile.Position = tile.Position;
@@ -169,7 +201,7 @@ namespace MyTerraria
 
         public void SetTile(TileType type, int x, int y, bool destroy)
         {
-            if (x < 0 || x > WORLD_WIDTH || y < 0 || y > WORLD_HEIGHT)
+            if (x < 0 || x >= WORLD_WIDTH || y < 0 || y >= WORLD_HEIGHT)
                 return;
 
             // Находим соседей
@@ -262,76 +294,126 @@ namespace MyTerraria
                 }
             }
 
-            Task.Run(() =>
+            /*if(worldSave)
             {
-                for (int x = 0; x < WORLD_WIDTH; x++)
+                Task.Run(() =>
                 {
-                    for (int y = 0; y < WORLD_HEIGHT; y++)
+                    File.WriteAllText("Worlds\\" + name + ".world", " ");
+
+                    StreamWriter sw = new StreamWriter("Worlds\\" + name + ".world", true, Encoding.UTF8);
+                    sw.Write(world);
+                    sw.Close();
+
+                    worldSave = false;
+
+                });
+            }*/
+        }
+
+        public void LoadWorld(string name)
+        {
+            this.name = name;
+
+            if (LoadFromFile("Worlds/" + name + ".world"))
+            {
+                for (int y = 0; y < cells.Length; y++)
+                {
+                    for (int x = 0; x < cells[y].Length; x++)
                     {
-                        var saplingTile = GetTile(x, y);
-                        var groundTile = GetTile(x, y);
-
-                        Tile upTile = GetTile(x, y - 1);
-                        Tile downTile = GetTile(x, y + 1);
-                        Tile leftTile = GetTile(x - 1, y);
-                        Tile rightTile = GetTile(x + 1, y);
-
-                        if (groundTile != null && groundTile.type == TileType.GROUND && Rand.Next(0, 5000) == 2)
+                        switch (cells[y][x])
                         {
-                            /*if (upTile == null || (upTile != null && (leftTile == null || rightTile == null || downTile == null)) && Rand.Next(0, 10) == 2)
-                                //if ((leftTile != null && leftTile.type == TileType.GRASS) || (rightTile != null && rightTile.type == TileType.GRASS) || (GetTile(x + 1, y - 1) != null && GetTile(x + 1, y - 1).type == TileType.GRASS) || (GetTile(x - 1, y - 1) != null && GetTile(x - 1, y - 1).type == TileType.GRASS) || (GetTile(x + 1, y + 1) != null && GetTile(x + 1, y + 1).type == TileType.GRASS) || (GetTile(x - 1, y + 1) != null && GetTile(x - 1, y + 1).type == TileType.GRASS))
-                                    if ((upTile != null && upTile.type == TileType.GRASS) || (downTile != null && downTile.type == TileType.GRASS) || (leftTile != null && leftTile.type == TileType.GRASS) || (rightTile != null && rightTile.type == TileType.GRASS))*/
-
-                            if (upTile != null && upTile.type == TileType.GRASS && (leftTile == null || rightTile == null || downTile == null))
-                            {
-                                SetTile(TileType.GRASS, x, y, false);
-                            }
-                            else if (downTile != null && downTile.type == TileType.GRASS && (leftTile == null || rightTile == null || upTile == null))
-                            {
-                                SetTile(TileType.GRASS, x, y, false);
-                            }
-                            else if (leftTile != null && leftTile.type == TileType.GRASS && (downTile == null || rightTile == null || upTile == null))
-                            {
-                                SetTile(TileType.GRASS, x, y, false);
-                            }
-                            else if (rightTile != null && rightTile.type == TileType.GRASS && (downTile == null || leftTile == null || upTile == null))
-                            {
-                                SetTile(TileType.GRASS, x, y, false);
-                            }
-                            if (upTile == null || (upTile != null && (leftTile == null || rightTile == null || downTile == null)))
-                                if ((leftTile != null && leftTile.type == TileType.GRASS) || (rightTile != null && rightTile.type == TileType.GRASS) || (GetTile(x + 1, y - 1) != null && GetTile(x + 1, y - 1).type == TileType.GRASS) || (GetTile(x - 1, y - 1) != null && GetTile(x - 1, y - 1).type == TileType.GRASS) || (GetTile(x + 1, y + 1) != null && GetTile(x + 1, y + 1).type == TileType.GRASS) || (GetTile(x - 1, y + 1) != null && GetTile(x - 1, y + 1).type == TileType.GRASS))
-                                    SetTile(TileType.GRASS, x, y, false);
+                            case ' ': SetTile(TileType.NONE, x, y, true); break;
+                            case '0': SetTile(TileType.GROUND, x, y, false); break;
+                            case '1': SetTile(TileType.STONE, x, y, false); break;
+                            case '2': SetTile(TileType.GRASS, x, y, false); break;
+                            case 't': SetTile(TileType.TREEBARK, x, y, false); break;
+                            case 'T': SetTile(TileType.TREETOPS, x, y, false); break;
+                            case 's': SetTile(TileType.TREESAPLING, x, y, false); break;
+                            case 'm': SetTile(TileType.MUSHROOM, x, y, false); break;
+                            case 'b': SetTile(TileType.BOARD, x, y, false); break;
                         }
-
-
-                        if (saplingTile != null && saplingTile.type == TileType.TREESAPLING)
-                            if (Rand.Next(0, 30) == 5)
-                            {
-                                SetTile(TileType.NONE, x, y, true);
-                                SetTree(x, y + 1);
-                            }
                     }
                 }
-            });
+            }
+        }
+
+        private bool LoadFromFile(string fileName)
+        {
+            if (!File.Exists(fileName)) return false;
+
+            cells = File.ReadAllLines(fileName);
+
+            return true;
+        }
+
+        private void SaveWorld(TileType type, int x, int y)
+        {
+            int index = x + y * WORLD_WIDTH;
+
+            if (x == WORLD_WIDTH - 1)
+            {
+                world[index] = '\n';
+                return;
+            }
+
+            switch (type)
+            {
+                case TileType.NONE:
+                    world[index] = ' ';
+                    break;
+                case TileType.GROUND:
+                    world[index] = '0';
+                    break;
+                case TileType.SAND:
+                    break;
+                case TileType.GRASS:
+                    world[index] = '2';
+                    break;
+                case TileType.STONE:
+                    world[index] = '1';
+                    break;
+                case TileType.TREEBARK:
+                    world[index] = 't';
+                    break;
+                case TileType.TREETOPS:
+                    world[index] = 'T';
+                    break;
+                case TileType.BOARD:
+                    world[index] = 'b';
+                    break;
+                case TileType.IRONORE:
+                    break;
+                case TileType.COPERORE:
+                    break;
+                case TileType.GOLDORE:
+                    break;
+                case TileType.SILVERORE:
+                    break;
+                case TileType.VEGETATION:
+                    break;
+                case TileType.MUSHROOM:
+                    world[index] = 'm';
+                    break;
+                case TileType.TREESAPLING:
+                    world[index] = 's';
+                    break;
+                case TileType.TORCH:
+                    break;
+            }
+
         }
 
         // Нарисовать мир
         public void Draw(RenderTarget target, RenderStates states)
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-
             states.Transform *= Transform;
 
-            Vector2f pos = Program.pos;
+            CamPos = Program.pos;
 
-            var tilePos = (pos.X / Tile.TILE_SIZE, pos.Y / Tile.TILE_SIZE);
+            var tilePos = (CamPos.X / Tile.TILE_SIZE, CamPos.Y / Tile.TILE_SIZE);
             var tilesPerScreen = (Program.Window.Size.X / Tile.TILE_SIZE, Program.Window.Size.Y / Tile.TILE_SIZE);
             var LeftMostTilesPos = (int)(tilePos.Item1 - tilesPerScreen.Item1 / 2);
             var TopMostTilesPos = (int)(tilePos.Item2 - tilesPerScreen.Item2 / 2);
-
-
 
             if (!Program.debagDraw)
             {
@@ -339,21 +421,30 @@ namespace MyTerraria
                 {
                     for (int y = TopMostTilesPos; y < TopMostTilesPos + tilesPerScreen.Item2 + 1; y++)
                     {
-                        if (x > -1 && y > -1 && x < WORLD_WIDTH && y < WORLD_HEIGHT && tiles[x + y * WORLD_WIDTH] != null)
+                        if (x > -1 && y > -1 && x < WORLD_WIDTH && y < WORLD_HEIGHT)
                         {
-                            var downTile = GetTile(x, y + 1);
-                            var rightTile = GetTile(x - 1, y);
-                            var leftTile = GetTile(x + 1, y);
-                            if (downTile == null && rightTile == null && leftTile == null)
-                                TreeFelling(x, y);
-                            else if (GetTile(x, y) != null && GetTile(x, y).type == TileType.GRASS && GetTile(x, y - 1) != null && GetTile(x, y - 1).type == TileType.TREEBARK)
-                                TreeFelling(x, y);
+                            if (GetTile(x, y) == null)
+                                SaveWorld(TileType.NONE, x, y);
+                            else
+                                SaveWorld(GetTile(x, y).type, x, y);
 
                             if (tiles[x + y * WORLD_WIDTH] != null)
-                            { 
-                                //tiles[x + y * WORLD_WIDTH].SetVisible(true);
-                                target.Draw(tiles[x + y * WORLD_WIDTH], states);
-                                //tiles[x + y * WORLD_WIDTH].SetVisible(false);
+                            {
+                                Tile upTile = GetTile(x, y - 1);
+                                Tile downTile = GetTile(x, y + 1);
+                                Tile leftTile = GetTile(x - 1, y);
+                                Tile rightTile = GetTile(x + 1, y);
+
+
+                                if (downTile == null && rightTile == null && leftTile == null)
+                                    TreeFelling(x, y);
+                                else if (GetTile(x, y) != null && GetTile(x, y).type == TileType.GRASS && GetTile(x, y - 1) != null && GetTile(x, y - 1).type == TileType.TREEBARK)
+                                    TreeFelling(x, y);
+
+                                if (tiles[x + y * WORLD_WIDTH] != null && tiles[x + y * WORLD_WIDTH].type != TileType.NONE)
+                                {
+                                    target.Draw(tiles[x + y * WORLD_WIDTH], states);
+                                }
                             }
                         }
                     }
@@ -367,25 +458,26 @@ namespace MyTerraria
                     {
                         if (x > -1 && y > -1 && x < WORLD_WIDTH && y < WORLD_HEIGHT && tiles[x + y * WORLD_WIDTH] != null)
                         {
-                            //tiles[x + y * WORLD_WIDTH].SetVisible(true);
                             target.Draw(tiles[x + y * WORLD_WIDTH], states);
-                            //tiles[x + y * WORLD_WIDTH].SetVisible(false);
                         }
                     }
                 }
 
 
             }
-            // Рисуем вещи
-            foreach (var item in items)
-                if (item.Position.X / 16 > LeftMostTilesPos && item.Position.X / 16 < LeftMostTilesPos + tilesPerScreen.Item1 + 1)
-                    if (item.Position.Y / 16 > TopMostTilesPos && item.Position.Y / 16 < TopMostTilesPos + tilesPerScreen.Item2 + 1)
-                        target.Draw(item);
 
-            stopwatch.Stop();
-
-
-            Program.Game.debag.SetMessageLine("Render time world on ms: " + stopwatch.Elapsed.Milliseconds.ToString());
+            try
+            {
+                // Рисуем вещи
+                foreach (var item in items)
+                    if (item.Position.X / 16 > LeftMostTilesPos && item.Position.X / 16 < LeftMostTilesPos + tilesPerScreen.Item1 + 1)
+                        if (item.Position.Y / 16 > TopMostTilesPos && item.Position.Y / 16 < TopMostTilesPos + tilesPerScreen.Item2 + 1)
+                            target.Draw(item);
+            }
+            catch(Exception ex)
+            {
+                //MessageBox.Show(ex.Message);
+            }
         }
     }
 }

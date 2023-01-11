@@ -16,18 +16,21 @@ namespace MyTerraria
         public bool IsDestroyed = false;        // Объект уничтожен?
 
         protected RectangleShape rect;
+
         protected Color color;
         protected Vector2f velocity;
         protected Vector2f movement;
+
         protected World world;
+
         protected bool isFly = true;
         protected bool isFlyer = false;
         protected bool isRectVisible = true;
         protected bool isGhost = false;         // Режим призрака?
+        
+        public static bool debag = true;
 
-        protected float gravity = 0.4f; 
-
-
+        protected float gravity = 0.4f;
 
         public Entity(World world)
         {
@@ -66,7 +69,8 @@ namespace MyTerraria
                     stepPos += stepVec;
                     stepRect = new FloatRect(stepPos, rect.Size);
 
-                    DebugRender.AddRectangle(stepRect, Color.Blue);
+                    if (debag)
+                        DebugRender.AddRectangle(stepRect, Color.Blue);
 
                     for (int x = 0; x <= (rect.Size.X - rect.Origin.X); x += Tile.TILE_SIZE)
                     {
@@ -84,7 +88,8 @@ namespace MyTerraria
                         {
                             FloatRect tileRect = new FloatRect(tile.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
 
-                            DebugRender.AddRectangle(tileRect, Color.Red);
+                            if (debag)
+                                DebugRender.AddRectangle(tileRect, Color.Red);
 
                             if (updateCollision(stepRect, tileRect, DirectionType.Down, ref stepPos))
                             {
@@ -104,7 +109,9 @@ namespace MyTerraria
                         if (tileTop != null && tileTop.activityPhithics)
                         {
                             FloatRect tiletop = new FloatRect(tileTop.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
-                            DebugRender.AddRectangle(tiletop, Color.Red);
+
+                            if (debag)
+                                DebugRender.AddRectangle(tiletop, Color.Red);
 
                             updateCollision(stepRect, tiletop, DirectionType.Up, ref stepPos);
 
@@ -159,8 +166,9 @@ namespace MyTerraria
                     if (t == null) continue;
 
                     FloatRect tileRect = new FloatRect(t.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
+                    if (debag)
+                        DebugRender.AddRectangle(tileRect, Color.Yellow);
 
-                    DebugRender.AddRectangle(tileRect, Color.Yellow);
                     if (t != null && t.activityPhithics)
                     {
                         if (updateCollision(stepRect, tileRect, dirType, ref stepPos))
