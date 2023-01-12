@@ -48,18 +48,18 @@ namespace MyTerraria
 
                 Window.DispatchEvents();
 
-                if (World.worldGen)
+                if (World.worldLoad)
                     Game.Update();
 
-                if (World.worldGen)
+                if (World.worldLoad)
                     CenterScreen();
 
-                Window.Clear(Color.Cyan);
+                Window.Clear(Color.Black);
 
-                Window.Draw(Content.ssBackgroundSky);
+                if (World.worldLoad)
+                    Window.Draw(Content.ssBackgroundSky);
 
                 Game.Draw();
-
 
                 Window.Display();
             }
@@ -110,7 +110,7 @@ namespace MyTerraria
             switch (e.Code)
             {
                 case Keyboard.Key.Escape:
-
+                    
                     break;
                 case Keyboard.Key.Up:
                     pos2.Y -= 1000 * Delta;
@@ -158,14 +158,17 @@ namespace MyTerraria
             }
         }
 
-        private static void Win_Resized(object sender, SFML.Window.SizeEventArgs e)
+        private static void Win_Resized(object sender, SizeEventArgs e)
         {
             Window.SetView(new View(new FloatRect(0, 0, e.Width, e.Height)));
         }
 
         private static void Win_Closed(object sender, EventArgs e)
         {
-            Window.Close();
+            if (World.worldLoad)
+                Game.World.SaveWorld(true);
+            else
+                Window.Close();
         }
     }
 }

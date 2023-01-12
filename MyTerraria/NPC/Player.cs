@@ -334,15 +334,15 @@ namespace MyTerraria.NPC
                     var InfoItemType = UIInvertory.cells[uiIsSelected].ItemStack.InfoItem;
                     if (tile != null)
                     {
-                        if (InfoItemType.Tooltype == ToolType.Pick && tile.type != TileType.TREEBARK && tile.type != TileType.TREETOPS)
+                        if (InfoItemType.Tooltype == ToolType.Pick && tile.type != TileType.Treebark && tile.type != TileType.Treetops)
                         {
-                            if (tile.type == TileType.GRASS)
-                                tile.type = TileType.GROUND;
+                            if (tile.type == TileType.Grass)
+                                tile.type = TileType.Ground;
 
-                            world.SetTile(tile.type, mousePos.X / 16, mousePos.Y / 16, true);
+                            world.SetTile(tile.type, mousePos.X / 16, mousePos.Y / 16, true, false);
                             AnimationUpdate(AnimType.Tool);
                         }
-                        else if(InfoItemType.Tooltype == ToolType.Axe && tile.type == TileType.TREEBARK || tile.type == TileType.TREETOPS)
+                        else if(InfoItemType.Tooltype == ToolType.Axe && tile.type == TileType.Treebark || tile.type == TileType.Treetops)
                         {
                             world.TreeFelling(mousePos.X / 16, mousePos.Y / 16);
                             AnimationUpdate(AnimType.Tool);
@@ -358,14 +358,14 @@ namespace MyTerraria.NPC
 
                         if (InfoItemType.Tooltype == ToolType.None && InfoItemType.Weapontype == WeaponType.None && (upTile != null || downTile != null || leftTile != null || rightTile != null))
                         {
-                            if (InfoItemType.Tiletype == TileType.TREESAPLING && downTile != null && downTile.type == TileType.GRASS)
+                            if (InfoItemType.Tiletype == TileType.Treesapling && downTile != null && downTile.type == TileType.Grass)
                             {
-                                world.SetTile(TileType.TREESAPLING, mousePos.X / 16, mousePos.Y / 16, false);
+                                world.SetTile(TileType.Treesapling, mousePos.X / 16, mousePos.Y / 16, false, false);
                                 UIInvertory.cells[uiIsSelected].ItemStack.ItemCount--;
                             }
-                            else if (InfoItemType.Tiletype != TileType.TREESAPLING)
+                            else if (InfoItemType.Tiletype != TileType.Treesapling)
                             {
-                                world.SetTile(InfoItemType.Tiletype, mousePos.X / 16, mousePos.Y / 16, false);
+                                world.SetTile(InfoItemType.Tiletype, mousePos.X / 16, mousePos.Y / 16, false, false);
                                 UIInvertory.cells[uiIsSelected].ItemStack.ItemCount--;
                             }
 
@@ -589,6 +589,19 @@ namespace MyTerraria.NPC
                 itemTile.Position = Position;
                 world.items.Add(itemTile);
                 itemTile = new ItemTile(world, InfoItem.ItemMushroom);
+                itemTile.Position = Position;
+                world.items.Add(itemTile);
+            }
+
+            for (int i = 0; i < 99; i++)
+            {
+                itemTile = new ItemTile(world, InfoItem.ItemBoardWall);
+                itemTile.Position = Position;
+                world.items.Add(itemTile);
+                itemTile = new ItemTile(world, InfoItem.ItemBoard);
+                itemTile.Position = Position;
+                world.items.Add(itemTile); 
+                itemTile = new ItemTile(world, InfoItem.ItemGround);
                 itemTile.Position = Position;
                 world.items.Add(itemTile);
             }

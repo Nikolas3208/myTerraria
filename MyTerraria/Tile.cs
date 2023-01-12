@@ -1,30 +1,35 @@
 ﻿using SFML.Graphics;
 using SFML.System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Remoting.Lifetime;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace MyTerraria
 {
     // Перечисление типов плитки
     public enum TileType
     {
-        NONE,               // Пусто
-        GROUND,             // Почва
-        SAND,               // Почва
-        GRASS,              // Земляной блок с травой
-        STONE,              //Камень
-        TREEBARK,           //Кора дерева
-        TREETOPS,           //Верхушка дерева
-        BOARD,              //Дска
-        IRONORE,            //Железная руда
-        COPERORE,            //Железная руда
-        GOLDORE,            //Железная руда
-        SILVERORE,            //Железная руда
-        VEGETATION,         //Растительность   
-        MUSHROOM,
-        TREESAPLING,        //Саженец дерева
-        TORCH               //Факел
+        None,               // Пусто
+        Ground,             // Почва
+        GroundWall,             // Почва
+        Sand,               // Почва
+        Grass,              // Земляной блок с травой
+        Stone,              //Камень
+        StoneWall,              //Камень
+        Treebark,           //Кора дерева
+        Treetops,           //Верхушка дерева
+        Board,              //Дска
+        BoardWall,              //Дска
+        Ironore,            //Железная руда
+        Coperore,           //Медная руда
+        Goldore,            //Золотая руда
+        Silverore,          //Серебряная руда
+        Vegetation,         //Растительность   
+        Mushroom,           //Гриб
+        Treesapling,        //Саженец дерева
+        Torch               //Факел
     }
 
     /*public enum WallType
@@ -49,6 +54,7 @@ namespace MyTerraria
         public Sprite rectShape;    // Прямоугольная форма плитки
 
         public bool activityPhithics = true;
+        public bool isWall;
 
         // Соседи
         public Tile upTile = null;     // Верхний сосед
@@ -113,9 +119,10 @@ namespace MyTerraria
         }
 
         // Конструктор класса
-        public Tile(TileType type, Color color, Tile upTile, Tile downTile, Tile leftTile, Tile rightTile)
+        public Tile(TileType type, Color color, Tile upTile, Tile downTile, Tile leftTile, Tile rightTile, bool isWall)
         {
             this.type = type;
+            this.isWall = isWall;
 
             // Присваиваем соседей, а соседям эту плитку
             if (upTile != null)
@@ -141,71 +148,89 @@ namespace MyTerraria
 
             Color = color;
 
-            switch (type)
+            try
             {
-                case TileType.NONE:
-                    activityPhithics = false;
-                    break;
-                case TileType.GROUND:
-                    SpriteSheet = Content.ssTileGround;    // Почва
-                    break;
-                case TileType.SAND:
-                    SpriteSheet = Content.ssTileSand;    // Песок
-                    break;
-                case TileType.GRASS:
-                    SpriteSheet = Content.ssTileGrass;    // Земляной блок с травой
-                    break;
-                case TileType.STONE:
-                    SpriteSheet = Content.ssTileStone;     //Камень
-                    break;
-                case TileType.TREEBARK:
-                    SpriteSheet = Content.ssTileTreeBark;   //Кора дерева
-                    activityPhithics = false;
-                    break;
-                case TileType.TREETOPS:
-                    SpriteSheet = Content.ssTileTreeTops;   //Вершина дерева
-                    activityPhithics = false;
-                    break;
-                case TileType.IRONORE:
-                    SpriteSheet = Content.ssTileIronOre;    //Железная руда
-                    break;
-                case TileType.COPERORE:
-                    SpriteSheet = Content.ssTileCoperOre;    //Железная руда
-                    break;
-                case TileType.GOLDORE:
-                    SpriteSheet = Content.ssTileGoldOre;    //Железная руда
-                    break;
-                case TileType.SILVERORE:
-                    SpriteSheet = Content.ssTileSilverOre;    //Железная руда
-                    break;
-                case TileType.VEGETATION:
-                    SpriteSheet = Content.ssTileVegetation; //Растительность
-                    activityPhithics = false;
-                    break;
-                case TileType.MUSHROOM:
-                    SpriteSheet = Content.ssTileVegetation;
-                    activityPhithics = false;
-                    break;
-                case TileType.TREESAPLING:
-                    SpriteSheet = Content.ssTileSaplingTree;
-                    activityPhithics = false;
-                    break;
-                case TileType.TORCH:
-                    SpriteSheet = Content.ssTileTorch;      //Факел
-                    activityPhithics = false;
-                    break;
-                case TileType.BOARD:
-                    SpriteSheet = Content.ssTileBoard;      //Доска
-                    break;
+                switch (type)
+                {
+                    case TileType.None:
+                        activityPhithics = false;
+                        break;
+                    case TileType.Ground:
+                        SpriteSheet = Content.ssTileGround;    // Почва
+                        break;
+                    case TileType.GroundWall:
+                        SpriteSheet = Content.ssWallGround;    // Почва
+                        activityPhithics = false;
+                        break;
+                    case TileType.Sand:
+                        SpriteSheet = Content.ssTileSand;    // Песок
+                        break;
+                    case TileType.Grass:
+                        SpriteSheet = Content.ssTileGrass;    // Земляной блок с травой
+                        break;
+                    case TileType.Stone:
+                        SpriteSheet = Content.ssTileStone;     //Камень
+                        break;
+                    case TileType.StoneWall:
+                        SpriteSheet = Content.ssWallStone;     //Камень
+                        activityPhithics = false;
+                        break;
+                    case TileType.Treebark:
+                        SpriteSheet = Content.ssTileTreeBark;   //Кора дерева
+                        activityPhithics = false;
+                        break;
+                    case TileType.Treetops:
+                        SpriteSheet = Content.ssTileTreeTops;   //Вершина дерева
+                        activityPhithics = false;
+                        break;
+                    case TileType.Ironore:
+                        SpriteSheet = Content.ssTileIronOre;    //Железная руда
+                        break;
+                    case TileType.Coperore:
+                        SpriteSheet = Content.ssTileCoperOre;    //Железная руда
+                        break;
+                    case TileType.Goldore:
+                        SpriteSheet = Content.ssTileGoldOre;    //Железная руда
+                        break;
+                    case TileType.Silverore:
+                        SpriteSheet = Content.ssTileSilverOre;    //Железная руда
+                        break;
+                    case TileType.Vegetation:
+                        SpriteSheet = Content.ssTileVegetation; //Растительность
+                        activityPhithics = false;
+                        break;
+                    case TileType.Mushroom:
+                        SpriteSheet = Content.ssTileVegetation;
+                        activityPhithics = false;
+                        break;
+                    case TileType.Treesapling:
+                        SpriteSheet = Content.ssTileSaplingTree;
+                        activityPhithics = false;
+                        break;
+                    case TileType.Torch:
+                        SpriteSheet = Content.ssTileTorch;      //Факел
+                        activityPhithics = false;
+                        break;
+                    case TileType.Board:
+                        SpriteSheet = Content.ssTileBoard;      //Доска
+                        break;
+                    case TileType.BoardWall:
+                        SpriteSheet = Content.ssWallBoard;      //Доска
+                        activityPhithics = false;
+                        break;
+                }
+
+                // Обновляем внешний вид плитки в зависимости от соседей
+                if (SpriteSheet != null)
+                    rectShape = new Sprite(SpriteSheet.Texture);
+
+                if (rectShape != null)
+                    UpdateView();
             }
-
-            // Обновляем внешний вид плитки в зависимости от соседей
-            if (SpriteSheet != null)
-                rectShape = new Sprite(SpriteSheet.Texture);
-
-            if (rectShape != null)
-                UpdateView();
-
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         // Обновляем внешний вид плитки в зависимости от соседей
@@ -324,19 +349,27 @@ namespace MyTerraria
                                 rectShape.TextureRect = SpriteSheet.GetTextureRect(9, 0 + i);
                             }
                             // Если есть только правый сосед
-                            else if (upTile == null && downTile != null && leftTile != null && leftTile.type == TileType.TREEBARK && rightTile != null)
+                            else if (upTile == null && downTile != null && leftTile != null && leftTile.type == TileType.Treebark && rightTile != null)
                             {
                                 int i = World.Rand.Next(0, 2); // Случайное число от 0 до 2
                                 rectShape.TextureRect = SpriteSheet.GetTextureRect(1 + i, 0);
                             }
                         }
                     break;
-
-                    case TileType.TREESAPLING:
+                    case TileType.GroundWall:
+                        rectShape.TextureRect = SpriteSheet.GetTextureRect(7, 0);
+                        break;
+                    case TileType.StoneWall:
+                        rectShape.TextureRect = SpriteSheet.GetTextureRect(7, 0);
+                        break;
+                    case TileType.BoardWall:
+                        rectShape.TextureRect = SpriteSheet.GetTextureRect(7, 0);
+                        break;
+                    case TileType.Treesapling:
                         rectShape.TextureRect = SpriteSheet.GetTextureRect(0, 0);
                         rectShape.Origin = new Vector2f(0, rectShape.Texture.Size.Y / 2);
                         break;
-                    case TileType.TREEBARK:
+                    case TileType.Treebark:
                         // Если есть верхний и нижний сосед
                         if (upTile != null && downTile != null && (leftTile == null || leftTile != null) && (rightTile == null || rightTile != null))
                         {
@@ -349,7 +382,7 @@ namespace MyTerraria
                             int i = World.Rand.Next(0, 3); // Случайное число от 0 до 3
                             rectShape.TextureRect = SpriteSheet.GetTextureRect(0, 9 + i);
                         }
-                        if (upTile != null && (upTile.type != TileType.TREEBARK && upTile.type != TileType.TREETOPS) && downTile != null && (leftTile == null || leftTile != null) && (rightTile == null || rightTile != null))
+                        if (upTile != null && (upTile.type != TileType.Treebark && upTile.type != TileType.Treetops) && downTile != null && (leftTile == null || leftTile != null) && (rightTile == null || rightTile != null))
                         {
                             int i = World.Rand.Next(0, 3); // Случайное число от 0 до 3
                             rectShape.TextureRect = SpriteSheet.GetTextureRect(0, 9 + i);
@@ -367,20 +400,20 @@ namespace MyTerraria
                             rectShape.TextureRect = SpriteSheet.GetTextureRect(2, 5 + i);
                         }
                         break;
-                    case TileType.TREETOPS:
+                    case TileType.Treetops:
                         //int i = World.Rand.Next(0, 3); // Случайное число от 0 до 2
                         rectShape.TextureRect = SpriteSheet.GetTextureRect(World.Rand.Next(0, 3), 0);
                         //rectShape.Scale = new Vector2f(4.5f,5);
                         rectShape.Origin = new Vector2f(Content.ssTileTreeTops.SubWidth - 50, Content.ssTileTreeTops.SubHeight - 16);
                         break;
-                    case TileType.MUSHROOM:
+                    case TileType.Mushroom:
                         rectShape.TextureRect = SpriteSheet.GetTextureRect(8, 0);
                         break;
-                    case TileType.VEGETATION:
+                    case TileType.Vegetation:
                         int i2 = World.Rand.Next(1, 9); // Случайное число от 0 до 2
                         rectShape.TextureRect = SpriteSheet.GetTextureRect(i2, 0);
                         break;
-                    case TileType.BOARD:
+                    case TileType.Board:
                         rectShape.TextureRect = SpriteSheet.GetTextureRect(1, 0);
                         break;
                 }

@@ -11,6 +11,13 @@ namespace MyTerraria.GUI
 {
     public abstract class BaseGUI : Transformable, Drawable
     {
+        public enum WidgetSize
+        {
+            Narrow = 0,
+            Small,
+            Wide
+        };
+
         protected Vector2f localMousePos;
         protected Vector2f gloabalMousePos;
         protected RectangleShape rect;
@@ -18,8 +25,24 @@ namespace MyTerraria.GUI
         protected bool isClicked;
         protected bool isEntered;
 
-        public bool isActive { get; private set; }
+        protected readonly float[] dimensions = new float[]
+        {
+            88f,
+            192f,
+            400f
+        };
+        protected bool isDrawRect = false;
+
+        public bool isActive { get; set; }
+        public IntRect NotActiveRect { get; set; } = new IntRect(0, 0, 200, 20);
+        public IntRect ActiveRect { get; set; } = new IntRect(0, 20, 200, 20);
+        public IntRect SelectedRect { get; set; } = new IntRect(0, 40, 200, 20);
+        public Color NotActiveColor { get; set; } = new Color(170, 170, 170);
         public Color ActiveColor { get; set; } = Color.White;
+        public Color SelectedColor { get; set; } = new Color(45, 107, 236);
+        public Color NotActiveTextColor { get; set; } = Color.White;
+        public Color ActiveTextColor { get; set; } = Color.White;
+        public Color SelectedTextColor { get; set; } = new Color(255, 255, 130);
         public virtual Color Color
         {
             get => rect.FillColor;
@@ -39,11 +62,13 @@ namespace MyTerraria.GUI
             private set => rect.Size = value;
         }
 
-        public BaseGUI()
+        public BaseGUI(WidgetSize size)
         {
+            localMousePos = new Vector2f(-1, 0);
+
             rect = new RectangleShape()
             {
-                Size = new Vector2f(88, 40),
+                Size = new Vector2f(dimensions[(int)size], 40),
                 FillColor = ActiveColor,
                 OutlineColor = Color.Black,
                 OutlineThickness = -2
@@ -51,7 +76,7 @@ namespace MyTerraria.GUI
 
             text = new Text()
             {
-                CharacterSize = 25,
+                CharacterSize = 35,
                 FillColor = Color.White,
                 Font = Content.font
             };
@@ -78,11 +103,54 @@ namespace MyTerraria.GUI
 		{
 		}
 
+        protected virtual void NotActiveState()
+        {
+            text.FillColor = NotActiveTextColor;
+            if (rect.Texture != null)
+            {
+                rect.TextureRect = NotActiveRect;
+            }
+            else
+            {
+                rect.FillColor = NotActiveColor;
+            }
+        }
+        protected virtual void ActiveState()
+        {
+            text.FillColor = ActiveTextColor;
+            text.CharacterSize = 35;
+            UpdateText();
+            if (rect.Texture != null)
+            {
+                rect.TextureRect = ActiveRect;
+            }
+            else
+            {
+                rect.FillColor = ActiveColor;
+            }
+        }
+        protected virtual void SelectedState()
+        {
+            text.FillColor = SelectedTextColor;
+            text.CharacterSize = 55;
+            UpdateText();
+            if (rect.Texture != null)
+            {
+                rect.TextureRect = SelectedRect;
+            }
+            else
+            {
+                rect.FillColor = SelectedColor;
+            }
+        }
+
         public void Draw(RenderTarget target, RenderStates states)
         {
             states.Transform *= Transform;
+            localMousePos = states.Transform.GetInverse().TransformPoint(gloabalMousePos);
 
-            //target.Draw(rect, states);
+            if(isDrawRect)
+            target.Draw(rect, states);
             target.Draw(text, states);
         }
 

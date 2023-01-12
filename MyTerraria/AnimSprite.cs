@@ -96,6 +96,7 @@ namespace MyTerraria
             rectShape = new RectangleShape(new Vector2f(ss.SubWidth, ss.SubHeight));
             rectShape.Origin = new Vector2f(ss.SubWidth / 2, ss.SubHeight / 2);
             rectShape.Texture = ss.Texture;
+
         }
 
         // Добавить анимацию

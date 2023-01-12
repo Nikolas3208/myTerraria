@@ -10,12 +10,9 @@ namespace MyTerraria.GUI
 {
     public class Button : BaseGUI
     {
-        static EventArgs args = new EventArgs();
-        static object s;
-
         public event EventHandler<EventArgs> Click = (object s, EventArgs e) => { };
 
-        public Button(string str) : base()
+        public Button(string str, WidgetSize size) : base(size)
         {
             Text = str;
             
@@ -23,7 +20,26 @@ namespace MyTerraria.GUI
 
         protected override void OnMouseMoved(object sender, MouseMoveEventArgs e)
         {
+
             base.OnMouseMoved(sender, e);
+
+            if (isEntered)
+            {
+                if (isClicked)
+                {
+                    NotActiveState();
+                }
+                else
+                {
+                    SelectedState();
+                }
+            }
+            else
+            {
+                ActiveState();
+            }
+            
+
         }
 
         protected override void OnMouseButtonPressed(object sender, MouseButtonEventArgs e)
@@ -41,13 +57,18 @@ namespace MyTerraria.GUI
         {
             if (e.Button == Mouse.Button.Left)
             {
-                if (isEntered && isClicked)
+                if (isEntered)
                 {
                     Click(this, EventArgs.Empty);
                 }
                 isClicked = false;
             }
         }
+
+        /*protected override void SelectedState()
+        {
+            base.SelectedState();
+        }*/
 
         public override void UpdateText()
         {

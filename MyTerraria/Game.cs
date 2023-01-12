@@ -16,28 +16,21 @@ namespace MyTerraria
         public Player Player { get; private set; }  // Игрок
         public World World { get; private set; } // Мир
 
-        public MainMenu menu { get; private set; }
+        private MainMenu menu;
 
         private List<Npc> Npc = new List<Npc>(); // Слизни
 
         private Stopwatch worldSaveTimer = new Stopwatch(); //Авто сохранение мира
 
+        private string WorldName = "World";
+
         //Клас игры
         public Game()
         {
-            //Init();
+            menu = new MainMenu();
         }
-
-        private void InitMenu()
-        {
-            MainMenu.AddButton(Color.Green, new Vector2f(300, 400), "play");
-        }
-
         public void Init()
         {
-            // Создаём новый мир и выполняем его генерацию
-            CreateWorld();
-
             // Создаём игрока
             CreatePlayer();
 
@@ -61,18 +54,30 @@ namespace MyTerraria
         private void CreatePlayer()
         {
             Player = new Player(World);
+            Player.StartPosition = new Vector2f((World.WORLD_WIDTH / 2) * 16, 0);
             Player.Spawn();
             Player.AddTools();
 
-            Player.Invertory = new UI.UIInvertory();
+            Player.Invertory = new UIInvertory();
         }
 
-        private void CreateWorld()
+        public void CreateWorld()
         {
             World = new World();
-            World.GenerateWorld("Level");
-            World.LoadWorld("Level");
-            World.worldGen = true;
+
+            World.GenerateWorld(WorldName);
+
+            LoadWorld();
+        }
+
+        public void LoadWorld()
+        {
+            if (World == null)
+                World = new World();
+
+            World.LoadWorld(WorldName);
+
+            Init();
         }
 
         // Обновление логики игры
@@ -107,14 +112,10 @@ namespace MyTerraria
         // Прорисовка игры
         public void Draw()
         {
-            if (!World.worldGen)
-            {
-                InitMenu();
-
+            if (!World.worldLoad)
                 MainMenu.Draw(Program.Window);
-            }
 
-            if (World.worldGen)
+            if (World.worldLoad)
             {
                 Program.Window.Draw(World);
                 Program.Window.Draw(Player);

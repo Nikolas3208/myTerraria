@@ -25,6 +25,8 @@ namespace MyTerraria
 
         public static bool PlayerCameraMove { get; private set; }
         public static bool worldGen = false;
+        public static bool worldLoad = false;
+        private bool isWall;
         public bool worldSave { get; set; }
 
         public static Random Rand { private set; get; }
@@ -72,16 +74,22 @@ namespace MyTerraria
                     PerlinCave[x + y * WORLD_WIDTH] = Perlin2D.Noise((x + seed) * caveFreq, (y + seed) * caveFreq);
                     if (y < GroundLavelMax + 40)
                     {
+                        //if (y > GroundLavelMax + 2)
+                            isWall = true;
+                        /*else
+                            isWall = false;*/
+
                         if (PerlinCave[x + y * WORLD_WIDTH] < 0.3f)
                             if (GetTile(x, y - 1) != null)
-                                SetTile(TileType.GROUND, x, y, false);
+                                SetTile(TileType.Ground, x, y, false, isWall);
                             else
                             {
-                                SetTile(TileType.GRASS, x, y, false);
+                                SetTile(TileType.Grass, x, y, false, isWall);
                             }
 
+
                         if (PerlinCave[x + y * WORLD_WIDTH] < 0.001f)
-                            SetTile(TileType.STONE, x, y, false);
+                            SetTile(TileType.Stone, x, y, false, isWall);
 
                         if (Rand.Next(0, 10) == 1)
                             SetTree(x, y);
@@ -89,10 +97,10 @@ namespace MyTerraria
                     else
                     {
                         if (PerlinCave[x + y * WORLD_WIDTH] < 0.3f)
-                            SetTile(TileType.GROUND, x, y, false);
+                            SetTile(TileType.Ground, x, y, false, true);
 
                         if (PerlinCave[x + y * WORLD_WIDTH] < 0.1f)
-                            SetTile(TileType.STONE, x, y, false);
+                            SetTile(TileType.Stone, x, y, false, false);
                     }
                 }
             }
@@ -102,7 +110,7 @@ namespace MyTerraria
                 for (int y = 0; y < WORLD_HEIGHT; y++)
                 {
                     if (GetTile(x, y) == null)
-                        SaveWorld(TileType.NONE, x, y);
+                        SaveWorld(TileType.None, x, y);
                     else
                         SaveWorld(GetTile(x, y).type, x, y);
                 }
@@ -116,7 +124,7 @@ namespace MyTerraria
             int maxHeight = Rand.Next(4, 30);
             int x2 = Rand.Next(-1, 2);
 
-            if (GetTile(x, y) != null && GetTile(x, y).type == TileType.GRASS)
+            if (GetTile(x, y) != null && GetTile(x, y).type == TileType.Grass)
             {
                 for (int y1 = 1; y1 < maxHeight + 6; y1++)
                 {
@@ -131,12 +139,12 @@ namespace MyTerraria
                     {
                         if (GetTile(x, y - y1) == null)
                         {
-                            SetTile(TileType.TREEBARK, x, y - y1, false);
+                            SetTile(TileType.Treebark, x, y - y1, false, false);
 
                             if (maxHeight > 6)
-                                SetTile(TileType.TREETOPS, x, y - maxHeight, false);
+                                SetTile(TileType.Treetops, x, y - maxHeight, false, false);
                             else
-                                SetTile(TileType.TREEBARK, x, y - maxHeight, false);
+                                SetTile(TileType.Treebark, x, y - maxHeight, false, false);
                         }
                     }
 
@@ -151,7 +159,7 @@ namespace MyTerraria
 
             GenerateTerrain();
 
-            tiles = new Tile[WORLD_WIDTH * WORLD_HEIGHT];
+            tiles = null;
 
             File.WriteAllText("Worlds\\" + name + ".world", " ");
 
@@ -172,17 +180,17 @@ namespace MyTerraria
                     Tile tileLeft = GetTile(x - 1, y - y1);
                     Tile tileRight = GetTile(x + 1, y - y1);
 
-                    if (tile != null && tile.type == TileType.TREEBARK)
+                    if (tile != null && tile.type == TileType.Treebark)
                     {
-                        SetTile(TileType.BOARD, x, y - y1, true);
-                        if (tileLeft != null && tileLeft.type == TileType.TREEBARK)
-                            SetTile(TileType.BOARD, x - 1, y - y1, true);
-                        if (tileRight != null && tileRight.type == TileType.TREEBARK)
-                            SetTile(TileType.BOARD, x + 1, y - y1, true);
+                        SetTile(TileType.Board, x, y - y1, true, false);
+                        if (tileLeft != null && tileLeft.type == TileType.Treebark)
+                            SetTile(TileType.Board, x - 1, y - y1, true, false);
+                        if (tileRight != null && tileRight.type == TileType.Treebark)
+                            SetTile(TileType.Board, x + 1, y - y1, true, false);
                     }
-                    else if (tile != null && tile.type == TileType.TREETOPS)
+                    else if (tile != null && tile.type == TileType.Treetops)
                     {
-                        SetTile(TileType.BOARD, x, y - y1, true);
+                        SetTile(TileType.Board, x, y - y1, true, false);
 
                         for (int i = 0; i < Rand.Next(1, 8); i++)
                         {
@@ -199,7 +207,7 @@ namespace MyTerraria
             });
         }
 
-        public void SetTile(TileType type, int x, int y, bool destroy)
+        public void SetTile(TileType type, int x, int y, bool destroy, bool isWall)
         {
             if (x < 0 || x >= WORLD_WIDTH || y < 0 || y >= WORLD_HEIGHT)
                 return;
@@ -214,16 +222,16 @@ namespace MyTerraria
 
             if (!destroy)
             {
-                if (type != TileType.NONE)
+                if (type != TileType.None)
                 {
-                    tile = new Tile(type, Color.White, upTile, downTile, leftTile, rightTile);
+                    tile = new Tile(type, Color.White, upTile, downTile, leftTile, rightTile, isWall);
                     tile.Position = new Vector2f(x * Tile.TILE_SIZE, y * Tile.TILE_SIZE) + Position;
                     tiles[index] = tile;
                 }
             }
             else
             {
-                if (type != TileType.NONE)
+                if (type != TileType.None)
                 {
                     tile = tiles[index];
 
@@ -239,7 +247,15 @@ namespace MyTerraria
                                 itemTile.Position = tile.Position;
                                 items.Add(itemTile);
 
-                                tiles[index] = null;
+                                if (!tile.isWall)
+                                    tiles[index] = null;
+                                else //if (tiles[index].type == TileType.Ground)
+                                {
+                                    tile = new Tile(TileType.GroundWall, Color.White, upTile, downTile, leftTile, rightTile, false);
+                                    tile.Position = tiles[index].Position;
+
+                                    tiles[index] = tile;
+                                }
                             }
                         }
                     }
@@ -294,25 +310,16 @@ namespace MyTerraria
                 }
             }
 
-            /*if(worldSave)
+            if(Keyboard.IsKeyPressed(Keyboard.Key.F))
             {
-                Task.Run(() =>
-                {
-                    File.WriteAllText("Worlds\\" + name + ".world", " ");
-
-                    StreamWriter sw = new StreamWriter("Worlds\\" + name + ".world", true, Encoding.UTF8);
-                    sw.Write(world);
-                    sw.Close();
-
-                    worldSave = false;
-
-                });
-            }*/
+                SaveWorld(false);
+            }
         }
 
         public void LoadWorld(string name)
         {
             this.name = name;
+            tiles = new Tile[WORLD_WIDTH * WORLD_HEIGHT];
 
             if (LoadFromFile("Worlds/" + name + ".world"))
             {
@@ -322,19 +329,25 @@ namespace MyTerraria
                     {
                         switch (cells[y][x])
                         {
-                            case ' ': SetTile(TileType.NONE, x, y, true); break;
-                            case '0': SetTile(TileType.GROUND, x, y, false); break;
-                            case '1': SetTile(TileType.STONE, x, y, false); break;
-                            case '2': SetTile(TileType.GRASS, x, y, false); break;
-                            case 't': SetTile(TileType.TREEBARK, x, y, false); break;
-                            case 'T': SetTile(TileType.TREETOPS, x, y, false); break;
-                            case 's': SetTile(TileType.TREESAPLING, x, y, false); break;
-                            case 'm': SetTile(TileType.MUSHROOM, x, y, false); break;
-                            case 'b': SetTile(TileType.BOARD, x, y, false); break;
+                            case ' ': SetTile(TileType.None, x, y, true, false); break;
+                            case '0': SetTile(TileType.Ground, x, y, false, false); break;
+                            case ')': SetTile(TileType.Ground, x, y, false, true); break;
+                            case '1': SetTile(TileType.Stone, x, y, false, false); break;
+                            case '!': SetTile(TileType.StoneWall, x, y, false, false); break;
+                            case '2': SetTile(TileType.Grass, x, y, false, false); break;
+                            case 't': SetTile(TileType.Treebark, x, y, false, false); break;
+                            case 'T': SetTile(TileType.Treetops, x, y, false, false); break;
+                            case 's': SetTile(TileType.Treesapling, x, y, false, false); break;
+                            case 'm': SetTile(TileType.Mushroom, x, y, false, false); break;
+                            case 'b': SetTile(TileType.Board, x, y, false, false); break;
+                            case 'B': SetTile(TileType.BoardWall, x, y, false, false); break;
                         }
                     }
                 }
             }
+
+            worldGen = true;
+            worldLoad = true;
         }
 
         private bool LoadFromFile(string fileName)
@@ -344,6 +357,34 @@ namespace MyTerraria
             cells = File.ReadAllLines(fileName);
 
             return true;
+        }
+
+        public void SaveWorld(bool close)
+        {
+            Task.Run(() =>
+            {
+                File.WriteAllText("Worlds\\" + name + ".world", " ");
+
+                if(close)
+                    for (int x = 0; x < WORLD_WIDTH; x++)
+                    {
+                        for (int y = 0; y < WORLD_HEIGHT; y++)
+                        {
+                            if (GetTile(x, y) == null)
+                                SaveWorld(TileType.None, x, y);
+                            else
+                                SaveWorld(GetTile(x, y).type, x, y);
+                        }
+                    }
+
+                StreamWriter sw = new StreamWriter("Worlds\\" + name + ".world", true, Encoding.UTF8);
+                sw.Write(world);
+                sw.Close();
+
+                worldSave = false;
+
+                Program.Window.Close();
+            });
         }
 
         private void SaveWorld(TileType type, int x, int y)
@@ -358,46 +399,58 @@ namespace MyTerraria
 
             switch (type)
             {
-                case TileType.NONE:
+                case TileType.None:
                     world[index] = ' ';
                     break;
-                case TileType.GROUND:
-                    world[index] = '0';
+                case TileType.Ground:
+                    if (!tiles[index].isWall)
+                        world[index] = '0';
+                    else
+                        world[index] = ')';
                     break;
-                case TileType.SAND:
+                case TileType.GroundWall:
+                    
                     break;
-                case TileType.GRASS:
+                case TileType.Sand:
+                    break;
+                case TileType.Grass:
                     world[index] = '2';
                     break;
-                case TileType.STONE:
+                case TileType.Stone:
                     world[index] = '1';
                     break;
-                case TileType.TREEBARK:
+                case TileType.StoneWall:
+                    world[index] = '!';
+                    break;
+                case TileType.Treebark:
                     world[index] = 't';
                     break;
-                case TileType.TREETOPS:
+                case TileType.Treetops:
                     world[index] = 'T';
                     break;
-                case TileType.BOARD:
+                case TileType.Board:
                     world[index] = 'b';
                     break;
-                case TileType.IRONORE:
+                case TileType.BoardWall:
+                    world[index] = 'B';
                     break;
-                case TileType.COPERORE:
+                case TileType.Ironore:
                     break;
-                case TileType.GOLDORE:
+                case TileType.Coperore:
                     break;
-                case TileType.SILVERORE:
+                case TileType.Goldore:
                     break;
-                case TileType.VEGETATION:
+                case TileType.Silverore:
                     break;
-                case TileType.MUSHROOM:
+                case TileType.Vegetation:
+                    break;
+                case TileType.Mushroom:
                     world[index] = 'm';
                     break;
-                case TileType.TREESAPLING:
+                case TileType.Treesapling:
                     world[index] = 's';
                     break;
-                case TileType.TORCH:
+                case TileType.Torch:
                     break;
             }
 
@@ -424,7 +477,7 @@ namespace MyTerraria
                         if (x > -1 && y > -1 && x < WORLD_WIDTH && y < WORLD_HEIGHT)
                         {
                             if (GetTile(x, y) == null)
-                                SaveWorld(TileType.NONE, x, y);
+                                SaveWorld(TileType.None, x, y);
                             else
                                 SaveWorld(GetTile(x, y).type, x, y);
 
@@ -438,10 +491,10 @@ namespace MyTerraria
 
                                 if (downTile == null && rightTile == null && leftTile == null)
                                     TreeFelling(x, y);
-                                else if (GetTile(x, y) != null && GetTile(x, y).type == TileType.GRASS && GetTile(x, y - 1) != null && GetTile(x, y - 1).type == TileType.TREEBARK)
+                                else if (GetTile(x, y) != null && GetTile(x, y).type == TileType.Grass && GetTile(x, y - 1) != null && GetTile(x, y - 1).type == TileType.Treebark)
                                     TreeFelling(x, y);
 
-                                if (tiles[x + y * WORLD_WIDTH] != null && tiles[x + y * WORLD_WIDTH].type != TileType.NONE)
+                                if (tiles[x + y * WORLD_WIDTH] != null && tiles[x + y * WORLD_WIDTH].type != TileType.None)
                                 {
                                     target.Draw(tiles[x + y * WORLD_WIDTH], states);
                                 }

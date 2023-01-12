@@ -20,20 +20,23 @@ namespace MyTerraria
     {
         public static List<InfoItem> InfoItems = new List<InfoItem>();
         
-        public static InfoItem ItemGround = new InfoItem(TileType.GROUND).SetSprite(Content.ssTileItemGround, 0, 0);
-        public static InfoItem ItemGrass = new InfoItem(TileType.GRASS).SetSprite(Content.ssTileItemGround , 0, 0);
-        public static InfoItem ItemStone = new InfoItem(TileType.STONE).SetSprite(Content.ssTileItemStone, 0, 0);
-        public static InfoItem ItemMushroom = new InfoItem(TileType.MUSHROOM).SetSprite(Content.ssTileItemMushroom, 0, 0);
-        public static InfoItem ItemVegetation = new InfoItem(TileType.VEGETATION).SetSprite(Content.ssTileItemMushroom, 0, 0);
-        public static InfoItem ItemTorch = new InfoItem(TileType.TORCH).SetSprite(Content.ssTileItemTorch, 0, 0);
-        public static InfoItem ItemBoard = new InfoItem(TileType.BOARD).SetSprite(Content.ssTileItemBoard, 0, 0);
+        public static InfoItem ItemGround = new InfoItem(TileType.Ground).SetSprite(Content.ssTileItemGround, 0, 0);
+        public static InfoItem ItemGroundWall = new InfoItem(TileType.GroundWall).SetSprite(Content.ssWallGround, 0, 0);
+        public static InfoItem ItemGrass = new InfoItem(TileType.Grass).SetSprite(Content.ssTileItemGround , 0, 0);
+        public static InfoItem ItemStone = new InfoItem(TileType.Stone).SetSprite(Content.ssTileItemStone, 0, 0);
+        public static InfoItem ItemStoneWall = new InfoItem(TileType.StoneWall).SetSprite(Content.ssWallStone, 0, 0);
+        public static InfoItem ItemMushroom = new InfoItem(TileType.Mushroom).SetSprite(Content.ssTileItemMushroom, 0, 0);
+        public static InfoItem ItemVegetation = new InfoItem(TileType.Vegetation).SetSprite(Content.ssTileItemMushroom, 0, 0);
+        public static InfoItem ItemTorch = new InfoItem(TileType.Torch).SetSprite(Content.ssTileItemTorch, 0, 0);
+        public static InfoItem ItemBoard = new InfoItem(TileType.Board).SetSprite(Content.ssTileItemBoard, 0, 0);
+        public static InfoItem ItemBoardWall = new InfoItem(TileType.BoardWall).SetSprite(Content.ssWallBoard, 0, 0);
 
-        public static InfoItem ItemTreeSapling = new InfoItem(TileType.TREESAPLING).SetSprite(Content.ssTileItemAcorn, 0, 0);
+        public static InfoItem ItemTreeSapling = new InfoItem(TileType.Treesapling).SetSprite(Content.ssTileItemAcorn, 0, 0);
         
-        public static InfoItem ItemIronOre = new InfoItem(TileType.IRONORE).SetSprite(Content.ssTileItemIronOre, 0, 0);
-        public static InfoItem ItemCopperOre = new InfoItem(TileType.COPERORE).SetSprite(Content.ssTileItemCopperOre, 0, 0);
-        public static InfoItem ItemGoldOre = new InfoItem(TileType.GOLDORE).SetSprite(Content.ssTileItemGoldOre, 0, 0);
-        public static InfoItem ItemSilverOre = new InfoItem(TileType.SILVERORE).SetSprite(Content.ssTileItemSilverOre, 0, 0);
+        public static InfoItem ItemIronOre = new InfoItem(TileType.Ironore).SetSprite(Content.ssTileItemIronOre, 0, 0);
+        public static InfoItem ItemCopperOre = new InfoItem(TileType.Coperore).SetSprite(Content.ssTileItemCopperOre, 0, 0);
+        public static InfoItem ItemGoldOre = new InfoItem(TileType.Goldore).SetSprite(Content.ssTileItemGoldOre, 0, 0);
+        public static InfoItem ItemSilverOre = new InfoItem(TileType.Silverore).SetSprite(Content.ssTileItemSilverOre, 0, 0);
 
         //-----------------------
 
@@ -68,11 +71,14 @@ namespace MyTerraria
         {
             InfoItems.Add(ItemPick);
             InfoItems.Add(ItemGround);
+            InfoItems.Add(ItemGroundWall);
             InfoItems.Add(ItemGrass);
             InfoItems.Add(ItemStone);
+            InfoItems.Add(ItemStoneWall);
             InfoItems.Add(ItemMushroom);
             InfoItems.Add(ItemTorch);
             InfoItems.Add(ItemBoard);
+            InfoItems.Add(ItemBoardWall);
             InfoItems.Add(ItemTreeSapling);
             InfoItems.Add(ItemAxe);
             InfoItems.Add(ItemIronOre);

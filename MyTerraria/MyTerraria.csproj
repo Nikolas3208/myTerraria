@@ -61,6 +61,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="SFML.Audio, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SFML.Audio.2.5.0\lib\netstandard2.0\SFML.Audio.dll</HintPath>
     </Reference>
@@ -75,6 +76,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -84,12 +86,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnimSprite.cs" />
-    <Compile Include="Bioms.cs" />
     <Compile Include="Content.cs" />
     <Compile Include="DebagInfo.cs" />
     <Compile Include="DebugRender.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="GUI\BaseGUI.cs" />
+    <Compile Include="GUI\Button.cs" />
+    <Compile Include="GUI\Menu\MainMenu.cs" />
     <Compile Include="InfoItem.cs" />
     <Compile Include="Items\Item.cs" />
     <Compile Include="Items\ItemTile.cs" />
