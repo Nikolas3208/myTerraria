@@ -9,10 +9,10 @@ using System.Windows;
 namespace MyTerraria
 {
     // Перечисление типов плитки
-    public enum TileType
+    /*public enum TileType
     {
-        None,               // Пусто
-        Ground,             // Почва
+        None = 0,               // Пусто
+        Ground = 1,             // Почва
         GroundWall,             // Почва
         Sand,               // Почва
         Grass,              // Земляной блок с травой
@@ -38,7 +38,7 @@ namespace MyTerraria
         GROUND,     // Почва
         STONE,      //Камень
         BOARD       //Дска
-    }*/
+    }
 
     // Класс плитки
     public class Tile : Transformable, Drawable
@@ -46,7 +46,7 @@ namespace MyTerraria
 
         // Размер тайла по ширине и высоте
         public const int TILE_SIZE = 16;
-        public static Color Color { get; set; }
+        public Color Color { get; set; }
         public SpriteSheet SpriteSheet { get; set; }    // Набор спрайтов плитки
 
         public TileType type;   // Тип плитки
@@ -55,6 +55,7 @@ namespace MyTerraria
 
         public bool activityPhithics = true;
         public bool isWall;
+        public bool SetWall;
 
         // Соседи
         public Tile upTile = null;     // Верхний сосед
@@ -119,10 +120,11 @@ namespace MyTerraria
         }
 
         // Конструктор класса
-        public Tile(TileType type, Color color, Tile upTile, Tile downTile, Tile leftTile, Tile rightTile, bool isWall)
+        public Tile(TileType type, Color color, Tile upTile, Tile downTile, Tile leftTile, Tile rightTile, bool isWall, bool setWall)
         {
             this.type = type;
             this.isWall = isWall;
+            this.SetWall = setWall;
 
             // Присваиваем соседей, а соседям эту плитку
             if (upTile != null)
@@ -158,13 +160,13 @@ namespace MyTerraria
                     case TileType.Ground:
                         SpriteSheet = Content.ssTileGround;    // Почва
                         if (isWall)
-                       {
-                            SpriteSheet = Content.ssWallGround;
+                        {
+                            SpriteSheet = Content.ssWallGround;    // Почва
                             activityPhithics = false;
-                        } 
+                        }
                         break;
                     case TileType.GroundWall:
-                        SpriteSheet = Content.ssWallGround;    // Почва
+                        SpriteSheet = Content.ssTileItemGround;    // Почва
                         activityPhithics = false;
                         break;
                     case TileType.Sand:
@@ -175,6 +177,11 @@ namespace MyTerraria
                         break;
                     case TileType.Stone:
                         SpriteSheet = Content.ssTileStone;     //Камень
+                        if (isWall)
+                        {
+                            SpriteSheet = Content.ssWallStone;    // Почва
+                            activityPhithics = false;
+                        }
                         break;
                     case TileType.StoneWall:
                         SpriteSheet = Content.ssWallStone;     //Камень
@@ -227,7 +234,11 @@ namespace MyTerraria
 
                 // Обновляем внешний вид плитки в зависимости от соседей
                 if (SpriteSheet != null)
+                {
                     rectShape = new Sprite(SpriteSheet.Texture);
+                    if(isWall)
+                        rectShape.Origin = new Vector2f(8,8);
+                }
 
                 if (rectShape != null)
                     UpdateView();
@@ -245,8 +256,9 @@ namespace MyTerraria
             {
                 switch (type)
                 {
-                     
+
                     default:
+                        //if(!isWall)
                         {
                             // Если у плитки есть все соседи
                             if (upTile != null && downTile != null && leftTile != null && rightTile != null)
@@ -332,6 +344,7 @@ namespace MyTerraria
                             //Если есть только верхний сосед
                             else if (upTile != null && downTile == null && leftTile == null && rightTile == null)
                             {
+
                                 int i = World.Rand.Next(0, 3); // Случайное число от 0 до 2
                                 rectShape.TextureRect = SpriteSheet.GetTextureRect(6, 3);
                             }
@@ -359,16 +372,32 @@ namespace MyTerraria
                                 int i = World.Rand.Next(0, 2); // Случайное число от 0 до 2
                                 rectShape.TextureRect = SpriteSheet.GetTextureRect(1 + i, 0);
                             }
+
+                            /*if(isWall && upTile != null && !upTile.isWall)
+                            {
+                                int i = World.Rand.Next(0, 3); // Случайное число от 0 до 2
+                                rectShape.TextureRect = SpriteSheet.GetTextureRect(1 + i, 0);
+                            }
+                            if (isWall && leftTile != null && !leftTile.isWall)
+                            {
+                                int i = World.Rand.Next(0, 3); // Случайное число от 0 до 2
+                                rectShape.TextureRect = SpriteSheet.GetTextureRect(0, i);
+                            }
+                            if (isWall && rightTile != null && !rightTile.isWall)
+                            {
+                                int i = World.Rand.Next(0, 3); // Случайное число от 0 до 2
+                                rectShape.TextureRect = SpriteSheet.GetTextureRect(4, i);
+                            }
+
+                            if (isWall && upTile != null && !upTile.isWall && leftTile != null && !leftTile.isWall)
+                            {
+                                rectShape.TextureRect = SpriteSheet.GetTextureRect(0, 3);
+                            }
+                            if (isWall && upTile != null && !upTile.isWall && rightTile != null && !rightTile.isWall)
+                            {
+                                rectShape.TextureRect = SpriteSheet.GetTextureRect(1, 3);
+                            }
                         }
-                    break;
-                    case TileType.GroundWall:
-                        rectShape.TextureRect = SpriteSheet.GetTextureRect(7, 0);
-                        break;
-                    case TileType.StoneWall:
-                        rectShape.TextureRect = SpriteSheet.GetTextureRect(7, 0);
-                        break;
-                    case TileType.BoardWall:
-                        rectShape.TextureRect = SpriteSheet.GetTextureRect(7, 0);
                         break;
                     case TileType.Treesapling:
                         rectShape.TextureRect = SpriteSheet.GetTextureRect(0, 0);
@@ -382,7 +411,7 @@ namespace MyTerraria
                             rectShape.TextureRect = SpriteSheet.GetTextureRect(0, i);
                         }
                         // Если есть верхний и нижний сосед
-                        if (upTile == null  && downTile != null && (leftTile == null || leftTile != null) && (rightTile == null || rightTile != null))
+                        if (upTile == null && downTile != null && (leftTile == null || leftTile != null) && (rightTile == null || rightTile != null))
                         {
                             int i = World.Rand.Next(0, 3); // Случайное число от 0 до 3
                             rectShape.TextureRect = SpriteSheet.GetTextureRect(0, 9 + i);
@@ -442,5 +471,5 @@ namespace MyTerraria
         {
             return new FloatRect(Position, new Vector2f(TILE_SIZE, TILE_SIZE));
         }
-    }
+    }*/
 }

@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B1E37DCA-B6E8-4405-B3C5-A08C8E48AC1F}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MyTerraria</RootNamespace>
     <AssemblyName>MyTerraria</AssemblyName>
@@ -98,7 +98,6 @@
     <Compile Include="Items\Item.cs" />
     <Compile Include="Items\ItemTile.cs" />
     <Compile Include="MathHelper.cs" />
-    <Compile Include="NPC\NpcFlyingEye.cs" />
     <Compile Include="Perlin2D.cs" />
     <Compile Include="NPC\Npc.cs" />
     <Compile Include="NPC\NpcFastSlime.cs" />
@@ -117,6 +116,9 @@
     <Compile Include="UI\UIManager.cs" />
     <Compile Include="UI\UIWindow.cs" />
     <Compile Include="World.cs" />
+    <Compile Include="Worlds\Chunk.cs" />
+    <Compile Include="Worlds\ITile.cs" />
+    <Compile Include="Worlds\Tile.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

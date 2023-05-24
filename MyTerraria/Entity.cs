@@ -1,4 +1,5 @@
-﻿using SFML.Graphics;
+﻿using MyTerraria.Worlds;
+using SFML.Graphics;
 using SFML.System;
 using System;
 using System.Diagnostics;
@@ -23,8 +24,8 @@ namespace MyTerraria
 
         protected World world;
 
+        protected bool isPlayer = true;
         protected bool isFly = true;
-        protected bool isFlyer = false;
         protected bool isRectVisible = true;
         protected bool isGhost = false;         // Режим призрака?
         
@@ -46,7 +47,7 @@ namespace MyTerraria
         {
             velocity.X *= 0.99f;
 
-            if (!isGhost && !isFlyer)
+            if (!isGhost)
             {
                 this.velocity.Y += gravity;
 
@@ -59,7 +60,7 @@ namespace MyTerraria
 
                 Vector2f nextPos = Position + offset;
                 Vector2f stepPos = Position - rect.Origin;
-                FloatRect stepRect = new FloatRect(stepPos, rect.Size);
+                FloatRect stepRect; // = new FloatRect(stepPos, rect.Size);
                 Vector2f stepVec = (nextPos - Position) / countStep;
 
                 for (int step = 0; step < countStep; step++)
@@ -75,16 +76,14 @@ namespace MyTerraria
                     for (int x = 0; x <= (rect.Size.X - rect.Origin.X); x += Tile.TILE_SIZE)
                     {
 
-                        int i = (int)((stepPos.X + 8 + x) / Tile.TILE_SIZE);
+                        int i = (int)((stepPos.X + (Tile.TILE_SIZE / 2) + x) / Tile.TILE_SIZE);
                         int j = (int)((stepPos.Y + rect.Size.Y) / Tile.TILE_SIZE);
-                        Tile tile = world.GetTile(i, j);
-                        Tile tileTop = world.GetTile(i, j - (int)rect.Size.Y / Tile.TILE_SIZE - 1);
 
-                        /*if (i < 0 || i >= World.WORLD_WIDTH || j < 0 || j >= World.WORLD_HEIGHT)
-                            return;*/
+                        Tile tile = (Tile)world.GetITile(i, j);
 
+                        Tile tileTop = (Tile)world.GetITile(i, j - (int)rect.Size.Y / Tile.TILE_SIZE - 1);
 
-                        if (tile != null && tile.activityPhithics)
+                        if (tile != null && tile.tile != Tiles.Wall)
                         {
                             FloatRect tileRect = new FloatRect(tile.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
 
@@ -102,11 +101,11 @@ namespace MyTerraria
                                 isFly = true;
 
                         }
-                        else if(world.GetTile((int)(stepPos.X + x) / Tile.TILE_SIZE, j) == null && world.GetTile((int)(stepPos.X - x) / Tile.TILE_SIZE, j) == null)
+                        else if(world.GetITile((int)(stepPos.X + x) / Tile.TILE_SIZE, j) == null && world.GetITile((int)(stepPos.X - x) / Tile.TILE_SIZE, j) == null)
                             isFly = true;
 
 
-                        if (tileTop != null && tileTop.activityPhithics)
+                        if (tileTop != null)
                         {
                             FloatRect tiletop = new FloatRect(tileTop.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
 
@@ -130,17 +129,7 @@ namespace MyTerraria
 
                     }
                 }
-
-
                 Position = stepPos + rect.Origin;
-            }
-            else if(!isGhost && isFlyer)
-            {
-                //rect.Rotation = World.Rand.Next(0, 360);
-
-                //velocity.Y += 0.44f;
-
-                Position += velocity + movement;
             }
             else
                 Position += velocity + movement;
@@ -156,12 +145,12 @@ namespace MyTerraria
             {
 
                 Tile[] walls = new Tile[] {
-                    world.GetTile(i + iOffset, j - y),
+                    (Tile)world.GetITile(i + iOffset, j - y),
                 };
 
 
                 isWallCollided = false;
-                foreach (Tile t in walls)
+                foreach (Worlds.Tile t in walls)
                 {
                     if (t == null) continue;
 
@@ -169,7 +158,7 @@ namespace MyTerraria
                     if (debag)
                         DebugRender.AddRectangle(tileRect, Color.Yellow);
 
-                    if (t != null && t.activityPhithics)
+                    if (t != null && t.tile != Tiles.Wall)
                     {
                         if (updateCollision(stepRect, tileRect, dirType, ref stepPos))
                         {

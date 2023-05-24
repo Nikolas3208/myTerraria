@@ -32,6 +32,13 @@ namespace MyTerraria
             objects.Add(obj);
         }
 
+        public static void AddText(string str, float x, float y, Font font)
+        {
+            var text = new Text(str, font);
+            text.Position = new Vector2f(x, y);
+            objects.Add(text);
+        }
+
         public static void AddRectangle(FloatRect rect, Color color)
         {
             AddRectangle(rect.Left, rect.Top, rect.Width, rect.Height, color);

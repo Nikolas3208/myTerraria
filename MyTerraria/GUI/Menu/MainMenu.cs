@@ -59,7 +59,7 @@ namespace MyTerraria.GUI.Menu
         private void ButtLoadWorld_Click(object sender, EventArgs e)
         {
             if (!World.worldLoad)
-                Program.Game.LoadWorld();
+                Program.Game.LoadWorldAsync();
         }
 
         private void ButtCreateWorld_Click(object sender, EventArgs e)

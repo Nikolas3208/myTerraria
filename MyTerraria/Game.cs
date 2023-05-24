@@ -7,23 +7,26 @@ using SFML.System;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace MyTerraria
 {
     class Game   
     {
-        public Player Player { get; private set; }  // Игрок
+        public Player Player { get; set; }  // Игрок
         public World World { get; private set; } // Мир
 
         private MainMenu menu;
 
-        private List<Npc> Npc = new List<Npc>(); // Слизни
+        public List<Npc> Npc = new List<Npc>(); // Слизни
 
         private Stopwatch worldSaveTimer = new Stopwatch(); //Авто сохранение мира
 
+        private string StandartWorldName = "World";
         private string WorldName = "World";
-
+        private int i = 1;
         //Клас игры
         public Game()
         {
@@ -32,17 +35,17 @@ namespace MyTerraria
         public void Init()
         {
             // Создаём игрока
-            CreatePlayer();
+            //CreatePlayer();
 
             //Влючаем или отключаем отображеие прямоугольников)
             NPC.Npc.debag = false;
 
             // Создаём быстрого слизня
             Npc.Add(new NpcFastSlime(World));
+
             //Обычный слизень
-            Npc.Add(new NpcSlime(World));
-            //Летаюший глаз
-            Npc.Add(new NpcFlyingEye(World));
+            for (int i = 0; i < 10; i++)
+                Npc.Add(new NpcSlime(World));
 
             //UI инвентарь
             UIManager.AddControl(Player.Invertory);
@@ -51,31 +54,20 @@ namespace MyTerraria
             DebugRender.Enabled = true;
         }
 
-        private void CreatePlayer()
-        {
-            Player = new Player(World);
-            Player.StartPosition = new Vector2f((World.WORLD_WIDTH / 2) * 16, 0);
-            Player.Spawn();
-            Player.AddTools();
-
-            Player.Invertory = new UIInvertory();
-        }
-
         public void CreateWorld()
         {
             World = new World();
 
-            World.GenerateWorld(WorldName);
-
-            LoadWorld();
+            World.GenerateWorldAsync(WorldName);
         }
 
-        public void LoadWorld()
+        public void LoadWorldAsync()
         {
-            if (World == null)
-                World = new World();
+            World = new World();
 
-            World.LoadWorld(WorldName);
+            //int w = Console.Read();
+
+            World.LoadWorld("Worlds\\" + WorldName + ".world");
 
             Init();
         }
@@ -94,6 +86,8 @@ namespace MyTerraria
 
             UIManager.UpdateOver();
             UIManager.Update();
+
+            DebugRender.AddText(Player.health.ToString() , Player.GetGlobalPosition().X + Program.Window.Size.X - 65f, Player.GetGlobalPosition().Y, Content.font);
 
             worldSaveTimer.Stop();
 

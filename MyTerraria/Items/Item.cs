@@ -1,6 +1,7 @@
 ﻿using MyTerraria.UI;
 using SFML.Graphics;
 using SFML.System;
+using System;
 
 namespace MyTerraria.Items
 {
@@ -9,7 +10,7 @@ namespace MyTerraria.Items
         public int Count = 1; //Количество подбираемых предметов
         public const float MOVE_DISTANCE_TO_PLAYER = 100f;  // Дистанция начала движения предмета в сторону игрока
         public const float TAKE_DISTANCE_TO_PLAYER = 20f;   // Дистанция подбора предмета игроком
-        public const float MOVE_SPEED_COEF = 1f;          // Коэффицент увеличения скорости движения
+        public const float MOVE_SPEED_COEF = 0.5f;          // Коэффицент увеличения скорости движения
 
         InfoItem infoItem;
 
@@ -27,23 +28,27 @@ namespace MyTerraria.Items
             float dist = MathHelper.GetDistance(Position, playerPos);
 
             isGhost = dist < MOVE_DISTANCE_TO_PLAYER;
+
             if (isGhost)
             {
                 if (dist < TAKE_DISTANCE_TO_PLAYER)
                 {
-                    Program.Game.Player.Invertory.AddItemStack(new UIItemStack(infoItem, 1));
-
-                    IsDestroyed = true;
+                    if (Program.Game.Player.Invertory.AddItemStack(new UIItemStack(infoItem, Count)))
+                    {
+                        IsDestroyed = true;
+                    }
                 }
                 else
                 {
                     Vector2f dir = MathHelper.Normalize(playerPos - Position);
-                    float speed = 5f - dist / MOVE_DISTANCE_TO_PLAYER;
-                    velocity = dir * speed * MOVE_SPEED_COEF;
+
+                    float speed = 2f - dist / MOVE_DISTANCE_TO_PLAYER;
+                    velocity += dir * speed * MOVE_SPEED_COEF;
                 }
             }
 
             base.Update();
+
         }
 
         public override void Draw(RenderTarget target, RenderStates states)

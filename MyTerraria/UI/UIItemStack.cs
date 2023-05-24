@@ -31,7 +31,7 @@ namespace MyTerraria.UI
         }
         public bool IsFull
         {
-            get { return ItemCount >= ItemCountMax; }
+            get { return ItemCount >= ItemCountMax;  }
         }
 
         public InfoItem InfoItem { get; private set; }

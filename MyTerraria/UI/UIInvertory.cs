@@ -75,6 +75,12 @@ namespace MyTerraria.UI
                         c.ItemStack = itemStack;
                         return true;
                     }
+                    else if (c.ItemStack.ItemCount == 0)
+                    {
+                        c.ItemStack = itemStack;
+                        return true;
+                    }
+                    
                 }
             }
 

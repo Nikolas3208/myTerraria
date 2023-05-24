@@ -13,6 +13,8 @@ namespace MyTerraria.NPC
 
         public NpcSlime(World world) : base(world)
         {
+            isPlayer = false;
+
             spriteSheet = Content.ssNpcSlime;
 
             rect = new RectangleShape(new Vector2f(spriteSheet.SubWidth / 1.5f, spriteSheet.SubHeight / 1.5f));
@@ -25,7 +27,7 @@ namespace MyTerraria.NPC
 
         public override void OnKill()
         {
-            StartPosition = Program.Game.Player.Position;
+            StartPosition = Program.Game.Player.GetGlobalPosition() + new Vector2f(World.Rand.Next(0, (int)Program.Window.Size.X), 0);
             Spawn();
         }
 
@@ -37,6 +39,13 @@ namespace MyTerraria.NPC
 
         public override void UpdateNPC()
         {
+            FloatRect stepRect = new FloatRect(Position, rect.Size);
+
+            if (stepRect.Intersects(PlayerRect))
+            {
+                velocity = GetJumpVelocity();
+            }
+
             //rect.FillColor = color;
             if (Position.X < 4 * 16)
             {
@@ -80,7 +89,7 @@ namespace MyTerraria.NPC
 
         public virtual Vector2f GetJumpVelocity()
         {
-            return new Vector2f(Direction * World.Rand.Next(1, 15), -World.Rand.Next(8, 15));
+            return new Vector2f(Direction * World.Rand.Next(1, 9), -World.Rand.Next(5, 10));
         }
     }
 }

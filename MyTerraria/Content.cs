@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System;
 using System.Windows.Forms;
 
+using MyTerraria.Worlds;
+
 namespace MyTerraria
 {
     class Content
@@ -71,6 +73,10 @@ namespace MyTerraria
         //public static SpriteSheet ssTileItemAcorn;//Acorn
         //public static SpriteSheet ssTileItemWorkbench;//Workbench
 
+        public static SpriteSheet ssWallItemGround;
+        public static SpriteSheet ssWallItemBoard;
+        public static SpriteSheet ssWallItemStone;
+
         //---------------------------------------------
 
         // NPC
@@ -123,9 +129,9 @@ namespace MyTerraria
                 //----------------------------------------------
 
                 //Wall
-                ssWallStone = new SpriteSheet(WALLWIDTH, WALLHEIGHT, false, 1, new Texture(CONTENT_DIR + "Textures\\walls\\Wall_1.png"));
-                ssWallGround = new SpriteSheet(WALLWIDTH, WALLHEIGHT, false, 1, new Texture(CONTENT_DIR + "Textures\\walls\\Wall_2.png"));
-                ssWallBoard = new SpriteSheet(12, 4, true, 1, new Texture(CONTENT_DIR + "Textures\\walls\\Wall_4.png"));
+                ssWallStone = new SpriteSheet(32, 32, false, 3, new Texture(CONTENT_DIR + "Textures\\walls\\Wall_1.png"));
+                ssWallGround = new SpriteSheet(32, 32, false, 3, new Texture(CONTENT_DIR + "Textures\\walls\\Wall_2.png"));
+                ssWallBoard = new SpriteSheet(32, 32, false, 3, new Texture(CONTENT_DIR + "Textures\\walls\\Wall_4.png"));
 
                 //---------------------------------------------
 
@@ -154,6 +160,10 @@ namespace MyTerraria
                 ssTileItemSlime = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_23.png"));
                 ssTileItemSword = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_24.png"));
                 ssTileItemAcorn = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_27.png"));
+
+                ssWallItemStone = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_26.png"));
+                ssWallItemGround = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_30.png"));
+                ssWallItemBoard = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_93.png"));
 
                 //---------------------------------------------
 

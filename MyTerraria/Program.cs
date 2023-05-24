@@ -79,10 +79,15 @@ namespace MyTerraria
         {
             //Позиция игрока
             //var pos = Game.Player.Position;
+
             if (!debagCamera)
-                pos = Program.Game.Player.Position;
+            {
+                pos = Game.Player.Position;
+                pos2 = pos;
+            }
             else
                 pos = pos2;
+
 
             //Получаем цент относительно персонажа
             newPos = (pos.X - Window.Size.X / 2, pos.Y - Window.Size.Y / 2);
@@ -102,7 +107,7 @@ namespace MyTerraria
 
         public static Vector2i GetGlobalMousePosition()
         {
-            return new Vector2i(GetMousePosition().X + (int)(Game.Player.Position.X - Window.Size.X / 2), GetMousePosition().Y + (int)(Game.Player.Position.Y - Window.Size.Y / 2));
+            return new Vector2i((int)(GetMousePosition().X * zoom + pos.X - Window.Size.X * zoom / 2), (int)(GetMousePosition().Y * zoom + pos.Y - Window.Size.Y * zoom / 2));
         }
 
         private static void Win_KeyPressed(object sender, KeyEventArgs e)
@@ -165,9 +170,9 @@ namespace MyTerraria
 
         private static void Win_Closed(object sender, EventArgs e)
         {
-            if (World.worldLoad)
+            /*if (World.worldLoad)
                 Game.World.SaveWorld(true);
-            else
+            else*/
                 Window.Close();
         }
     }

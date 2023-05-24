@@ -8,6 +8,9 @@ namespace MyTerraria.NPC
     {
         public Vector2f StartPosition;
         public Vector2f vector;
+        public FloatRect PlayerRect;
+
+        public float health = 100f;
 
         public int Direction
         {
@@ -37,11 +40,15 @@ namespace MyTerraria.NPC
 
         public override void Update()
         {
+            PlayerRect = new FloatRect(Program.Game.Player.Position - Program.Game.Player.rect.Origin, Program.Game.Player.rect.Size);
+
             UpdateNPC();
             base.Update();
 
             // Если игрок упал в пропасть, то возрождаем его
             if (Position.Y > World.WORLD_HEIGHT * 16)
+                OnKill();
+            else if(health <= 0)
                 OnKill();
 
             if (Position.X < 4 * 16)

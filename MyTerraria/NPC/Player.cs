@@ -1,8 +1,11 @@
 ﻿using MyTerraria.Items;
 using MyTerraria.UI;
+using MyTerraria.Worlds;
+
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
+
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,6 +55,7 @@ namespace MyTerraria.NPC
 
         public Player(World world) : base(world)
         {
+            health = 100f;
 
             //Window = new RenderWindow(new VideoMode(800, 600), "Моя Terraria!");
             rect = new RectangleShape(new Vector2f(Tile.TILE_SIZE * 2f, Tile.TILE_SIZE * 3f));
@@ -266,6 +270,7 @@ namespace MyTerraria.NPC
 
         public override void OnKill()
         {
+            health = 100;
             Spawn();
         }
 
@@ -327,47 +332,36 @@ namespace MyTerraria.NPC
 
             if (Mouse.IsButtonPressed(Mouse.Button.Left))
             {
-                Tile tile = world.GetTile(mousePos.X / 16, mousePos.Y / 16);
+                Tile tile = (Tile)world.GetTile(mousePos.X / 16, mousePos.Y / 16);
 
                 if (UIInvertory.cells != null && UIInvertory.cells[uiIsSelected].ItemStack != null && UIInvertory.cells[uiIsSelected].ItemStack.itemCount != 0)
                 {
                     var InfoItemType = UIInvertory.cells[uiIsSelected].ItemStack.InfoItem;
                     if (tile != null)
                     {
-                        if (InfoItemType.Tooltype == ToolType.Pick && tile.type != TileType.Treebark && tile.type != TileType.Treetops)
+                        if (InfoItemType.Tooltype == ToolType.Pick && tile.type != TileType.Treebark)
                         {
-                            if (tile.type == TileType.Grass)
-                                tile.type = TileType.Ground;
-
-                            world.SetTile(tile.type, mousePos.X / 16, mousePos.Y / 16, true, false);
+                            world.SetTile(Tiles.Tile, tile.type, mousePos.X / 16, mousePos.Y / 16, tile.isGrass, true);
                             AnimationUpdate(AnimType.Tool);
                         }
-                        else if(InfoItemType.Tooltype == ToolType.Axe && tile.type == TileType.Treebark || tile.type == TileType.Treetops)
+                        else if(InfoItemType.Tooltype == ToolType.Axe && tile.type == TileType.Treebark)
                         {
-                            world.TreeFelling(mousePos.X / 16, mousePos.Y / 16);
+                            
                             AnimationUpdate(AnimType.Tool);
                         }
 
                     }
                     else
                     {
-                        Tile upTile = Program.Game.World.GetTile(mousePos.X / 16, mousePos.Y / 16 - 1);     // Верхний сосед
-                        Tile downTile = Program.Game.World.GetTile(mousePos.X / 16, mousePos.Y / 16 + 1);   // Нижний сосед
-                        Tile leftTile = Program.Game.World.GetTile(mousePos.X / 16 - 1, mousePos.Y / 16);   // Левый сосед
-                        Tile rightTile = Program.Game.World.GetTile(mousePos.X / 16 + 1, mousePos.Y / 16);  // Правый сосед
+                        Tile upTile = (Tile)Program.Game.World.GetTile(mousePos.X / 16, mousePos.Y / 16 - 1);     // Верхний сосед
+                        Tile downTile = (Tile)Program.Game.World.GetTile(mousePos.X / 16, mousePos.Y / 16 + 1);   // Нижний сосед
+                        Tile leftTile = (Tile)Program.Game.World.GetTile(mousePos.X / 16 - 1, mousePos.Y / 16);   // Левый сосед
+                        Tile rightTile = (Tile)Program.Game.World.GetTile(mousePos.X / 16 + 1, mousePos.Y / 16);  // Правый сосед
 
                         if (InfoItemType.Tooltype == ToolType.None && InfoItemType.Weapontype == WeaponType.None && (upTile != null || downTile != null || leftTile != null || rightTile != null))
                         {
-                            if (InfoItemType.Tiletype == TileType.Treesapling && downTile != null && downTile.type == TileType.Grass)
-                            {
-                                world.SetTile(TileType.Treesapling, mousePos.X / 16, mousePos.Y / 16, false, false);
-                                UIInvertory.cells[uiIsSelected].ItemStack.ItemCount--;
-                            }
-                            else if (InfoItemType.Tiletype != TileType.Treesapling)
-                            {
-                                world.SetTile(InfoItemType.Tiletype, mousePos.X / 16, mousePos.Y / 16, false, false);
-                                UIInvertory.cells[uiIsSelected].ItemStack.ItemCount--;
-                            }
+                            world.SetTile(InfoItemType.Tiles, InfoItemType.Tiletype, mousePos.X / 16, mousePos.Y / 16);
+                            UIInvertory.cells[uiIsSelected].ItemStack.ItemCount--;
 
                             AnimationUpdate(AnimType.Tool);
                         }
@@ -386,6 +380,11 @@ namespace MyTerraria.NPC
             tool = new Sprite(UIInvertory.cells[uiIsSelected].ItemStack.InfoItem.SpriteSheet.Texture);
             tool.Origin = new Vector2f(0, tool.Texture.Size.Y);
             tool.Rotation = angle;
+
+            FloatRect toolRect = new FloatRect(Position, new Vector2f(tool.Texture.Size.X, tool.Texture.Size.Y));
+
+            DebugRender.AddRectangle(toolRect, Color.Red);
+
             //tool.Position = GetGlobalPosition();
 
             angle += 3.23f * speed;
@@ -452,6 +451,18 @@ namespace MyTerraria.NPC
             Content.ssBackgroundSky.Origin = new Vector2f(Content.ssTextureBackgroundSky.Size.X / 2, Content.ssTextureBackgroundSky.Size.Y / 2);
             Content.ssBackgroundSky.Scale = new Vector2f(50, 1);
 
+            /*foreach (var slime in Program.Game.Npc)
+            {
+                FloatRect slimeRect = new FloatRect(slime.Position, new Vector2f(spriteSheet.SubWidth / 1.5f, spriteSheet.SubHeight / 1.5f));
+
+                if (PlayerRect.Intersects(slimeRect))
+                {
+                    DebugRender.AddRectangle(PlayerRect, Color.Red);
+
+                    Direction = slime.Direction * -1;
+                    velocity = new Vector2f(-velocity.X * 2.8f, -velocity.Y * 0.3f) * Direction;
+                }
+            }*/
 
             bool isMoveLeft = Keyboard.IsKeyPressed(Keyboard.Key.A);
             bool isMoveRight = Keyboard.IsKeyPressed(Keyboard.Key.D);
@@ -519,6 +530,8 @@ namespace MyTerraria.NPC
                     Direction = 1;
                 }
 
+                
+
                 if (movement.X > PLAYER_MOVE_SPEED)
                     movement.X = PLAYER_MOVE_SPEED;
                 else if (movement.X < -PLAYER_MOVE_SPEED)
@@ -582,29 +595,9 @@ namespace MyTerraria.NPC
             itemTile.Position = Position;
             world.items.Add(itemTile);
 
-            //Сажены дерева
-            for (int i = 0; i < 10; i++)
-            {
-                itemTile = new ItemTile(world, InfoItem.ItemTreeSapling);
-                itemTile.Position = Position;
-                world.items.Add(itemTile);
-                itemTile = new ItemTile(world, InfoItem.ItemMushroom);
-                itemTile.Position = Position;
-                world.items.Add(itemTile);
-            }
-
-            for (int i = 0; i < 99; i++)
-            {
-                itemTile = new ItemTile(world, InfoItem.ItemBoardWall);
-                itemTile.Position = Position;
-                world.items.Add(itemTile);
-                itemTile = new ItemTile(world, InfoItem.ItemBoard);
-                itemTile.Position = Position;
-                world.items.Add(itemTile); 
-                itemTile = new ItemTile(world, InfoItem.ItemGround);
-                itemTile.Position = Position;
-                world.items.Add(itemTile);
-            }
+            itemTile = new ItemTile(world, InfoItem.ItemVegetation);
+            itemTile.Position = Position;
+            world.items.Add(itemTile);
         }
     }
 }
