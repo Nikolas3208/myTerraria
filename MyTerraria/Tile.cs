@@ -157,6 +157,11 @@ namespace MyTerraria
                         break;
                     case TileType.Ground:
                         SpriteSheet = Content.ssTileGround;    // Почва
+                        if (isWall)
+                       {
+                            SpriteSheet = Content.ssWallGround;
+                            activityPhithics = false;
+                        } 
                         break;
                     case TileType.GroundWall:
                         SpriteSheet = Content.ssWallGround;    // Почва
