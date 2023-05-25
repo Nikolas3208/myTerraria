@@ -4,7 +4,7 @@ using System;
 
 namespace MyTerraria.Worlds
 {
-    public enum Tiles
+    /*public enum Tiles
     {
         Tile,
         DynamicTile,
@@ -48,5 +48,5 @@ namespace MyTerraria.Worlds
         void UpdateView();
 
         void UpdateColor(Color color);
-    }
+    }*/
 }

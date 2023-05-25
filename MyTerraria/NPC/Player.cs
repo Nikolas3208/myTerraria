@@ -326,32 +326,39 @@ namespace MyTerraria.NPC
             if (UIInvertory.cells != null && UIInvertory.cells[uiIsSelected].ItemStack != null && UIInvertory.cells[uiIsSelected].ItemStack.InfoItem != null)
                 DebugRender.AddRectangle(mousePos.X, mousePos.Y, UIInvertory.cells[uiIsSelected].ItemStack.InfoItem.SpriteSheet.Texture.Size.X, UIInvertory.cells[uiIsSelected].ItemStack.InfoItem.SpriteSheet.Texture.Size.Y, UIInvertory.cells[uiIsSelected].ItemStack.InfoItem.SpriteSheet.Texture);
 
-            FloatRect rect = new FloatRect(new Vector2f(mousePos.X, mousePos.Y), new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
-
-            DebugRender.AddRectangle(rect, Color.Green);
+            Chunk chunk = world.GetChunk(mousePos.X / Chunk.CHUNK_SIZE, mousePos.Y / Chunk.CHUNK_SIZE);
 
             if (Mouse.IsButtonPressed(Mouse.Button.Left))
             {
-                Tile tile = (Tile)world.GetTile(mousePos.X / 16, mousePos.Y / 16);
-
                 if (UIInvertory.cells != null && UIInvertory.cells[uiIsSelected].ItemStack != null && UIInvertory.cells[uiIsSelected].ItemStack.itemCount != 0)
                 {
-                    var InfoItemType = UIInvertory.cells[uiIsSelected].ItemStack.InfoItem;
-                    if (tile != null)
-                    {
-                        if (InfoItemType.Tooltype == ToolType.Pick && tile.type != TileType.Treebark)
-                        {
-                            world.SetTile(Tiles.Tile, tile.type, mousePos.X / 16, mousePos.Y / 16, tile.isGrass, true);
-                            AnimationUpdate(AnimType.Tool);
-                        }
-                        else if(InfoItemType.Tooltype == ToolType.Axe && tile.type == TileType.Treebark)
-                        {
-                            
-                            AnimationUpdate(AnimType.Tool);
-                        }
 
+                    var InfoItemType = UIInvertory.cells[uiIsSelected].ItemStack.InfoItem;
+
+                    if (chunk != null)
+                    {
+                        Tile tile = chunk.GetTile(mousePos.X / Chunk.CHUNK_SIZE, mousePos.Y / Chunk.CHUNK_SIZE);
+                        if (tile != null)
+                        {
+                            Vector2f tilePos = tile.Position + chunk.Position;
+
+                            FloatRect tileRect = new FloatRect(tilePos, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
+                            DebugRender.AddRectangle(tileRect, Color.Green);
+
+                            if (InfoItemType.Tooltype == ToolType.Pick)
+                            {
+                                world.SetTile(tile.type, tilePos.X / 16, tilePos.Y / 16, tile.isGrass, true);
+                                AnimationUpdate(AnimType.Tool);
+                            }
+                            else if (InfoItemType.Tooltype == ToolType.Axe && tile.type == TileType.Treebark)
+                            {
+
+                                AnimationUpdate(AnimType.Tool);
+                            }
+
+                        }
                     }
-                    else
+                    if(world.GetTile(mousePos.X / Chunk.CHUNK_SIZE, mousePos.Y / Chunk.CHUNK_SIZE) == null)
                     {
                         Tile upTile = (Tile)Program.Game.World.GetTile(mousePos.X / 16, mousePos.Y / 16 - 1);     // Верхний сосед
                         Tile downTile = (Tile)Program.Game.World.GetTile(mousePos.X / 16, mousePos.Y / 16 + 1);   // Нижний сосед
@@ -360,7 +367,7 @@ namespace MyTerraria.NPC
 
                         if (InfoItemType.Tooltype == ToolType.None && InfoItemType.Weapontype == WeaponType.None && (upTile != null || downTile != null || leftTile != null || rightTile != null))
                         {
-                            world.SetTile(InfoItemType.Tiles, InfoItemType.Tiletype, mousePos.X / 16, mousePos.Y / 16);
+                            world.SetTile(InfoItemType.Tiletype, mousePos.X / 16, mousePos.Y / 16);
                             UIInvertory.cells[uiIsSelected].ItemStack.ItemCount--;
 
                             AnimationUpdate(AnimType.Tool);

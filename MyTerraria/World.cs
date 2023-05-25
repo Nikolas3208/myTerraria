@@ -18,8 +18,8 @@ namespace MyTerraria
     public class World : Transformable, Drawable
     {
         // Кол-во плиток по ширине и высоте
-        public static int WORLD_WIDTH = 500;
-        public static int WORLD_HEIGHT = 200;
+        public static int WORLD_WIDTH = 63;
+        public static int WORLD_HEIGHT = 63;
         public static (int, int) WORLD_LOAD = (200, 100);
 
         public static int GroundLavelMax;
@@ -32,8 +32,11 @@ namespace MyTerraria
         public static Perlin2D Perlin2D { private set; get; }
 
         // Плитки
-        public ITile[] Tiles = new ITile[WORLD_WIDTH * WORLD_HEIGHT];
-        public Tile tile;
+        /*public Tile[] Tiles = new Tile[WORLD_WIDTH * WORLD_HEIGHT];
+        public Tile tile;*/
+
+        private Chunk[] chunks;
+        private Chunk chunk;
 
         // Предметы
         public List<Item> items = new List<Item>();
@@ -62,6 +65,7 @@ namespace MyTerraria
         {
             Rand = seed > 0 ? new Random(seed) : new Random((int)DateTime.Now.Ticks);
             Perlin2D = new Perlin2D();
+            chunks = new Chunk[WORLD_WIDTH * WORLD_HEIGHT];
             InfoItem.Colectionsgen();
         }
 
@@ -70,7 +74,7 @@ namespace MyTerraria
             GroundLavelMax = Rand.Next(WORLD_HEIGHT / 5, WORLD_HEIGHT / 2);
             int GroundLevelMin = GroundLavelMax + Rand.Next(100, 250);
 
-            for (int i = 0; i < WORLD_WIDTH; i++)
+            /*for (int i = 0; i < WORLD_WIDTH; i++)
             {
                 terrain[i] = Perlin2D.Noise(seed * terrainFreq, (i + seed) * terrainFreq) * terrainFactor;
                 mouns[i] = Perlin2D.Noise(seed * terrainMounsFreq, (i + seed) * terrainMounsFreq) * terrainMounsFactor;
@@ -168,14 +172,14 @@ namespace MyTerraria
             {
                 for (int y = (int)v[x] + GroundLavelMax; y < WORLD_HEIGHT + (int)mouns[x] + (int)terrain[x] + (int)(GroundLavelMax * 1.5f); y++)
                 {
-                    SetTile(Worlds.Tiles.Tile, TileType.Ground, x, y);
+                    SetTile(TileType.Ground, x, y);
 
                     int index = x + y * WORLD_WIDTH;
 
                     if (index < WORLD_WIDTH * WORLD_HEIGHT)
                     {
                         if (PerlinCave[index] >= 0.001f)
-                            SetTile(Worlds.Tiles.Tile, TileType.Stone, x, y);
+                            SetTile(TileType.Stone, x, y);
                     }
                 }
             }
@@ -199,9 +203,9 @@ namespace MyTerraria
             for (int x = 0; x < WORLD_WIDTH; x++)
             {
                 int y = (int)v[x] + GroundLavelMax;
-                Tile tile = (Tile)GetITile(x, y);
+                Tile tile = (Tile)GetTile(x, y);
 
-                if (GetITile(x, y) != null && GetITile(x, y).type == TileType.Ground)
+                if (GetTile(x, y) != null && GetTile(x, y).type == TileType.Ground)
                     tile.Grass(true);
             }
 
@@ -327,6 +331,14 @@ namespace MyTerraria
                     }
                 }
             }*/
+
+            for (int x = 0; x < WORLD_WIDTH; x++)
+            {
+                for (int y = 1; y < WORLD_HEIGHT; y++)
+                {
+                    SetChunk(x, y);
+                }
+            }
         }
 
         // Генерируем новый мир
@@ -336,71 +348,118 @@ namespace MyTerraria
 
             GenerateTerrain();
 
-            SaveWordlFromFile("Worlds\\" + name + ".world", Tiles);
+            /*SaveWordlFromFile("Worlds\\" + name + ".world", Tiles);
             {
                 Tiles = null;
                 worldGen = true;
 
-            }
+            }*/
+            CreatePlayer( 0, 0 );
+
+            worldGen = true;
+            worldLoad = true;
         }
 
-        public void SetTile(Tiles tile, TileType type, int x, int y, bool isgrass = false, bool destriy = false)
+        public void SetChunk(int x, int y, bool isAir = false)
+        {
+            chunk = new Chunk(isAir);
+            chunk.Position = new Vector2f(x * Tile.TILE_SIZE * Chunk.CHUNK_SIZE, y * Tile.TILE_SIZE * Chunk.CHUNK_SIZE) + Position;
+            chunks[x + y * WORLD_WIDTH] = chunk;
+        }
+
+        public void SetTile(TileType type, float x, float y, bool isgrass = false, bool destriy = false)
         {
             if (x < 0 || x >= WORLD_WIDTH || y < 0 || y >= WORLD_HEIGHT)
                 return;
 
-            // Находим соседей
-            Tile upTile = (Tile)GetITile(x, y - 1);     // верхний сосед
-            Tile downTile = (Tile)GetITile(x, y + 1);   // нижний сосед
-            Tile leftTile = (Tile)GetITile(x - 1, y);   // левый сосед
-            Tile rightTile = (Tile)GetITile(x + 1, y);  // правый сосед
+            chunk = GetChunk(x, y);
 
-            int index = x + y * WORLD_WIDTH;
-
-            if (type != TileType.None && !destriy)
+            if (chunk != null && type != TileType.None && !destriy)
             {
-                Tile tileBlock = new Tile(tile, type, upTile, downTile, leftTile, rightTile);
-                tileBlock.Position = new Vector2f(x * Tile.TILE_SIZE, y * Tile.TILE_SIZE) + Position;
-                tileBlock.Grass(isgrass);
-                Tiles[x + y * WORLD_WIDTH] = tileBlock;
+                int Xt = (int)(Math.Floor(x - (Position.X / Chunk.CHUNK_SIZE)));
+                int Yt = (int)(Math.Floor(y - (Position.Y / Chunk.CHUNK_SIZE)));
+                chunk.SetTile(type, Xt, Yt);
             }
-            else if(type != TileType.None && destriy)
+            else if (chunk != null && type != TileType.None && destriy)
             {
-                Tile tileType = (Tile)Tiles[index];
+                InfoItem item = InfoItem.GetItem(type);
 
-                foreach (InfoItem item in InfoItem.InfoItems)
+                if (item != null)
                 {
-                    if (item.Tiletype == type)
-                    {
-                        InfoItem infoItem = item;
+                    var itemTile = new ItemTile(this, item);
+                    itemTile.Position = new Vector2f(x, y) * Tile.TILE_SIZE;
+                    items.Add(itemTile);
 
-                        if (infoItem != null)
-                        {
-                            var itemTile = new ItemTile(this, infoItem);
-                            itemTile.Position = tileType.Position;
-                            items.Add(itemTile);
-                        }
-                    }
+                    chunk.SetTile(TileType.None, (int)x, (int)y);
                 }
 
-                Tiles[x + y * WORLD_WIDTH] = null;
-
-                // Присваиваем соседей, а соседям эту плитку
-                if (upTile != null) upTile.DownTile = null;
-                if (downTile != null) downTile.UpTile = null;
-                if (leftTile != null) leftTile.RightTile = null;
-                if (rightTile != null) rightTile.LeftTile = null;
             }
             else
             {
-                Tiles[x + y * WORLD_WIDTH] = null;
 
-                // Присваиваем соседей, а соседям эту плитку
-                if (upTile != null) upTile.DownTile = null;
-                if (downTile != null) downTile.UpTile = null;
-                if (leftTile != null) leftTile.RightTile = null;
-                if (rightTile != null) rightTile.LeftTile = null;
+                int Xc = (int)Math.Floor(x / Chunk.CHUNK_SIZE);
+                int Yc = (int)Math.Floor(y / Chunk.CHUNK_SIZE);
+
+                SetChunk(Xc, Yc, true);
+                chunk = GetChunk(x, y);
+
+                int Xt = (int)(Math.Floor(x - (Position.X / Chunk.CHUNK_SIZE)));
+                int Yt = (int)(Math.Floor(y - (Position.Y / Chunk.CHUNK_SIZE)));
+                chunk.SetTile(type, Xt, Yt);
             }
+
+            //// Находим соседей
+            //Tile upTile = (Tile)GetTile(x, y - 1);     // верхний сосед
+            //Tile downTile = (Tile)GetTile(x, y + 1);   // нижний сосед
+            //Tile leftTile = (Tile)GetTile(x - 1, y);   // левый сосед
+            //Tile rightTile = (Tile)GetTile(x + 1, y);  // правый сосед
+
+            //int index = x + y * WORLD_WIDTH;
+
+            //if (type != TileType.None && !destriy)
+            //{
+            //    Tile tileBlock = new Tile(type, upTile, downTile, leftTile, rightTile);
+            //    tileBlock.Position = new Vector2f(x * Tile.TILE_SIZE, y * Tile.TILE_SIZE) + Position;
+            //    tileBlock.Grass(isgrass);
+            //    Tiles[x + y * WORLD_WIDTH] = tileBlock;
+            //}
+            //else if(type != TileType.None && destriy)
+            //{
+            //    Tile tileType = (Tile)Tiles[index];
+
+            //    foreach (InfoItem item in InfoItem.InfoItems)
+            //    {
+            //        if (item.Tiletype == type)
+            //        {
+            //            InfoItem infoItem = item;
+
+            //            if (infoItem != null)
+            //            {
+            //                var itemTile = new ItemTile(this, infoItem);
+            //                itemTile.Position = tileType.Position;
+            //                items.Add(itemTile);
+            //            }
+            //        }
+            //    }
+
+            //    Tiles[x + y * WORLD_WIDTH] = null;
+
+            //    // Присваиваем соседей, а соседям эту плитку
+            //    if (upTile != null) upTile.DownTile = null;
+            //    if (downTile != null) downTile.UpTile = null;
+            //    if (leftTile != null) leftTile.RightTile = null;
+            //    if (rightTile != null) rightTile.LeftTile = null;
+            //}
+            //else
+            //{
+            //    Tiles[x + y * WORLD_WIDTH] = null;
+
+            //    // Присваиваем соседей, а соседям эту плитку
+            //    if (upTile != null) upTile.DownTile = null;
+            //    if (downTile != null) downTile.UpTile = null;
+            //    if (leftTile != null) leftTile.RightTile = null;
+            //    if (rightTile != null) rightTile.LeftTile = null;
+            //}
 
         }
 
@@ -477,31 +536,38 @@ namespace MyTerraria
         }*/
 
         // Получить плитку по мировым координатам
-        public ITile GetTileByWorldPos(float x, float y)
+        public Tile GetTileByWorldPos(float x, float y)
         {
             int i = (int)(x / Tile.TILE_SIZE);
             int j = (int)(y / Tile.TILE_SIZE);
             return GetTile(i, j);
         }
-        public ITile GetTileByWorldPos(Vector2f pos)
+        public Tile GetTileByWorldPos(Vector2f pos)
         {
             return GetTileByWorldPos(pos.X, pos.Y);
         }
-        public ITile GetTileByWorldPos(Vector2i pos)
+        public Tile GetTileByWorldPos(Vector2i pos)
         {
             return GetTileByWorldPos(pos.X, pos.Y);
         }
-        public ITile GetITile(int x, int y)
+        public Tile GetTile(int x, int y)
         {
-            if(x >= 0 && y >= 0 && x < WORLD_WIDTH && y < WORLD_HEIGHT)
-                return Tiles[x + y * WORLD_WIDTH];
-
+            if (x / Chunk.CHUNK_SIZE >= 0 && y / Chunk.CHUNK_SIZE >= 0 && x / Chunk.CHUNK_SIZE < WORLD_WIDTH && y / Chunk.CHUNK_SIZE < WORLD_HEIGHT)
+            {
+                chunk = GetChunk(x, y);
+                if (chunk != null)
+                    return chunk.GetTile(x, y);
+            }
             return null;
         }
-        public ITile GetTile(int x, int y)
+
+        public Chunk GetChunk(float x, float y)
         {
+            x = (float)Math.Floor(x / Chunk.CHUNK_SIZE);
+            y = (float)Math.Floor(y / Chunk.CHUNK_SIZE);
+
             if (x >= 0 && y >= 0 && x < WORLD_WIDTH && y < WORLD_HEIGHT)
-                return Tiles[x + y * WORLD_WIDTH];
+                return chunks[(int)(x + y * WORLD_WIDTH)];
 
             return null;
         }
@@ -520,7 +586,7 @@ namespace MyTerraria
                 }
             }
         }
-        private Task SaveWordlFromFile(string path, ITile[] tiles)
+        private Task SaveWordlFromFile(string path, Tile[] tiles)
         {
             if (File.Exists(path)) File.Delete(path);
 
@@ -532,10 +598,10 @@ namespace MyTerraria
             {
                 for (int y = 0; y < WORLD_HEIGHT; y++)
                 {
-                    if (GetITile(x, y) != null)
+                    if (GetTile(x, y) != null)
                     {
-                        Tile tile = (Tile)GetITile(x, y);
-                        sw.Write("p " + tile.Position.X / 16 + " " + tile.Position.Y / 16 + "\nt " + tile.type + " " + tile.tile + " " + tile.isGrass + "\n;" + "\n");
+                        Tile tile = (Tile)GetTile(x, y);
+                        sw.Write("p " + tile.Position.X / 16 + " " + tile.Position.Y / 16 + "\nt " + tile.type + " " + tile.isGrass + "\n;" + "\n");
                     }
                 }
             }
@@ -545,11 +611,10 @@ namespace MyTerraria
         }
         public void LoadWorld(string path)
         {
-            Tiles = new ITile[WORLD_WIDTH * WORLD_HEIGHT];
+            /*Tiles = new Tile[WORLD_WIDTH * WORLD_HEIGHT];
 
             Vector2f pos = new Vector2f();
             TileType tileType = TileType.None;
-            Tiles tile = Worlds.Tiles.Tile;
             bool isgrass = false;
 
             if (File.Exists(path))
@@ -574,11 +639,10 @@ namespace MyTerraria
 
                             case "t":
                                 tileType = (TileType)Enum.Parse(typeof(TileType), words[0]);
-                                tile = (Tiles)Enum.Parse(typeof(Tiles), words[1]);
-                                isgrass = bool.Parse(words[2]);
+                                isgrass = bool.Parse(words[1]);
                                 break;
                             case ";":
-                                SetTile(tile, tileType, (int)(pos.X), (int)(pos.Y), isgrass);
+                                SetTile(tileType, (int)(pos.X), (int)(pos.Y), isgrass);
                                 break;
                             case "s":
                                 CreatePlayer(int.Parse(words[0]), int.Parse(words[1]));
@@ -587,7 +651,7 @@ namespace MyTerraria
                     }
                 }
 
-            worldLoad = true;
+            worldLoad = true;*/
         }
         private void CreatePlayer(int x, int y)
         {
@@ -605,8 +669,8 @@ namespace MyTerraria
 
             CamPos = Program.pos;
 
-            var tilePos = (CamPos.X / Tile.TILE_SIZE, CamPos.Y / Tile.TILE_SIZE);
-            var tilesPerScreen = (Program.Window.Size.X * Program.zoom / Tile.TILE_SIZE, Program.Window.Size.Y * Program.zoom / Tile.TILE_SIZE);
+            var tilePos = (CamPos.X / Tile.TILE_SIZE / Chunk.CHUNK_SIZE, CamPos.Y / Tile.TILE_SIZE / Chunk.CHUNK_SIZE);
+            var tilesPerScreen = (Program.Window.Size.X * Program.zoom / Tile.TILE_SIZE / Chunk.CHUNK_SIZE, Program.Window.Size.Y * Program.zoom / Tile.TILE_SIZE / Chunk.CHUNK_SIZE);
             var LeftMostTilesPos = (int)(tilePos.Item1 - tilesPerScreen.Item1 / 2);
             var TopMostTilesPos = (int)(tilePos.Item2 - tilesPerScreen.Item2 / 2);
 
@@ -616,9 +680,18 @@ namespace MyTerraria
                 {
                     if (x > -1 && y > -1 && x < WORLD_WIDTH && y < WORLD_HEIGHT)
                     {
-                        if (GetTile(x, y) != null)
+                        int index = x + y * WORLD_WIDTH;
+                        if (chunks[index] != null)
                         {
-                            /*if (GetTile(x, y).type != TileType.Treebark)
+                            FloatRect chunkRect = chunks[index].GetFloatRect();
+                            DebugRender.AddRectangle(chunkRect, Color.Red);
+
+                            target.Draw(chunks[index]);
+                        }
+
+                        /*if (chunks[index] != null)
+                        {
+                            if (GetTile(x, y).type != TileType.Treebark)
                             {
                                 for (int i = 0; i <= 15; i++)
                                 {
@@ -641,10 +714,13 @@ namespace MyTerraria
                                     }
 
                                 }
-                            }*/
+                            }
 
-                            target.Draw(Tiles[x + y * WORLD_WIDTH], states);
-                        }
+                            FloatRect chunk = GetChunk(x, y).GetFloatRect();
+                            DebugRender.AddRectangle(chunk, Color.Magenta);
+
+                            target.Draw(chunks[x + y * WORLD_WIDTH], states);
+                        }*/
                     }
                 }
             }
@@ -653,8 +729,8 @@ namespace MyTerraria
             {
                 // Рисуем вещи
                 foreach (var item in items)
-                    if (item.Position.X / 16 > LeftMostTilesPos && item.Position.X / 16 < LeftMostTilesPos + tilesPerScreen.Item1 + 1)
-                        if (item.Position.Y / 16 > TopMostTilesPos && item.Position.Y / 16 < TopMostTilesPos + tilesPerScreen.Item2 + 1)
+                    /*if (item.Position.X / 16 > LeftMostTilesPos && item.Position.X / 16 < LeftMostTilesPos + tilesPerScreen.Item1 + 1)
+                        if (item.Position.Y / 16 > TopMostTilesPos && item.Position.Y / 16 < TopMostTilesPos + tilesPerScreen.Item2 + 1)*/
                             target.Draw(item);
             }
             catch (Exception ex)

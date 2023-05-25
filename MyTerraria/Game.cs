@@ -59,13 +59,13 @@ namespace MyTerraria
             World = new World();
 
             World.GenerateWorldAsync(WorldName);
+
+            Init();
         }
 
         public void LoadWorldAsync()
         {
             World = new World();
-
-            //int w = Console.Read();
 
             World.LoadWorld("Worlds\\" + WorldName + ".world");
 

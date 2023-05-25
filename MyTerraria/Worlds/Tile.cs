@@ -4,10 +4,29 @@ using System;
 
 namespace MyTerraria.Worlds
 {
-    public class Tile : Transformable, ITile
+    public enum TileType
+    {
+        None,               // Пусто
+        Ground,             // Почва
+        GroundWall,         // Почва
+        Sand,               // Почва
+        Stone,              //Камень
+        StoneWall,          //Камень
+        Treebark,           //Кора дерева
+        Board,              //Дска
+        BoardWall,          //Дска
+        Ironore,            //Железная руда
+        Coperore,           //Медная руда
+        Goldore,            //Золотая руда
+        Silverore,          //Серебряная руда
+        Vegetation,         //Растительность   
+        Mushroom,           //Гриб
+        Treesapling,        //Саженец дерева
+        Torch               //Факел
+    }
+    public class Tile : Transformable, Drawable    
     {
         public const int TILE_SIZE = 16;
-        public Tiles tile { get; set; }
         public TileType type { get; set; }
         public bool isGrass { get; set; }
         public Color Color { get; set; } = Color.White;
@@ -81,12 +100,11 @@ namespace MyTerraria.Worlds
         Vertex[] v = new Vertex[6];
         Vector2u TexturePosFraq = new Vector2u();
 
-        public Tile(Tiles tile, TileType type, Tile upTile, Tile downTile, Tile leftTile, Tile rightTile)
+        public Tile(TileType type, Tile upTile, Tile downTile, Tile leftTile, Tile rightTile)
         {
             isGrass = false;
 
             this.type = type;
-            this.tile = tile;
 
             // Присваиваем соседей, а соседям эту плитку
             if (upTile != null)
@@ -315,7 +333,7 @@ namespace MyTerraria.Worlds
                     }
                     break;
             }
-            if (tile != Tiles.Wall)
+            //if (tile != Tiles.Wall)
             {
                 int x = (int)(TexturePosFraq.X * 16 + TexturePosFraq.X * 2);
                 int y = (int)(TexturePosFraq.Y * 16 + TexturePosFraq.Y * 2);
@@ -327,7 +345,7 @@ namespace MyTerraria.Worlds
                 v[4].TexCoords = new Vector2f(16 + x, y);
                 v[5].TexCoords = new Vector2f(16 + x, 16 + y);
             }
-            else if(tile == Tiles.Wall)
+            /*else if(tile == Tiles.Wall)
             {
                 int x = (int)(TexturePosFraq.X * 32 + TexturePosFraq.X * 4);
                 int y = (int)(TexturePosFraq.Y * 32 + TexturePosFraq.Y * 4);
@@ -345,7 +363,7 @@ namespace MyTerraria.Worlds
                 v[3].TexCoords = new Vector2f(x, 32 + y);
                 v[4].TexCoords = new Vector2f(32 + x, y);
                 v[5].TexCoords = new Vector2f(32 + x, 32 + y);
-            }
+            }*/
         }
 
         public void Draw(RenderTarget target, RenderStates states)
@@ -381,6 +399,11 @@ namespace MyTerraria.Worlds
             }
 
             isGrass = v;
+        }
+
+        public FloatRect GetFloatRect()
+        {
+            return new FloatRect(Position, new Vector2f(TILE_SIZE, TILE_SIZE));
         }
     }
 }

@@ -79,30 +79,32 @@ namespace MyTerraria
                         int i = (int)((stepPos.X + (Tile.TILE_SIZE / 2) + x) / Tile.TILE_SIZE);
                         int j = (int)((stepPos.Y + rect.Size.Y) / Tile.TILE_SIZE);
 
-                        Tile tile = (Tile)world.GetITile(i, j);
+                        Chunk chunk = world.GetChunk(i, j);
 
-                        Tile tileTop = (Tile)world.GetITile(i, j - (int)rect.Size.Y / Tile.TILE_SIZE - 1);
+                        Tile tile = (Tile)world.GetTile(i, j);
 
-                        if (tile != null && tile.tile != Tiles.Wall)
-                        {
-                            FloatRect tileRect = new FloatRect(tile.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
-
-                            if (debag)
-                                DebugRender.AddRectangle(tileRect, Color.Red);
-
-                            if (updateCollision(stepRect, tileRect, DirectionType.Down, ref stepPos))
+                        Tile tileTop = (Tile)world.GetTile(i, j - (int)rect.Size.Y / Tile.TILE_SIZE - 1);
+                        if (chunk != null)
+                            if (tile != null)
                             {
-                                velocity.Y = 0;
-                                isFly = false;
+                                FloatRect tileRect = new FloatRect(tile.Position + chunk.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
 
-                                isBreakStep = false;
+                                if (debag)
+                                    DebugRender.AddRectangle(tileRect, Color.Red);
+
+                                if (updateCollision(stepRect, tileRect, DirectionType.Down, ref stepPos))
+                                {
+                                    velocity.Y = 0;
+                                    isFly = false;
+
+                                    isBreakStep = false;
+                                }
+                                else
+                                    isFly = true;
+
                             }
-                            else
+                            else if (world.GetTile((int)(stepPos.X + x) / Tile.TILE_SIZE, j) == null && world.GetTile((int)(stepPos.X - x) / Tile.TILE_SIZE, j) == null)
                                 isFly = true;
-
-                        }
-                        else if(world.GetITile((int)(stepPos.X + x) / Tile.TILE_SIZE, j) == null && world.GetITile((int)(stepPos.X - x) / Tile.TILE_SIZE, j) == null)
-                            isFly = true;
 
 
                         if (tileTop != null)
@@ -143,26 +145,32 @@ namespace MyTerraria
 
             for (int y = 1; y <= rect.Size.Y / Tile.TILE_SIZE; y++)
             {
+                Chunk chunk = world.GetChunk(i + iOffset, j - 1);
 
-                Tile[] walls = new Tile[] {
-                    (Tile)world.GetITile(i + iOffset, j - y),
-                };
-
-
-                isWallCollided = false;
-                foreach (Worlds.Tile t in walls)
+                if (chunk != null)
                 {
-                    if (t == null) continue;
 
-                    FloatRect tileRect = new FloatRect(t.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
-                    if (debag)
-                        DebugRender.AddRectangle(tileRect, Color.Yellow);
+                    Tile[] walls = new Tile[] {
+                        world.GetTile(i + iOffset, j - y),
+                    };
 
-                    if (t != null && t.tile != Tiles.Wall)
+
+                    isWallCollided = false;
+                    foreach (Tile t in walls)
                     {
-                        if (updateCollision(stepRect, tileRect, dirType, ref stepPos))
+                        if (t == null) continue;
+
+                        FloatRect tileRect = new FloatRect(t.Position + chunk.Position, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
+
+                        if (debag)
+                            DebugRender.AddRectangle(tileRect, Color.Yellow);
+
+                        if (t != null)
                         {
-                            isWallCollided = true;
+                            if (updateCollision(stepRect, tileRect, dirType, ref stepPos))
+                            {
+                                isWallCollided = true;
+                            }
                         }
                     }
                 }
