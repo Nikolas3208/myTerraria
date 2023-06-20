@@ -24,9 +24,8 @@ namespace MyTerraria
 
         private Stopwatch worldSaveTimer = new Stopwatch(); //Авто сохранение мира
 
-        private string StandartWorldName = "World";
+        //private string StandartWorldName = "World";
         private string WorldName = "World";
-        private int i = 1;
         //Клас игры
         public Game()
         {
@@ -38,7 +37,7 @@ namespace MyTerraria
             //CreatePlayer();
 
             //Влючаем или отключаем отображеие прямоугольников)
-            NPC.Npc.debag = false;
+            NPC.Npc.debag = true;
 
             // Создаём быстрого слизня
             Npc.Add(new NpcFastSlime(World));
@@ -76,17 +75,22 @@ namespace MyTerraria
         public void Update()
         {
             worldSaveTimer.Start();
+            try
+            {
+                
+                    Player.Update();
+                    World.Update();
 
-            Player.Update();
+                    foreach (var s in Npc)
+                        s.Update();
 
-            World.Update();
+                    UIManager.UpdateOver();
+                    UIManager.Update();
+            }
+            catch(Exception ex)
+            {
 
-            foreach (var s in Npc)
-                s.Update();
-
-            UIManager.UpdateOver();
-            UIManager.Update();
-
+            }
             DebugRender.AddText(Player.health.ToString() , Player.GetGlobalPosition().X + Program.Window.Size.X - 65f, Player.GetGlobalPosition().Y, Content.font);
 
             worldSaveTimer.Stop();

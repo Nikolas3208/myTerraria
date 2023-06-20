@@ -99,6 +99,15 @@ namespace MyTerraria
         // UI
         public static Texture texUIInvertoryBack;      // Инвертарь
 
+        //---------------------------------------------
+
+        public static Music mRunNpc;
+        public static Music mDig_0;
+        public static Music mGrab;
+
+        //---------------------------------------------
+
+        //
         public static Font font = new Font(CONTENT_DIR + "Fonts\\arial.ttf");    // Шрифт
 
         public static void Load()
@@ -116,6 +125,7 @@ namespace MyTerraria
                 ssTileGround = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_0.png"));
                 ssTileStone = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_1.png"));
                 ssTileGrass = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_2.png"));
+                ssTileSand = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_2.png"));
                 ssTileVegetation = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_3.png"));
                 ssTileTorch = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_4.png"));
                 ssTileTreeBark = new SpriteSheet(20, 20, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_5.png"));
@@ -190,6 +200,10 @@ namespace MyTerraria
                 //---------------------------------------------
 
                 //Sound
+
+                mRunNpc = new Music(CONTENT_DIR + "Sounds\\Run.wav");
+                mDig_0 = new Music(CONTENT_DIR + "Sounds\\Dig_0.wav");
+                mGrab = new Music(CONTENT_DIR + "Sounds\\Grab.wav");
             }
             catch (Exception ex)
             {

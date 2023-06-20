@@ -17,9 +17,9 @@ namespace MyTerraria
 {
     public class World : Transformable, Drawable
     {
-        // Кол-во плиток по ширине и высоте
-        public static int WORLD_WIDTH = 63;
-        public static int WORLD_HEIGHT = 63;
+        // Кол-во чанков по ширине и высоте
+        public const int WORLD_WIDTH = 16;
+        public const int WORLD_HEIGHT = 16;
         public static (int, int) WORLD_LOAD = (200, 100);
 
         public static int GroundLavelMax;
@@ -31,25 +31,23 @@ namespace MyTerraria
         public static Random Rand { private set; get; }
         public static Perlin2D Perlin2D { private set; get; }
 
-        // Плитки
-        /*public Tile[] Tiles = new Tile[WORLD_WIDTH * WORLD_HEIGHT];
-        public Tile tile;*/
-
+        // Чанки
         private Chunk[] chunks;
         private Chunk chunk;
 
         // Предметы
         public List<Item> items = new List<Item>();
 
+        //Позиция камеры
         private Vector2f CamPos;
 
-        public float[] PerlinCave = new float[WORLD_WIDTH * WORLD_HEIGHT];
-        public float[] Cave = new float[WORLD_WIDTH * WORLD_HEIGHT];
+        public float[] PerlinCave = new float[WORLD_WIDTH * Chunk.CHUNK_SIZE * WORLD_HEIGHT * Chunk.CHUNK_SIZE];
+        public float[] Cave = new float[WORLD_WIDTH * Chunk.CHUNK_SIZE * WORLD_HEIGHT * Chunk.CHUNK_SIZE];
 
-        private float[] terrain = new float[WORLD_WIDTH];
-        private float[] mouns = new float[WORLD_WIDTH];
-        private float[] temp = new float[WORLD_WIDTH];
-        private float[] v = new float[WORLD_WIDTH];
+        private float[] terrain = new float[WORLD_WIDTH * Chunk.CHUNK_SIZE];
+        private float[] mouns = new float[WORLD_WIDTH * Chunk.CHUNK_SIZE];
+        private float[] temp = new float[WORLD_WIDTH * Chunk.CHUNK_SIZE];
+        private float[] v = new float[WORLD_WIDTH * Chunk.CHUNK_SIZE];
 
         private float caveFreq = 0.09f;
         private float caveFactor = 18f;
@@ -57,6 +55,8 @@ namespace MyTerraria
         private float terrainFactor = 7f;
         private float terrainMounsFreq = 0.2f;
         private float terrainMounsFactor = 24f;
+
+        private float Time;
 
         private string name;
 
@@ -67,14 +67,15 @@ namespace MyTerraria
             Perlin2D = new Perlin2D();
             chunks = new Chunk[WORLD_WIDTH * WORLD_HEIGHT];
             InfoItem.Colectionsgen();
+            Time = 6.00f;
         }
 
         private void GenerateTerrain(int seed = -1)
         {
-            GroundLavelMax = Rand.Next(WORLD_HEIGHT / 5, WORLD_HEIGHT / 2);
+            GroundLavelMax = Rand.Next(WORLD_HEIGHT * Chunk.CHUNK_SIZE / 5, WORLD_HEIGHT * Chunk.CHUNK_SIZE / 2);
             int GroundLevelMin = GroundLavelMax + Rand.Next(100, 250);
 
-            /*for (int i = 0; i < WORLD_WIDTH; i++)
+            for (int i = 0; i < WORLD_WIDTH * Chunk.CHUNK_SIZE; i++)
             {
                 terrain[i] = Perlin2D.Noise(seed * terrainFreq, (i + seed) * terrainFreq) * terrainFactor;
                 mouns[i] = Perlin2D.Noise(seed * terrainMounsFreq, (i + seed) * terrainMounsFreq) * terrainMounsFactor;
@@ -82,17 +83,17 @@ namespace MyTerraria
                 v[i] = (terrain[i] * mouns[i]);
             }
 
-            for (int x = 0; x < WORLD_WIDTH; x++)
+            for (int x = 0; x < WORLD_WIDTH * Chunk.CHUNK_SIZE; x++)
             {
-                for (int y = 0; y < WORLD_HEIGHT; y++)
+                for (int y = 0; y < WORLD_HEIGHT * Chunk.CHUNK_SIZE; y++)
                 {
-                    PerlinCave[x + y * WORLD_WIDTH] = Perlin2D.Noise((x + seed) * caveFreq, (y + seed) * caveFreq) * caveFactor;
+                    PerlinCave[x + y * WORLD_WIDTH * Chunk.CHUNK_SIZE] = Perlin2D.Noise((x + seed) * caveFreq, (y + seed) * caveFreq) * caveFactor;
 
-                    Cave[x + y * WORLD_WIDTH] = Perlin2D.Noise(x + seed, y + seed) * caveFreq * caveFactor;
+                    Cave[x + y * WORLD_WIDTH * Chunk.CHUNK_SIZE] = Perlin2D.Noise(x * caveFreq + seed, y * caveFreq + seed) * caveFreq * caveFactor;
                 }
             }
 
-            for (int i = 1; i < WORLD_WIDTH * WORLD_HEIGHT - 1; i++)
+            for (int i = 1; i < WORLD_WIDTH * Chunk.CHUNK_SIZE * WORLD_HEIGHT * Chunk.CHUNK_SIZE - 1; i++)
             {
                 float sum = PerlinCave[i];
                 int count = 1;
@@ -116,8 +117,7 @@ namespace MyTerraria
 
                 PerlinCave[i] = (int)(sum / count);
             }
-
-            for (int i = 1; i < WORLD_WIDTH - 1; i++)
+            for (int i = 1; i < WORLD_WIDTH * Chunk.CHUNK_SIZE - 1; i++)
             {
                 float sum = v[i];
                 int count = 1;
@@ -142,7 +142,7 @@ namespace MyTerraria
                 v[i] = (int)(sum / count);
             }
 
-            for (int i = 1; i < WORLD_WIDTH - 1; i++)
+            for (int i = 1; i < WORLD_WIDTH * Chunk.CHUNK_SIZE - 1; i++)
             {
                 float sum = mouns[i];
                 int count = 1;
@@ -168,39 +168,37 @@ namespace MyTerraria
             }
 
             //Генерация верхнего уровня и вкраплений камня
-            for (int x = 0; x < WORLD_WIDTH; x++)
+            for (int x = 0; x < WORLD_WIDTH * Chunk.CHUNK_SIZE -1; x++)
             {
-                for (int y = (int)v[x] + GroundLavelMax; y < WORLD_HEIGHT + (int)mouns[x] + (int)terrain[x] + (int)(GroundLavelMax * 1.5f); y++)
+                for (int y = (int)v[x] + GroundLavelMax; y < WORLD_HEIGHT * Chunk.CHUNK_SIZE + (int)mouns[x] + (int)terrain[x] + (int)(GroundLavelMax * 1.5f) -1; y++)
                 {
                     SetTile(TileType.Ground, x, y);
 
-                    int index = x + y * WORLD_WIDTH;
+                    int index = x + y * WORLD_WIDTH * Chunk.CHUNK_SIZE;
 
-                    if (index < WORLD_WIDTH * WORLD_HEIGHT)
-                    {
+                    if (index < WORLD_WIDTH * Chunk.CHUNK_SIZE * WORLD_HEIGHT * Chunk.CHUNK_SIZE)
                         if (PerlinCave[index] >= 0.001f)
                             SetTile(TileType.Stone, x, y);
-                    }
                 }
             }
 
             //Вырезание пешер
-            for (int x = 0; x < WORLD_WIDTH; x++)
+            for (int x = 0; x < WORLD_WIDTH * Chunk.CHUNK_SIZE; x++)
             {
-                for (int y = (int)mouns[x] + (int)terrain[x] + (int)(GroundLavelMax + 10); y < WORLD_HEIGHT + (v[x] + GroundLavelMax); y++)
+                for (int y = (int)mouns[x] + (int)terrain[x] + GroundLavelMax; y < WORLD_HEIGHT * Chunk.CHUNK_SIZE + (v[x] + GroundLavelMax); y++)
                 {
-                    int index = x + y * WORLD_WIDTH;
+                    int index = x + y * WORLD_WIDTH * Chunk.CHUNK_SIZE;
 
-                    if (index < WORLD_WIDTH * WORLD_HEIGHT)
+                    if (index < WORLD_WIDTH * Chunk.CHUNK_SIZE * WORLD_HEIGHT * Chunk.CHUNK_SIZE)
                     {
-                        //if (Cave[index] <= 0.03f)
-                            //SetTile(Worlds.Tiles.Tile, TileType.None, x, y);
+                        /*if (Cave[index] <= 0.019f && PerlinCave[index] >= 0.004f)
+                            SetTile(TileType.None, x, y);*/
                     }
                 }
             }
 
             //Засаживание растительноестью
-            for (int x = 0; x < WORLD_WIDTH; x++)
+            for (int x = 0; x < WORLD_WIDTH * Chunk.CHUNK_SIZE; x++)
             {
                 int y = (int)v[x] + GroundLavelMax;
                 Tile tile = (Tile)GetTile(x, y);
@@ -331,20 +329,17 @@ namespace MyTerraria
                     }
                 }
             }*/
-
-            for (int x = 0; x < WORLD_WIDTH; x++)
-            {
-                for (int y = 1; y < WORLD_HEIGHT; y++)
-                {
-                    SetChunk(x, y);
-                }
-            }
         }
 
         // Генерируем новый мир
         public void GenerateWorldAsync(string name)
         {
             this.name = name;
+
+            /*Thread genThread = new Thread(new ThreadStart(() => { GenerateTerrain(); }));
+            genThread.Name = "GenerateTerrain";
+            genThread.Start();
+            genThread.Join();*/
 
             GenerateTerrain();
 
@@ -354,12 +349,13 @@ namespace MyTerraria
                 worldGen = true;
 
             }*/
-            CreatePlayer( 0, 0 );
+            CreatePlayer(WORLD_WIDTH / 2 * 16, (int)v[WORLD_WIDTH / 2 * 16] + GroundLavelMax - 2);
 
             worldGen = true;
             worldLoad = true;
         }
 
+        //Устанавливаем чанк
         public void SetChunk(int x, int y, bool isAir = false)
         {
             chunk = new Chunk(isAir);
@@ -367,9 +363,10 @@ namespace MyTerraria
             chunks[x + y * WORLD_WIDTH] = chunk;
         }
 
+        //Устанавливаем таилы
         public void SetTile(TileType type, float x, float y, bool isgrass = false, bool destriy = false)
         {
-            if (x < 0 || x >= WORLD_WIDTH || y < 0 || y >= WORLD_HEIGHT)
+            if (x < 0 || x >= WORLD_WIDTH * Chunk.CHUNK_SIZE || y < 0 || y >= WORLD_HEIGHT * Chunk.CHUNK_SIZE)
                 return;
 
             chunk = GetChunk(x, y);
@@ -394,7 +391,7 @@ namespace MyTerraria
                 }
 
             }
-            else
+            else if (chunk == null && type != TileType.None)
             {
 
                 int Xc = (int)Math.Floor(x / Chunk.CHUNK_SIZE);
@@ -407,133 +404,14 @@ namespace MyTerraria
                 int Yt = (int)(Math.Floor(y - (Position.Y / Chunk.CHUNK_SIZE)));
                 chunk.SetTile(type, Xt, Yt);
             }
-
-            //// Находим соседей
-            //Tile upTile = (Tile)GetTile(x, y - 1);     // верхний сосед
-            //Tile downTile = (Tile)GetTile(x, y + 1);   // нижний сосед
-            //Tile leftTile = (Tile)GetTile(x - 1, y);   // левый сосед
-            //Tile rightTile = (Tile)GetTile(x + 1, y);  // правый сосед
-
-            //int index = x + y * WORLD_WIDTH;
-
-            //if (type != TileType.None && !destriy)
-            //{
-            //    Tile tileBlock = new Tile(type, upTile, downTile, leftTile, rightTile);
-            //    tileBlock.Position = new Vector2f(x * Tile.TILE_SIZE, y * Tile.TILE_SIZE) + Position;
-            //    tileBlock.Grass(isgrass);
-            //    Tiles[x + y * WORLD_WIDTH] = tileBlock;
-            //}
-            //else if(type != TileType.None && destriy)
-            //{
-            //    Tile tileType = (Tile)Tiles[index];
-
-            //    foreach (InfoItem item in InfoItem.InfoItems)
-            //    {
-            //        if (item.Tiletype == type)
-            //        {
-            //            InfoItem infoItem = item;
-
-            //            if (infoItem != null)
-            //            {
-            //                var itemTile = new ItemTile(this, infoItem);
-            //                itemTile.Position = tileType.Position;
-            //                items.Add(itemTile);
-            //            }
-            //        }
-            //    }
-
-            //    Tiles[x + y * WORLD_WIDTH] = null;
-
-            //    // Присваиваем соседей, а соседям эту плитку
-            //    if (upTile != null) upTile.DownTile = null;
-            //    if (downTile != null) downTile.UpTile = null;
-            //    if (leftTile != null) leftTile.RightTile = null;
-            //    if (rightTile != null) rightTile.LeftTile = null;
-            //}
-            //else
-            //{
-            //    Tiles[x + y * WORLD_WIDTH] = null;
-
-            //    // Присваиваем соседей, а соседям эту плитку
-            //    if (upTile != null) upTile.DownTile = null;
-            //    if (downTile != null) downTile.UpTile = null;
-            //    if (leftTile != null) leftTile.RightTile = null;
-            //    if (rightTile != null) rightTile.LeftTile = null;
-            //}
+            else if (chunk != null && type == TileType.None)
+            {
+                int Xt = (int)(Math.Floor(x - (Position.X / Chunk.CHUNK_SIZE)));
+                int Yt = (int)(Math.Floor(y - (Position.Y / Chunk.CHUNK_SIZE)));
+                chunk.SetTile(TileType.None, Xt, Yt);
+            }
 
         }
-
-        /*public void SetTile(TileType type, int x, int y, bool destroy)
-        {
-            if (x < 0 || x >= WORLD_WIDTH || y < 0 || y >= WORLD_HEIGHT)
-                return;
-
-            // Находим соседей
-            Tile upTile = GetTile(x, y - 1);     // верхний сосед
-            Tile downTile = GetTile(x, y + 1);   // нижний сосед
-            Tile leftTile = GetTile(x - 1, y);   // левый сосед
-            Tile rightTile = GetTile(x + 1, y);  // правый сосед
-
-            int index = x + y * WORLD_WIDTH;
-
-            if (!destroy)
-            {
-                if (type != TileType.None)
-                {
-                    if (type == TileType.GroundWall || type == TileType.StoneWall || type == TileType.BoardWall)
-                        tile = new Tile(type, Color.White, upTile, downTile, leftTile, rightTile, true, true);
-                    else
-                        tile = new Tile(type, Color.White, upTile, downTile, leftTile, rightTile, false, false);
-                    tile.Position = new Vector2f(x * Tile.TILE_SIZE, y * Tile.TILE_SIZE) + Position;
-                    tiles[index] = tile;
-                }
-            }
-            else
-            {
-                if (type != TileType.None && !tile.SetWall && !tile.isWall)
-                {
-                    tile = tiles[index];
-
-                    foreach (InfoItem item in InfoItem.InfoItems)
-                    {
-                        if (item.Tiletype == type)
-                        {
-                            InfoItem infoItem = item;
-
-                            if (infoItem != null)
-                            {
-                                var itemTile = new ItemTile(this, infoItem);
-                                itemTile.Position = tile.Position;
-                                items.Add(itemTile);
-
-                                if (!tile.isWall)
-                                    tiles[index] = null;
-                                else //if (tiles[index].type == TileType.Ground)
-                                {
-                                    tile = new Tile(TileType.GroundWall, Color.White, upTile, downTile, leftTile, rightTile, false, false);
-                                    tile.Position = tiles[index].Position;
-
-                                    tiles[index] = tile;
-                                }
-                            }
-                        }
-                    }
-                }
-                else if (tile.SetWall)
-                {
-                    tiles[index] = null;
-                    SetTile(type, x, y, false);
-                }
-                else
-                    tiles[index] = null;
-
-                // Присваиваем соседей, а соседям эту плитку
-                if (upTile != null) upTile.DownTile = null;
-                if (downTile != null) downTile.UpTile = null;
-                if (leftTile != null) leftTile.RightTile = null;
-                if (rightTile != null) rightTile.LeftTile = null;
-            }
-        }*/
 
         // Получить плитку по мировым координатам
         public Tile GetTileByWorldPos(float x, float y)
@@ -550,22 +428,25 @@ namespace MyTerraria
         {
             return GetTileByWorldPos(pos.X, pos.Y);
         }
-        public Tile GetTile(int x, int y)
+        public Tile GetTile(int x, int y, bool isDel = false)
         {
             if (x / Chunk.CHUNK_SIZE >= 0 && y / Chunk.CHUNK_SIZE >= 0 && x / Chunk.CHUNK_SIZE < WORLD_WIDTH && y / Chunk.CHUNK_SIZE < WORLD_HEIGHT)
             {
-                chunk = GetChunk(x, y);
+                chunk = GetChunk(x, y, isDel);
                 if (chunk != null)
                     return chunk.GetTile(x, y);
             }
             return null;
         }
 
-        public Chunk GetChunk(float x, float y)
+        //Получаем чанк
+        public Chunk GetChunk(float x, float y, bool isDel = false)
         {
-            x = (float)Math.Floor(x / Chunk.CHUNK_SIZE);
-            y = (float)Math.Floor(y / Chunk.CHUNK_SIZE);
-
+            if (!isDel)
+            {
+                x = (float)Math.Floor(x / Chunk.CHUNK_SIZE);
+                y = (float)Math.Floor(y / Chunk.CHUNK_SIZE);
+            }
             if (x >= 0 && y >= 0 && x < WORLD_WIDTH && y < WORLD_HEIGHT)
                 return chunks[(int)(x + y * WORLD_WIDTH)];
 
@@ -653,26 +534,29 @@ namespace MyTerraria
 
             worldLoad = true;*/
         }
+
+        //Создание персонажа
         private void CreatePlayer(int x, int y)
         {
             Program.Game.Player = new Player(this);
-            Program.Game.Player.StartPosition = new Vector2f(x * 16, y * 16);
+            Program.Game.Player.StartPosition = new Vector2f(x * Chunk.CHUNK_SIZE, y * Chunk.CHUNK_SIZE);
             Program.Game.Player.Spawn();
             Program.Game.Player.AddTools();
 
             Program.Game.Player.Invertory = new UIInvertory();
         }
+
         // Нарисовать мир
         public void Draw(RenderTarget target, RenderStates states)
         {
             states.Transform *= Transform;
 
-            CamPos = Program.pos;
+            CamPos = Program.Game.Player.Position;
 
-            var tilePos = (CamPos.X / Tile.TILE_SIZE / Chunk.CHUNK_SIZE, CamPos.Y / Tile.TILE_SIZE / Chunk.CHUNK_SIZE);
+            var chunkPos = (CamPos.X / Tile.TILE_SIZE / Chunk.CHUNK_SIZE, CamPos.Y / Tile.TILE_SIZE / Chunk.CHUNK_SIZE);
             var tilesPerScreen = (Program.Window.Size.X * Program.zoom / Tile.TILE_SIZE / Chunk.CHUNK_SIZE, Program.Window.Size.Y * Program.zoom / Tile.TILE_SIZE / Chunk.CHUNK_SIZE);
-            var LeftMostTilesPos = (int)(tilePos.Item1 - tilesPerScreen.Item1 / 2);
-            var TopMostTilesPos = (int)(tilePos.Item2 - tilesPerScreen.Item2 / 2);
+            var LeftMostTilesPos = (int)(chunkPos.Item1 - tilesPerScreen.Item1 / 2);
+            var TopMostTilesPos = (int)(chunkPos.Item2 - tilesPerScreen.Item2 / 2);
 
             for (int x = LeftMostTilesPos; x < LeftMostTilesPos + tilesPerScreen.Item1 + 1; x++)
             {
@@ -680,13 +564,61 @@ namespace MyTerraria
                 {
                     if (x > -1 && y > -1 && x < WORLD_WIDTH && y < WORLD_HEIGHT)
                     {
-                        int index = x + y * WORLD_WIDTH;
-                        if (chunks[index] != null)
+                        chunk = GetChunk(x, y, true);
+
+                        if (chunk != null) 
                         {
-                            FloatRect chunkRect = chunks[index].GetFloatRect();
+                            FloatRect chunkRect = chunk.GetFloatRect();
                             DebugRender.AddRectangle(chunkRect, Color.Red);
 
-                            target.Draw(chunks[index]);
+                            /*for (int Xc = 0; Xc <= 15; Xc++)
+                            {
+                                byte color = 255;
+                                for (int Yc = 0; Yc < 15; Yc++)
+                                {
+                                    float col = (color - Xc * 17 - Yc * 17);
+
+                                    if (col > 255)
+                                        col = 255;
+                                    if (col <= 0)
+                                        color = 0;
+                                    else
+                                        color = (byte)col;
+                                    
+
+                                    if (chunk.GetTile((int)CamPos.X / Tile.TILE_SIZE + Xc, (int)CamPos.Y / Tile.TILE_SIZE + Yc + 3) != null)
+                                    {
+                                        //if (GetTile((int)CamPos.X / Tile.TILE_SIZE + Xc, (int)CamPos.Y / Tile.TILE_SIZE + Yc + 3).Color != new Color(color, color, color))
+                                        GetTile((int)CamPos.X / Tile.TILE_SIZE + Xc, (int)CamPos.Y / Tile.TILE_SIZE + Yc + 3).UpdateColor(new Color(color, color, color));
+                                    }
+                                    if (chunk.GetTile((int)CamPos.X / Tile.TILE_SIZE - Xc, (int)CamPos.Y / Tile.TILE_SIZE + Yc + 3) != null)
+                                    {
+                                        //if (GetTile((int)CamPos.X / Tile.TILE_SIZE - Xc, (int)CamPos.Y / Tile.TILE_SIZE + Yc + 3).Color != new Color(color, color, color))
+                                        GetTile((int)CamPos.X / Tile.TILE_SIZE - Xc, (int)CamPos.Y / Tile.TILE_SIZE + Yc + 3).UpdateColor(new Color(color, color, color));
+                                    }
+
+                                    if (chunk.GetTile((int)CamPos.X / Tile.TILE_SIZE + Xc, (int)CamPos.Y / Tile.TILE_SIZE - Yc + 3) != null)
+                                    {
+                                        //if (GetTile((int)CamPos.X / Tile.TILE_SIZE + Xc, (int)CamPos.Y / Tile.TILE_SIZE - Yc + 3).Color != new Color(color, color, color))
+                                        GetTile((int)CamPos.X / Tile.TILE_SIZE + Xc, (int)CamPos.Y / Tile.TILE_SIZE - Yc + 3).UpdateColor(new Color(color, color, color));
+                                    }
+                                    if (chunk.GetTile((int)CamPos.X / Tile.TILE_SIZE - Xc, (int)CamPos.Y / Tile.TILE_SIZE - Yc + 3) != null)
+                                    {
+                                        //if (GetTile((int)CamPos.X / Tile.TILE_SIZE - Xc, (int)CamPos.Y / Tile.TILE_SIZE - Yc + 3).Color != new Color(color, color, color))
+                                        GetTile((int)CamPos.X / Tile.TILE_SIZE - Xc, (int)CamPos.Y / Tile.TILE_SIZE - Yc + 3).UpdateColor(new Color(color, color, color));
+                                    }
+                                }
+                            }*/
+
+                            try
+                            {
+                                target.Draw(chunk);
+                            }
+                            catch (Exception ex)
+                            {
+
+                            }
+                            
                         }
 
                         /*if (chunks[index] != null)
@@ -735,7 +667,7 @@ namespace MyTerraria
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.Message);
+                Console.WriteLine(ex.Message);
             }
         }
     }

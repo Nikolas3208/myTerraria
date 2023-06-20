@@ -7,6 +7,8 @@ namespace MyTerraria.Items
 {
     public abstract class Item : Entity
     {
+        private SoundController sound = new SoundController();
+
         public int Count = 1; //Количество подбираемых предметов
         public const float MOVE_DISTANCE_TO_PLAYER = 100f;  // Дистанция начала движения предмета в сторону игрока
         public const float TAKE_DISTANCE_TO_PLAYER = 20f;   // Дистанция подбора предмета игроком
@@ -20,6 +22,8 @@ namespace MyTerraria.Items
             rect = new RectangleShape(new Vector2f(infoItem.SpriteSheet.SubWidth, infoItem.SpriteSheet.SubHeight));
             rect.Texture = infoItem.SpriteSheet.Texture;
             rect.TextureRect = infoItem.SpriteSheet.GetTextureRect(infoItem.SpriteI, infoItem.SpriteJ);
+
+            sound.AddSound("grab", Content.mGrab);
         }
 
         public override void Update()
@@ -36,6 +40,7 @@ namespace MyTerraria.Items
                     if (Program.Game.Player.Invertory.AddItemStack(new UIItemStack(infoItem, Count)))
                     {
                         IsDestroyed = true;
+                        sound.PlaySound("grab");
                     }
                 }
                 else

@@ -39,30 +39,6 @@ namespace MyTerraria.NPC
 
         public override void UpdateNPC()
         {
-            FloatRect stepRect = new FloatRect(Position, rect.Size);
-
-            if (stepRect.Intersects(PlayerRect))
-            {
-                velocity = GetJumpVelocity();
-            }
-
-            //rect.FillColor = color;
-            if (Position.X < 4 * 16)
-            {
-                Direction *= -1;
-                velocity = new Vector2f(-velocity.X * 0.8f, velocity.Y);
-            }
-            if(Position.X > World.WORLD_WIDTH * 16)
-            {
-                Direction *= -1;
-                velocity = new Vector2f(-velocity.X * 0.8f, velocity.Y);
-            }
-
-            if(MathHelper.GetDistance(Program.Game.Player.Position,Position) > 1200)
-            {
-                OnKill();
-            }
-
             if (!isFly)
             {
                 if (waitTimer >= TIME_WAIT_JUMP)

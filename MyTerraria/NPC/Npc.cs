@@ -6,6 +6,8 @@ namespace MyTerraria.NPC
 {
     public abstract class Npc : Entity
     {
+        public SoundController soundController;
+
         public Vector2f StartPosition;
         public Vector2f vector;
         public FloatRect PlayerRect;
@@ -46,20 +48,18 @@ namespace MyTerraria.NPC
             base.Update();
 
             // Если игрок упал в пропасть, то возрождаем его
-            if (Position.Y > World.WORLD_HEIGHT * 16)
+            if (Position.Y / 16 > World.WORLD_HEIGHT * 16)
                 OnKill();
             else if(health <= 0)
                 OnKill();
 
-            if (Position.X < 4 * 16)
+            if (Position.X < (Program.Window.Size.X / 256 / 2 + 1) * 256)
             {
-                Direction *= -1;
-                velocity = new Vector2f(-velocity.X * 0.8f, velocity.Y);
+                Position = new Vector2f((Program.Window.Size.X / 256 / 2 + 1) * 256, Position.Y);
             }
-            if (Position.X > World.WORLD_WIDTH * 16)
+            else if (Position.X > World.WORLD_WIDTH * 256 - ((Program.Window.Size.X / 256 / 2 + 1) * 256))
             {
-                Direction *= -1;
-                velocity = new Vector2f(-velocity.X * 0.8f, velocity.Y);
+                Position = new Vector2f(World.WORLD_WIDTH * 256 - ((Program.Window.Size.X / 256 / 2 + 1) * 256), Position.Y);
             }
 
             if (MathHelper.GetDistance(Program.Game.Player.Position, Position) > 1200)

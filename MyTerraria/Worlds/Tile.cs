@@ -24,7 +24,7 @@ namespace MyTerraria.Worlds
         Treesapling,        //Саженец дерева
         Torch               //Факел
     }
-    public class Tile : Transformable, Drawable    
+    public class Tile : Transformable    
     {
         public const int TILE_SIZE = 16;
         public TileType type { get; set; }
@@ -96,9 +96,10 @@ namespace MyTerraria.Worlds
         }
 
         Texture texture;
+        public int IdTile = 0;
 
-        Vertex[] v = new Vertex[6];
-        Vector2u TexturePosFraq = new Vector2u();
+        public Vertex[] v = new Vertex[6];
+        public Vector2u TexturePosFraq = new Vector2u();
 
         public Tile(TileType type, Tile upTile, Tile downTile, Tile leftTile, Tile rightTile)
         {
@@ -366,14 +367,16 @@ namespace MyTerraria.Worlds
             }*/
         }
 
-        public void Draw(RenderTarget target, RenderStates states)
+        /*public void Draw(RenderTarget target, RenderStates states)
         {
             states.Transform *= Transform;
             if (type != TileType.None)
                 states.Texture = texture;
 
             target.Draw(v, PrimitiveType.Triangles, states);
-        }
+            
+            //UpdateColor(Color.Black);
+        }*/
 
         public void UpdateColor(Color color)
         {

@@ -64,6 +64,18 @@ namespace MyTerraria.NPC
             isRectVisible = false;
 
             CreateAnimation();
+
+            
+            CreateSoundController();
+        }
+
+        private void CreateSoundController()
+        {
+            soundController = new SoundController();
+
+            soundController.AddSound("run", Content.mRunNpc, isLoop: true);
+            soundController.AddSound("dig", Content.mDig_0);
+            soundController.AddSound("grab", Content.mGrab);
         }
 
         private void CreateAnimation()
@@ -318,6 +330,8 @@ namespace MyTerraria.NPC
 
         Sprite tool;
 
+        float timeTile = 1;
+
         private void UpdateMouse()
         {
             mousePos = Program.GetGlobalMousePosition();
@@ -345,20 +359,36 @@ namespace MyTerraria.NPC
                             FloatRect tileRect = new FloatRect(tilePos, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
                             DebugRender.AddRectangle(tileRect, Color.Green);
 
+                            DebugRender.AddText(InfoItem.GetItem(tile.type).Strength.ToString(), Position.X, Position.Y, Content.font);
+
+
                             if (InfoItemType.Tooltype == ToolType.Pick)
                             {
-                                world.SetTile(tile.type, tilePos.X / 16, tilePos.Y / 16, tile.isGrass, true);
-                                AnimationUpdate(AnimType.Tool);
+                                if (timeTile <= 0)
+                                {
+                                    world.SetTile(tile.type, tilePos.X / 16, tilePos.Y / 16, tile.isGrass, true);
+                                    AnimationUpdate(AnimType.Tool);
+
+                                    soundController.PlaySound("dig");
+                                    //soundController.PlaySound("grab");
+
+                                    timeTile = 1;
+                                }
+
+                                timeTile -= InfoItem.GetItem(tile.type).Strength;
+
+                                DebugRender.AddText(timeTile.ToString(), Position.X, Position.Y, Content.font);
                             }
                             else if (InfoItemType.Tooltype == ToolType.Axe && tile.type == TileType.Treebark)
                             {
 
                                 AnimationUpdate(AnimType.Tool);
                             }
-
+                            DebugRender.AddText(timeTile.ToString(), Position.X, Position.Y, Content.font);
                         }
                     }
-                    if(world.GetTile(mousePos.X / Chunk.CHUNK_SIZE, mousePos.Y / Chunk.CHUNK_SIZE) == null)
+
+                    if (world.GetTile(mousePos.X / Chunk.CHUNK_SIZE, mousePos.Y / Chunk.CHUNK_SIZE) == null)
                     {
                         Tile upTile = (Tile)Program.Game.World.GetTile(mousePos.X / 16, mousePos.Y / 16 - 1);     // Верхний сосед
                         Tile downTile = (Tile)Program.Game.World.GetTile(mousePos.X / 16, mousePos.Y / 16 + 1);   // Нижний сосед
@@ -376,6 +406,8 @@ namespace MyTerraria.NPC
                     ToolUpdate();
 
                 }
+
+
             }
         }
 
@@ -520,6 +552,11 @@ namespace MyTerraria.NPC
 
             if (isMove)
             {
+                if (isFly == false)
+                    soundController.PlaySound("run");
+                else
+                    soundController.StopSound("run");
+
                 if (isMoveLeft)
                 {
                     if (movement.X > 0)
@@ -553,6 +590,7 @@ namespace MyTerraria.NPC
             else
             {
                 movement = new Vector2f();
+                soundController.StopSound("run");
 
                 // Анимация спокойствия
                 if (!isFly && !Mouse.IsButtonPressed(Mouse.Button.Left))

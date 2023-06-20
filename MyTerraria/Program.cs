@@ -22,7 +22,7 @@ namespace MyTerraria
             //Создание окна
             Window = new RenderWindow(VideoMode.DesktopMode, "My Terraria!");
             //Window.SetVerticalSyncEnabled(true);
-            Window.SetFramerateLimit(75);
+            //Window.SetFramerateLimit(75);
             //Window.SetMouseCursorVisible(false);
 
             Window.Closed += Win_Closed;
@@ -50,6 +50,7 @@ namespace MyTerraria
 
                 if (World.worldLoad)
                     Game.Update();
+                    //Task.Run (() => { Game.Update(); }).Wait(10);
 
                 if (World.worldLoad)
                     CenterScreen();
@@ -170,10 +171,7 @@ namespace MyTerraria
 
         private static void Win_Closed(object sender, EventArgs e)
         {
-            /*if (World.worldLoad)
-                Game.World.SaveWorld(true);
-            else*/
-                Window.Close();
+            Window.Close();
         }
     }
 }

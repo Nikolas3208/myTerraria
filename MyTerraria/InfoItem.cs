@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 
 using MyTerraria.Worlds;
+using SFML.Audio;
 
 namespace MyTerraria
 {
@@ -23,9 +24,9 @@ namespace MyTerraria
     {
         public static List<InfoItem> InfoItems = new List<InfoItem>();
         
-        public static InfoItem ItemGround = new InfoItem(TileType.Ground).SetSprite(Content.ssTileItemGround, 0, 0);
+        public static InfoItem ItemGround = new InfoItem(TileType.Ground, 0.08f).SetSprite(Content.ssTileItemGround, 0, 0);
         public static InfoItem ItemGroundWall = new InfoItem(TileType.GroundWall).SetSprite(Content.ssWallItemGround, 0, 0);
-        public static InfoItem ItemStone = new InfoItem(TileType.Stone).SetSprite(Content.ssTileItemStone, 0, 0);
+        public static InfoItem ItemStone = new InfoItem(TileType.Stone, 0.01f).SetSprite(Content.ssTileItemStone, 0, 0);
         public static InfoItem ItemStoneWall = new InfoItem(TileType.StoneWall).SetSprite(Content.ssWallItemStone, 0, 0);
         public static InfoItem ItemMushroom = new InfoItem(TileType.Mushroom).SetSprite(Content.ssTileItemMushroom, 0, 0);
         public static InfoItem ItemVegetation = new InfoItem(TileType.Vegetation).SetSprite(Content.ssTileItemMushroom, 0, 0);
@@ -51,13 +52,16 @@ namespace MyTerraria
 
         //------------------------
 
+        public float Strength;
+
         public TileType Tiletype;
         public ToolType Tooltype;
         public WeaponType Weapontype;
 
-        public InfoItem(TileType type)
+        public InfoItem(TileType type, float strength = 1)
         {
             Tiletype = type;
+            Strength = strength;
         }
 
         public InfoItem(ToolType type)
