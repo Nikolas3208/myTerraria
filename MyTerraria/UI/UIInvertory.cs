@@ -1,4 +1,5 @@
-﻿using SFML.Graphics;
+﻿using MyTerraria.Items;
+using SFML.Graphics;
 using SFML.System;
 using System;
 using System.Collections.Generic;
@@ -46,10 +47,10 @@ namespace MyTerraria.UI
         }
 
         // Возвращает ячейку со свободным местом по информации о предмете
-        UIInvertoryCell GetNotFullCellByInfoItem(InfoItem infoItem)
+        UIInvertoryCell GetNotFullCellByInfoItem(Item item)
         {
             foreach (var c in cells)
-                if (c.ItemStack != null && c.ItemStack.InfoItem == infoItem && !c.ItemStack.IsFull)
+                if (c.ItemStack != null && c.ItemStack.Item != null && c.ItemStack.Item.type == item.type && c.ItemStack.Item.TileType == item.TileType && !c.ItemStack.IsFull)
                     return c;
 
             return null;
@@ -59,7 +60,7 @@ namespace MyTerraria.UI
         {
             UIItemStack = itemStack;
             
-            var cell = GetNotFullCellByInfoItem(itemStack.InfoItem);
+            var cell = GetNotFullCellByInfoItem(itemStack.Item);
 
             if (cell != null)
             {

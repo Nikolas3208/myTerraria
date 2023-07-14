@@ -1,12 +1,29 @@
 ﻿using MyTerraria.UI;
+using MyTerraria.Worlds;
+using MyTerraria.Items.ItemTile;
 using SFML.Graphics;
 using SFML.System;
 using System;
+using MyTerraria.Items.Tools;
 
 namespace MyTerraria.Items
 {
+    public enum ItemType
+    {
+        Tile,
+        Axe,
+        Pick
+    };
     public abstract class Item : Entity
     {
+        // Максимальное кол-во предметов в стеке
+        public int MaxCountInStack { get; set; } = 99;
+        public TileType TileType { get; set; }
+        public ItemType type { get; set; }
+        public Texture Texture { get; set; }
+        public int SpriteI { get; private set; }
+        public int SpriteJ { get; private set; }
+
         private SoundController sound = new SoundController();
 
         public int Count = 1; //Количество подбираемых предметов
@@ -14,14 +31,13 @@ namespace MyTerraria.Items
         public const float TAKE_DISTANCE_TO_PLAYER = 20f;   // Дистанция подбора предмета игроком
         public const float MOVE_SPEED_COEF = 0.5f;          // Коэффицент увеличения скорости движения
 
-        InfoItem infoItem;
-
-        public Item(World world, InfoItem infoItem) : base(world)
+        public Item(World world, Texture texture, ItemType type) : base(world)
         {
-            this.infoItem = infoItem;
-            rect = new RectangleShape(new Vector2f(infoItem.SpriteSheet.SubWidth, infoItem.SpriteSheet.SubHeight));
-            rect.Texture = infoItem.SpriteSheet.Texture;
-            rect.TextureRect = infoItem.SpriteSheet.GetTextureRect(infoItem.SpriteI, infoItem.SpriteJ);
+            this.Texture = texture;
+            this.type = type;
+
+            rect = new RectangleShape(new Vector2f(texture.Size.X, texture.Size.Y));
+            rect.Texture = texture;
 
             sound.AddSound("grab", Content.mGrab);
         }
@@ -37,7 +53,17 @@ namespace MyTerraria.Items
             {
                 if (dist < TAKE_DISTANCE_TO_PLAYER)
                 {
-                    if (Program.Game.Player.Invertory.AddItemStack(new UIItemStack(infoItem, Count)))
+                    if (type == ItemType.Tile && Program.Game.Player.Invertory.AddItemStack(new UIItemStack(new ItemTile.ItemTile(world, Texture, type, TileType), Count)))
+                    {
+                        IsDestroyed = true;
+                        sound.PlaySound("grab");
+                    }
+                    else if(type == ItemType.Axe && Program.Game.Player.Invertory.AddItemStack(new UIItemStack(new ItemAxe(world, Texture, type), Count)))
+                    {
+                        IsDestroyed = true;
+                        sound.PlaySound("grab");
+                    }
+                    else if (type == ItemType.Pick && Program.Game.Player.Invertory.AddItemStack(new UIItemStack(new ItemPick(world, Texture, type), Count)))
                     {
                         IsDestroyed = true;
                         sound.PlaySound("grab");
@@ -63,5 +89,7 @@ namespace MyTerraria.Items
             if (isRectVisible)
                 target.Draw(rect, states);
         }
+
+        public abstract bool OnClickMouseButton(Tile tile);
     }
 }

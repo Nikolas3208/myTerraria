@@ -70,15 +70,18 @@ namespace MyTerraria.Worlds
                 }
                 else
                 {
-                    IdTile = tiles[index].IdTile;
+                    tile = tiles[index];
+                    IdTile = tile.IdTile;
                     tiles[index] = null;
-
-                    tileMesh[IdTile + 0] = new Vertex();
-                    tileMesh[IdTile + 1] = new Vertex();
-                    tileMesh[IdTile + 2] = new Vertex();
-                    tileMesh[IdTile + 3] = new Vertex();
-                    tileMesh[IdTile + 4] = new Vertex();
-                    tileMesh[IdTile + 5] = new Vertex();
+                    if (IdTile <= tileMesh.Length - 6)
+                    {
+                        tileMesh[IdTile + 0] = new Vertex();
+                        tileMesh[IdTile + 1] = new Vertex();
+                        tileMesh[IdTile + 2] = new Vertex();
+                        tileMesh[IdTile + 3] = new Vertex();
+                        tileMesh[IdTile + 4] = new Vertex();
+                        tileMesh[IdTile + 5] = new Vertex();
+                    }
 
                     // Присваиваем соседей, а соседям эту плитку
                     if (upTile != null) upTile.DownTile = null;
@@ -106,27 +109,27 @@ namespace MyTerraria.Worlds
             states.Transform *= Transform;
             states.Texture = Content.ssTileBoard.Texture;
 
-            /*for (int y = 0; y < 16; y++)
+            for (int y = 0; y < 16; y++)
             {
                 for (int x = 0; x < 16; x++)
                 {
                     tile = tiles[x + y * CHUNK_SIZE];
                     if (tile != null)
                     {
-                        v[0] = tileMesh[tile.IdTile + 0] = tile.v[0];
-                        v[1] = tileMesh[tile.IdTile + 1] = tile.v[1];
-                        v[2] = tileMesh[tile.IdTile + 2] = tile.v[2];
-                        v[3] = tileMesh[tile.IdTile + 3] = tile.v[3];
-                        v[4] = tileMesh[tile.IdTile + 4] = tile.v[4];
-                        v[5] = tileMesh[tile.IdTile + 5] = tile.v[5];
+                        v[0] = tile.v[0];
+                        v[1] = tile.v[1];
+                        v[2] = tile.v[2];
+                        v[3] = tile.v[3];
+                        v[4] = tile.v[4];
+                        v[5] = tile.v[5];
 
                         states.Texture = tile.SpriteSheet.Texture;
                         target.Draw(v, PrimitiveType.Triangles, states);
                     }
                 }
-            }*/
+            }
 
-            target.Draw(tileMesh, PrimitiveType.Triangles, states);
+            //target.Draw(tileMesh, PrimitiveType.Triangles, states);
         }
 
         public FloatRect GetFloatRect()

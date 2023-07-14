@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Xml.Linq;
 
 namespace MyTerraria
@@ -75,23 +76,17 @@ namespace MyTerraria
         public void Update()
         {
             worldSaveTimer.Start();
-            try
-            {
-                
-                    Player.Update();
-                    World.Update();
 
-                    foreach (var s in Npc)
-                        s.Update();
+            Player.Update();
+            World.Update();
 
-                    UIManager.UpdateOver();
-                    UIManager.Update();
-            }
-            catch(Exception ex)
-            {
+            foreach (var s in Npc)
+                s.Update();
 
-            }
-            DebugRender.AddText(Player.health.ToString() , Player.GetGlobalPosition().X + Program.Window.Size.X - 65f, Player.GetGlobalPosition().Y, Content.font);
+            UIManager.UpdateOver();
+            UIManager.Update();
+
+            DebugRender.AddText(Player.health.ToString(), Player.GetGlobalPosition().X + Program.Window.Size.X - 65f, Player.GetGlobalPosition().Y, Content.font);
 
             worldSaveTimer.Stop();
 

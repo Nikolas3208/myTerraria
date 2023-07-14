@@ -1,4 +1,5 @@
 ﻿using MyTerraria.Items;
+using MyTerraria.Items.ItemTile;
 using MyTerraria.NPC;
 using MyTerraria.UI;
 using MyTerraria.Worlds;
@@ -12,13 +13,14 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace MyTerraria
 {
     public class World : Transformable, Drawable
     {
         // Кол-во чанков по ширине и высоте
-        public const int WORLD_WIDTH = 16;
+        public const int WORLD_WIDTH = 100;
         public const int WORLD_HEIGHT = 16;
         public static (int, int) WORLD_LOAD = (200, 100);
 
@@ -379,11 +381,14 @@ namespace MyTerraria
             }
             else if (chunk != null && type != TileType.None && destriy)
             {
-                InfoItem item = InfoItem.GetItem(type);
+                int Xt = (int)(Math.Floor(x - (Position.X / Chunk.CHUNK_SIZE)));
+                int Yt = (int)(Math.Floor(y - (Position.Y / Chunk.CHUNK_SIZE)));
 
-                if (item != null)
+               // InfoItem item = InfoItem.GetItem(type);
+
+                //if (item != null)
                 {
-                    var itemTile = new ItemTile(this, item);
+                    Item itemTile = new ItemTile(this, InfoItem.itemTile[type].Texture, ItemType.Tile, type);
                     itemTile.Position = new Vector2f(x, y) * Tile.TILE_SIZE;
                     items.Add(itemTile);
 
@@ -571,6 +576,15 @@ namespace MyTerraria
                             FloatRect chunkRect = chunk.GetFloatRect();
                             DebugRender.AddRectangle(chunkRect, Color.Red);
 
+                            try
+                            {
+                                target.Draw(chunk);
+                            }
+                            catch (Exception ex)
+                            {
+                                //MessageBox.Show(ex.Message);
+                            }
+
                             /*for (int Xc = 0; Xc <= 15; Xc++)
                             {
                                 byte color = 255;
@@ -610,15 +624,8 @@ namespace MyTerraria
                                 }
                             }*/
 
-                            try
-                            {
-                                target.Draw(chunk);
-                            }
-                            catch (Exception ex)
-                            {
 
-                            }
-                            
+
                         }
 
                         /*if (chunks[index] != null)
@@ -667,7 +674,7 @@ namespace MyTerraria
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                //MessageBox.Show(ex.Message);
             }
         }
     }

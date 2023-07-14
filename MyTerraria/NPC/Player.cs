@@ -1,4 +1,6 @@
 ﻿using MyTerraria.Items;
+using MyTerraria.Items.ItemTile;
+using MyTerraria.Items.Tools;
 using MyTerraria.UI;
 using MyTerraria.Worlds;
 
@@ -337,8 +339,8 @@ namespace MyTerraria.NPC
             mousePos = Program.GetGlobalMousePosition();
 
 
-            if (UIInvertory.cells != null && UIInvertory.cells[uiIsSelected].ItemStack != null && UIInvertory.cells[uiIsSelected].ItemStack.InfoItem != null)
-                DebugRender.AddRectangle(mousePos.X, mousePos.Y, UIInvertory.cells[uiIsSelected].ItemStack.InfoItem.SpriteSheet.Texture.Size.X, UIInvertory.cells[uiIsSelected].ItemStack.InfoItem.SpriteSheet.Texture.Size.Y, UIInvertory.cells[uiIsSelected].ItemStack.InfoItem.SpriteSheet.Texture);
+            if (UIInvertory.cells != null && UIInvertory.cells[uiIsSelected].ItemStack != null && UIInvertory.cells[uiIsSelected].ItemStack.Item != null)
+                DebugRender.AddRectangle(mousePos.X, mousePos.Y, UIInvertory.cells[uiIsSelected].ItemStack.Item.Texture.Size.X, UIInvertory.cells[uiIsSelected].ItemStack.Item.Texture.Size.Y, UIInvertory.cells[uiIsSelected].ItemStack.Item.Texture);
 
             Chunk chunk = world.GetChunk(mousePos.X / Chunk.CHUNK_SIZE, mousePos.Y / Chunk.CHUNK_SIZE);
 
@@ -346,8 +348,7 @@ namespace MyTerraria.NPC
             {
                 if (UIInvertory.cells != null && UIInvertory.cells[uiIsSelected].ItemStack != null && UIInvertory.cells[uiIsSelected].ItemStack.itemCount != 0)
                 {
-
-                    var InfoItemType = UIInvertory.cells[uiIsSelected].ItemStack.InfoItem;
+                    var Item = UIInvertory.cells[uiIsSelected].ItemStack.Item;
 
                     if (chunk != null)
                     {
@@ -359,29 +360,17 @@ namespace MyTerraria.NPC
                             FloatRect tileRect = new FloatRect(tilePos, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
                             DebugRender.AddRectangle(tileRect, Color.Green);
 
-                            DebugRender.AddText(InfoItem.GetItem(tile.type).Strength.ToString(), Position.X, Position.Y, Content.font);
-
-
-                            if (InfoItemType.Tooltype == ToolType.Pick)
+                            if (Item.type == ItemType.Pick && Item.OnClickMouseButton(tile))
                             {
-                                if (timeTile <= 0)
-                                {
-                                    world.SetTile(tile.type, tilePos.X / 16, tilePos.Y / 16, tile.isGrass, true);
-                                    AnimationUpdate(AnimType.Tool);
+                                world.SetTile(tile.type, tilePos.X / 16, tilePos.Y / 16, destriy: true);
+                                AnimationUpdate(AnimType.Tool);
 
-                                    soundController.PlaySound("dig");
-                                    //soundController.PlaySound("grab");
-
-                                    timeTile = 1;
-                                }
-
-                                timeTile -= InfoItem.GetItem(tile.type).Strength;
+                                //soundController.PlaySound("dig");
 
                                 DebugRender.AddText(timeTile.ToString(), Position.X, Position.Y, Content.font);
                             }
-                            else if (InfoItemType.Tooltype == ToolType.Axe && tile.type == TileType.Treebark)
+                            else if (Item.type == ItemType.Axe && Item.OnClickMouseButton(tile))
                             {
-
                                 AnimationUpdate(AnimType.Tool);
                             }
                             DebugRender.AddText(timeTile.ToString(), Position.X, Position.Y, Content.font);
@@ -395,9 +384,9 @@ namespace MyTerraria.NPC
                         Tile leftTile = (Tile)Program.Game.World.GetTile(mousePos.X / 16 - 1, mousePos.Y / 16);   // Левый сосед
                         Tile rightTile = (Tile)Program.Game.World.GetTile(mousePos.X / 16 + 1, mousePos.Y / 16);  // Правый сосед
 
-                        if (InfoItemType.Tooltype == ToolType.None && InfoItemType.Weapontype == WeaponType.None && (upTile != null || downTile != null || leftTile != null || rightTile != null))
+                        if (Item.TileType != TileType.None && (upTile != null || downTile != null || leftTile != null || rightTile != null))
                         {
-                            world.SetTile(InfoItemType.Tiletype, mousePos.X / 16, mousePos.Y / 16);
+                            world.SetTile(Item.TileType, mousePos.X / 16, mousePos.Y / 16);
                             UIInvertory.cells[uiIsSelected].ItemStack.ItemCount--;
 
                             AnimationUpdate(AnimType.Tool);
@@ -416,7 +405,7 @@ namespace MyTerraria.NPC
 
         private void ToolUpdate()
         {
-            tool = new Sprite(UIInvertory.cells[uiIsSelected].ItemStack.InfoItem.SpriteSheet.Texture);
+            tool = new Sprite(UIInvertory.cells[uiIsSelected].ItemStack.Item.Texture);
             tool.Origin = new Vector2f(0, tool.Texture.Size.Y);
             tool.Rotation = angle;
 
@@ -489,19 +478,6 @@ namespace MyTerraria.NPC
             Content.ssBackgroundSky.Position = Position;
             Content.ssBackgroundSky.Origin = new Vector2f(Content.ssTextureBackgroundSky.Size.X / 2, Content.ssTextureBackgroundSky.Size.Y / 2);
             Content.ssBackgroundSky.Scale = new Vector2f(50, 1);
-
-            /*foreach (var slime in Program.Game.Npc)
-            {
-                FloatRect slimeRect = new FloatRect(slime.Position, new Vector2f(spriteSheet.SubWidth / 1.5f, spriteSheet.SubHeight / 1.5f));
-
-                if (PlayerRect.Intersects(slimeRect))
-                {
-                    DebugRender.AddRectangle(PlayerRect, Color.Red);
-
-                    Direction = slime.Direction * -1;
-                    velocity = new Vector2f(-velocity.X * 2.8f, -velocity.Y * 0.3f) * Direction;
-                }
-            }*/
 
             bool isMoveLeft = Keyboard.IsKeyPressed(Keyboard.Key.A);
             bool isMoveRight = Keyboard.IsKeyPressed(Keyboard.Key.D);
@@ -630,19 +606,17 @@ namespace MyTerraria.NPC
 
         public void AddTools()
         {
-            var itemTile = new ItemTile(world, InfoItem.ItemSword);
-            itemTile.Position = Position;
-            world.items.Add(itemTile);
-            itemTile = new ItemTile(world, InfoItem.ItemPick);
-            itemTile.Position = Position;
-            world.items.Add(itemTile);
-            itemTile = new ItemTile(world, InfoItem.ItemAxe);
-            itemTile.Position = Position;
-            world.items.Add(itemTile);
-
-            itemTile = new ItemTile(world, InfoItem.ItemVegetation);
-            itemTile.Position = Position;
-            world.items.Add(itemTile);
+            
+            var itemPick = new ItemPick(world, Content.ssTileItemPick.Texture, ItemType.Pick);
+            itemPick.Position = Position;
+            world.items.Add(itemPick);
+            world.items.Add(itemPick);
+            var itemAxe = new ItemAxe(world, Content.ssTileItemAxe.Texture, ItemType.Axe);
+            itemAxe.Position = Position;
+            world.items.Add(itemAxe);
+            var itemGround = new ItemTile(world, Content.ssTileItemGround.Texture, ItemType.Tile, TileType.Ground);
+            itemGround.Position = Position;
+            world.items.Add(itemGround);
         }
     }
 }

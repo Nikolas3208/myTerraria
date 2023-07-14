@@ -1,4 +1,7 @@
-﻿using SFML.Graphics;
+﻿using MyTerraria.Items;
+using MyTerraria.Items.ItemTile;
+using MyTerraria.Items.Tools;
+using SFML.Graphics;
 using SFML.System;
 using System;
 using System.Collections.Generic;
@@ -17,16 +20,19 @@ namespace MyTerraria.UI
             set
             {
                 itemCount = value;
-                textCount.DisplayedString = itemCount.ToString();
-                var textRect = textCount.GetGlobalBounds();
-                textCount.Position = new Vector2f((int)(rectShape.Size.X / 2 - textRect.Width / 2), (int)(rectShape.Size.Y - textCount.CharacterSize - 5));
+                if (textCount != null)
+                {
+                    textCount.DisplayedString = itemCount.ToString();
+                    var textRect = textCount.GetGlobalBounds();
+                    textCount.Position = new Vector2f((int)(rectShape.Size.X / 2 - textRect.Width / 2), (int)(rectShape.Size.Y - textCount.CharacterSize - 5));
+                }
             }
         }
         public int ItemCountMax
         {
             get
             {
-                return InfoItem.MaxCountInStack;
+                return Item.MaxCountInStack;
             }
         }
         public bool IsFull
@@ -34,27 +40,78 @@ namespace MyTerraria.UI
             get { return ItemCount >= ItemCountMax;  }
         }
 
-        public InfoItem InfoItem { get; private set; }
+        public Item Item { get; private set; }
 
         RectangleShape rectShapeImage;
         Text textCount;
 
-        public UIItemStack(InfoItem infoItem, int count)
+        public UIItemStack(ItemTile item, int count)
         {
-            InfoItem = infoItem;
+            Item = item;
 
             var rectSize = (Vector2f)Content.texUIInvertoryBack.Size;
             rectShape = new RectangleShape(rectSize);
             rectShape.FillColor = Color.Transparent;
 
-            var imgSize = new Vector2f(infoItem.SpriteSheet.SubWidth, infoItem.SpriteSheet.SubHeight);
+            var imgSize = new Vector2f(item.Texture.Size.X, item.Texture.Size.Y);
             rectShapeImage = new RectangleShape(imgSize);
             rectShapeImage.Position = rectSize / 2 - imgSize / 2;
-            rectShapeImage.Texture = infoItem.SpriteSheet.Texture;
-            rectShapeImage.TextureRect = infoItem.SpriteSheet.GetTextureRect(infoItem.SpriteI, infoItem.SpriteJ);
+            rectShapeImage.Texture = item.Texture;
 
             textCount = new Text("0", Content.font, 15);
             textCount.FillColor = Color.Black;
+
+            ItemCount = count;
+        }
+
+        public UIItemStack(ItemPick item, int count)
+        {
+            Item = item;
+
+            var rectSize = (Vector2f)Content.texUIInvertoryBack.Size;
+            rectShape = new RectangleShape(rectSize);
+            rectShape.FillColor = Color.Transparent;
+
+            var imgSize = new Vector2f(item.Texture.Size.X, item.Texture.Size.Y);
+            rectShapeImage = new RectangleShape(imgSize);
+            rectShapeImage.Position = rectSize / 2 - imgSize / 2;
+            rectShapeImage.Texture = item.Texture;
+
+            if (item.MaxCountInStack > 1)
+            {
+                textCount = new Text("0", Content.font, 15);
+                textCount.FillColor = Color.Black;
+            }
+            else
+            {
+                textCount = null;
+            }
+
+            ItemCount = count;
+        }
+
+        public UIItemStack(ItemAxe item, int count)
+        {
+            Item = item;
+
+            var rectSize = (Vector2f)Content.texUIInvertoryBack.Size;
+            rectShape = new RectangleShape(rectSize);
+            rectShape.FillColor = Color.Transparent;
+
+            var imgSize = new Vector2f(item.Texture.Size.X, item.Texture.Size.Y);
+            rectShapeImage = new RectangleShape(imgSize);
+            rectShapeImage.Position = rectSize / 2 - imgSize / 2;
+            rectShapeImage.Texture = item.Texture;
+
+            if (item.MaxCountInStack > 1)
+            {
+                textCount = new Text("0", Content.font, 15);
+                textCount.FillColor = Color.Black;
+            }
+            else
+            {
+                textCount = null;
+            }
 
             ItemCount = count;
         }
@@ -63,7 +120,7 @@ namespace MyTerraria.UI
         {
             rectShapeImage.Texture = null;
             textCount = null;
-            InfoItem = null;
+            Item = null;
         }
 
         public override void OnDragBegin()
@@ -95,7 +152,7 @@ namespace MyTerraria.UI
                 var itemSrc = ui as UIItemStack;
                 var itemDest = this;
 
-                if (itemSrc.InfoItem == itemDest.InfoItem && !itemDest.IsFull && itemDest.ItemCount + itemSrc.ItemCount < itemDest.ItemCountMax)
+                if (itemSrc.Item.type == itemDest.Item.type && itemSrc.Item.TileType == itemDest.Item.TileType && !itemDest.IsFull && itemDest.ItemCount + itemSrc.ItemCount < itemDest.ItemCountMax)
                     itemDest.ItemCount += itemSrc.ItemCount;
                 else
                     ui.OnCancelDrag();

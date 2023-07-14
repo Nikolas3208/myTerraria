@@ -21,8 +21,8 @@ namespace MyTerraria
         {
             //Создание окна
             Window = new RenderWindow(VideoMode.DesktopMode, "My Terraria!");
-            //Window.SetVerticalSyncEnabled(true);
-            //Window.SetFramerateLimit(75);
+            Window.SetVerticalSyncEnabled(true);
+            Window.SetFramerateLimit(75);
             //Window.SetMouseCursorVisible(false);
 
             Window.Closed += Win_Closed;

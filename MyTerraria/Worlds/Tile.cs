@@ -12,7 +12,7 @@ namespace MyTerraria.Worlds
         Sand,               // Почва
         Stone,              //Камень
         StoneWall,          //Камень
-        Treebark,           //Кора дерева
+        Wood,               //Дерево
         Board,              //Дска
         BoardWall,          //Дска
         Ironore,            //Железная руда
@@ -132,7 +132,9 @@ namespace MyTerraria.Worlds
             SetSpriteSheet(type);
 
             if (type != TileType.None)
+            {
                 texture = SpriteSheet.Texture;
+            }
 
             v[0] = new Vertex(new Vector2f(0, 0));
             v[1] = new Vertex(new Vector2f(0, 16));
@@ -179,7 +181,7 @@ namespace MyTerraria.Worlds
                 case TileType.StoneWall:
                     SpriteSheet = Content.ssWallStone;
                     break;
-                case TileType.Treebark:
+                case TileType.Wood:
                     SpriteSheet = Content.ssTileTreeBark;
                     break;
                 case TileType.Ironore:
@@ -327,7 +329,7 @@ namespace MyTerraria.Worlds
                         TexturePosFraq = new Vector2u(9, 0 + (uint)i);
                     }
                     // Если есть только правый сосед
-                    else if (upTile == null && downTile != null && leftTile != null && leftTile.type == TileType.Treebark && rightTile != null)
+                    else if (upTile == null && downTile != null && leftTile != null && leftTile.type == TileType.Wood && rightTile != null)
                     {
                         int i = World.Rand.Next(0, 2); // Случайное число от 0 до 2
                         TexturePosFraq = new Vector2u(1 + (uint)i, 0);
