@@ -6,41 +6,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyTerraria.Items.Tools
+namespace MyTerraria.Items.ItemTool
 {
 
     //Предмет "Кирка"
-    public class ItemPick : Item
+    public class ItemPick : ItemTool
     {
-        public ItemPick(World world, Texture texture, ItemType type) : base(world, texture, type)
+        public ItemPick(ItemToolType type, int textureNumber, int maxStackSize) : base(type, textureNumber, maxStackSize)
         {
-        }
-
-        public bool IsDestroy(Tile tile)
-        {
-            if (tile != null)
-            {
-                if (tile.type != TileType.Wood)
-                    return true;
-            }
-            return false;
-        }
-
-        public override bool OnClickMouseButton(Tile tile)
-        {
-            if (tile != null)
-            {
-                if (IsDestroy(tile))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public override void OnWallCollided()
-        {
-
+            IType = ItemType.Pick;
+            Texture = Content.itemTextureList[textureNumber];
         }
     }
 }

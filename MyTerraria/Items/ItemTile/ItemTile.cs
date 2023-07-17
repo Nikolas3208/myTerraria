@@ -10,21 +10,20 @@ using System.Threading.Tasks;
 namespace MyTerraria.Items.ItemTile
 {
     // Предмет "Плитка"
-    public class ItemTile : Item
+    public class ItemTile : ItemBase
     {
-        public ItemTile(World world, Texture texture, ItemType type, TileType tileType) : base(world, texture, type)
+        /// <summary>
+        /// Конструктор класса "Плитка"
+        /// </summary>
+        /// <param name="tile">Плитка</param>
+        /// <param name="textureNumber">Номер текстуры</param>
+        /// <param name="maxStackSize">Максимальное количество обектов в стаке</param>
+        public ItemTile(TileType type, int textureNumber, int maxStackSize) : base(textureNumber, maxStackSize)
         {
-            MaxCountInStack = 99;
-            this.TileType = tileType;
-        }
+            IType = ItemType.Tile;
+            tileType = type;
 
-        public override bool OnClickMouseButton(Tile tile)
-        {
-            return false;
-        }
-
-        public override void OnWallCollided()
-        {
+            Texture = Content.itemTextureList[textureNumber];
         }
     }
 }

@@ -38,7 +38,7 @@ namespace MyTerraria
             //CreatePlayer();
 
             //Влючаем или отключаем отображеие прямоугольников)
-            NPC.Npc.debag = true;
+            NPC.Npc.debag = false;
 
             // Создаём быстрого слизня
             Npc.Add(new NpcFastSlime(World));
@@ -49,9 +49,10 @@ namespace MyTerraria
 
             //UI инвентарь
             UIManager.AddControl(Player.Invertory);
+            UIManager.AddControl(Player.Health);
 
             // Включаем прорисовку объектов для визуальной отладки
-            DebugRender.Enabled = true;
+            DebugRender.Enabled = false;
         }
 
         public void CreateWorld()

@@ -23,7 +23,7 @@ namespace MyTerraria.UI
             int cellCount = 10;
 
             for (int i = 0; i < cellCount; i++)
-                AddCell();
+                    AddCell();
 
             //cells[a].IsSelected = true;
 
@@ -47,10 +47,10 @@ namespace MyTerraria.UI
         }
 
         // Возвращает ячейку со свободным местом по информации о предмете
-        UIInvertoryCell GetNotFullCellByInfoItem(Item item)
+        UIInvertoryCell GetNotFullCellByInfoItem(ItemBase item)
         {
             foreach (var c in cells)
-                if (c.ItemStack != null && c.ItemStack.Item != null && c.ItemStack.Item.type == item.type && c.ItemStack.Item.TileType == item.TileType && !c.ItemStack.IsFull)
+                if (c.ItemStack != null && c.ItemStack.Item != null && c.ItemStack.Item.IType == item.IType && c.ItemStack.Item.Texture == item.Texture && !c.ItemStack.IsFull)
                     return c;
 
             return null;
@@ -86,6 +86,22 @@ namespace MyTerraria.UI
             }
 
             return false;
+        }
+
+        public void Update()
+        {
+            Position = new Vector2i((int)Program.Game.Player.GetGlobalPosition().X, (int)Program.Game.Player.GetGlobalPosition().Y);
+        }
+
+        public void VisibleInvertoryFull()
+        {
+            for (int i = 10; i < 20; i++)
+            {
+                if (!cells[i].visible)
+                    cells[i].visible = true;
+                else
+                    cells[i].visible = false;
+            }
         }
     }
 }

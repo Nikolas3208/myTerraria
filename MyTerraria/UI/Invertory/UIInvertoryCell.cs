@@ -29,7 +29,7 @@ namespace MyTerraria.UI
             get { return itemStack; }
             set
             {
-                if (itemStack != null && value != null && itemStack.Item != null && itemStack.Item.type == value.Item.type && itemStack.Item.TileType == value.Item.TileType)
+                if (itemStack != null && value != null && itemStack.Item != null && itemStack.Item.IType == value.Item.IType)
                 {
                     itemStack.ItemCount += value.ItemCount;
                     return;
@@ -60,11 +60,6 @@ namespace MyTerraria.UI
         {
             if (ui is UIItemStack)
                 ItemStack = ui as UIItemStack;
-        }
-
-        internal void DeleteItem(InfoItem infoItem)
-        {
-            
         }
     }
 }

@@ -11,6 +11,8 @@ namespace MyTerraria.UI
         public UIBase Parent = null;                        // Родитель
         public List<UIBase> Childs = new List<UIBase>();    // Дети
 
+        public bool visible = true;
+
         public new Vector2i Position
         {
             get { return (Vector2i)base.Position; }
@@ -78,7 +80,8 @@ namespace MyTerraria.UI
         public virtual void Draw(RenderTarget target, RenderStates states)
         {
             states.Transform *= Transform;
-            target.Draw(rectShape, states);
+            if (visible)
+                target.Draw(rectShape, states);
 
             foreach (var c in Childs)
                 if (c != UIManager.Drag)

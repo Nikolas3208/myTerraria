@@ -9,7 +9,7 @@ using MyTerraria.Worlds;
 namespace MyTerraria
 {
     class Content
-    {
+    { 
         public const int WALLWIDTH = 45;
         public const int WALLHEIGHT = 39;
 
@@ -24,58 +24,13 @@ namespace MyTerraria
         //---------------------------------------------
 
         //Tile
-        public static SpriteSheet ssTileGround; 
-        public static SpriteSheet ssTileSand; 
-        public static SpriteSheet ssTileGrass; 
-        public static SpriteSheet ssTileGrassDistortion; 
-        public static SpriteSheet ssTileStone; 
-        public static SpriteSheet ssTileStoneDistortion; 
-        public static SpriteSheet ssTileIronOre;
-        public static SpriteSheet ssTileCoperOre;
-        public static SpriteSheet ssTileGoldOre;
-        public static SpriteSheet ssTileSilverOre;
-        public static SpriteSheet ssTileTreeBark; 
-        public static SpriteSheet ssTileTreeTops; 
-        public static SpriteSheet ssTileTreeTopsDistortion; 
-        public static SpriteSheet ssTileVegetation; 
-        public static SpriteSheet ssTileBoard; 
-        public static SpriteSheet ssTileSaplingTree; 
-        public static SpriteSheet ssTileTorch;
+        public static List<SpriteSheet> ssTileList = new List<SpriteSheet>();
 
         //---------------------------------------------
 
-        //Wall
-        public static SpriteSheet ssWallGround; // Ground
-        public static SpriteSheet ssWallStone; // Stone
-        public static SpriteSheet ssWallBoard; // Board
-
-        //---------------------------------------------
 
         //Items
-        public static SpriteSheet ssTileItemPick;//Pick
-        public static SpriteSheet ssTileItemGround;//Ground
-        public static SpriteSheet ssTileItemStone;//Stone
-        public static SpriteSheet ssTileItemMushroom;//Mushroom
-        public static SpriteSheet ssTileItemTorch;//Torch
-        public static SpriteSheet ssTileItemBoard; // Board
-        public static SpriteSheet ssTileItemAcorn; // Board
-        public static SpriteSheet ssTileItemAxe;//Axe
-        public static SpriteSheet ssTileItemIronOre;//Iron Ore
-        public static SpriteSheet ssTileItemCopperOre;//Copper Ore
-        public static SpriteSheet ssTileItemGoldOre;//Gold Ore
-        public static SpriteSheet ssTileItemSilverOre;//Silver Ore
-        public static SpriteSheet ssTileItemGoldIngot;//Gold Ingot
-        public static SpriteSheet ssTileItemCopperIngot;//Gold Ingot
-        public static SpriteSheet ssTileItemSilverIngot;//Silver Ingot
-        public static SpriteSheet ssTileItemIronIngot;//Iron Ingot
-        public static SpriteSheet ssTileItemSlime;//Slime
-        public static SpriteSheet ssTileItemSword;//Sword
-        //public static SpriteSheet ssTileItemAcorn;//Acorn
-        //public static SpriteSheet ssTileItemWorkbench;//Workbench
-
-        public static SpriteSheet ssWallItemGround;
-        public static SpriteSheet ssWallItemBoard;
-        public static SpriteSheet ssWallItemStone;
+        public static List<Texture> itemTextureList = new List<Texture>();
 
         //---------------------------------------------
 
@@ -122,7 +77,7 @@ namespace MyTerraria
                 //---------------------------------------------
 
                 //TilleBlock
-                ssTileGround = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_0.png"));
+                /*ssTileGround = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_0.png"));
                 ssTileStone = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_1.png"));
                 ssTileGrass = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_2.png"));
                 ssTileSand = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_2.png"));
@@ -134,12 +89,17 @@ namespace MyTerraria
                 ssTileGoldOre = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_8.png"));
                 ssTileSilverOre = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_9.png"));
                 ssTileSaplingTree = new SpriteSheet(540 / 30, 38, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_20.png"));
-                ssTileBoard = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_30.png"));
+                ssTileBoard = new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + "Textures\\tiles\\Tiles_30.png"));*/
+
+                for (int i = 0; i < 10; i++)
+                {
+                    ssTileList.Add(new SpriteSheet(Tile.TILE_SIZE, Tile.TILE_SIZE, false, 1, new Texture(CONTENT_DIR + $"Textures\\tiles\\Tiles_{i}.png")));
+                }
 
                 //----------------------------------------------
 
                 //Wall
-                ssWallStone = new SpriteSheet(32, 32, false, 3, new Texture(CONTENT_DIR + "Textures\\walls\\Wall_1.png"));
+                /*ssWallStone = new SpriteSheet(32, 32, false, 3, new Texture(CONTENT_DIR + "Textures\\walls\\Wall_1.png"));
                 ssWallGround = new SpriteSheet(32, 32, false, 3, new Texture(CONTENT_DIR + "Textures\\walls\\Wall_2.png"));
                 ssWallBoard = new SpriteSheet(32, 32, false, 3, new Texture(CONTENT_DIR + "Textures\\walls\\Wall_4.png"));
 
@@ -148,32 +108,38 @@ namespace MyTerraria
                 //Верхущка дерева
                 ssTileTreeTops = new SpriteSheet(80, 80, false, 1, new Texture(CONTENT_DIR + "Textures\\trees\\Tree_Tops.png"));
                 ssTileTreeTopsDistortion = new SpriteSheet(3, 1, true, 1, new Texture(CONTENT_DIR + "Textures\\trees\\Tree_Tops_1.png"));
-
+                */
                 //---------------------------------------------
 
                 //Items
-                ssTileItemPick = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_1.png"));
-                ssTileItemGround = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_2.png"));
-                ssTileItemStone = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_3.png"));
-                ssTileItemMushroom = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_5.png"));
-                ssTileItemTorch = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_8.png"));
-                ssTileItemBoard = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_9.png"));
-                ssTileItemAxe = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_10.png"));
-                ssTileItemIronOre = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_11.png"));
-                ssTileItemCopperOre = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_12.png"));
-                ssTileItemGoldOre = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_13.png"));
-                ssTileItemSilverOre = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_14.png"));
-                ssTileItemGoldIngot = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_19.png"));
-                ssTileItemCopperIngot = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_20.png"));
-                ssTileItemSilverIngot = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_21.png"));
-                ssTileItemIronIngot = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_22.png"));
-                ssTileItemSlime = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_23.png"));
-                ssTileItemSword = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_24.png"));
-                ssTileItemAcorn = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_27.png"));
+               /* ssTileItemPick = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_1.png");
+                ssTileItemGround = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_2.png");
+                ssTileItemStone = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_3.png");
+                ssTileItemMushroom = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_5.png");
+                ssTileItemTorch = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_8.png");
+                ssTileItemBoard = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_9.png");
+                ssTileItemAxe = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_10.png");
+                ssTileItemIronOre = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_11.png");
+                ssTileItemCopperOre = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_12.png");
+                ssTileItemGoldOre = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_13.png");
+                ssTileItemSilverOre = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_14.png");
+                ssTileItemGoldIngot = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_19.png");
+                ssTileItemCopperIngot = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_20.png");
+                ssTileItemSilverIngot = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_21.png");
+                ssTileItemIronIngot = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_22.png");
+                ssTileItemSlime = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_23.png");
+                ssTileItemSword = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_24.png");
+                ssTileItemAcorn = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_27.png");
 
-                ssWallItemStone = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_26.png"));
-                ssWallItemGround = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_30.png"));
-                ssWallItemBoard = new SpriteSheet(1, 1, true, 0, new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_93.png"));
+                ssWallItemStone = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_26.png");
+                ssWallItemGround = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_30.png");
+                ssWallItemBoard = new Texture(CONTENT_DIR + "Textures\\ui\\items\\Item_93.png");*/
+
+                //Загрузка текстур item-ов
+                for (int i = 0; i < 30; i++)
+                {
+                    itemTextureList.Add(new Texture(CONTENT_DIR + $"Textures\\ui\\items\\Item_{i}.png"));
+                }
 
                 //---------------------------------------------
 

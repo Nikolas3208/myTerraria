@@ -6,33 +6,26 @@ namespace MyTerraria.Worlds
 {
     public enum TileType
     {
-        None,               // Пусто
-        Ground,             // Почва
-        GroundWall,         // Почва
-        Sand,               // Почва
-        Stone,              //Камень
-        StoneWall,          //Камень
-        Wood,               //Дерево
-        Board,              //Дска
-        BoardWall,          //Дска
-        Ironore,            //Железная руда
-        Coperore,           //Медная руда
-        Goldore,            //Золотая руда
-        Silverore,          //Серебряная руда
-        Vegetation,         //Растительность   
-        Mushroom,           //Гриб
-        Treesapling,        //Саженец дерева
-        Torch               //Факел
+        Ground = 0,
+        Stone = 1,
+        Grass = 2,
+        Wood = 5,
+        IronOre = 6,
+        CoperOre = 7,
+        GoldOre = 8,
+        SilverOre = 9,
+        None = 999
     }
+        
     public class Tile : Transformable    
     {
         public const int TILE_SIZE = 16;
         public TileType type { get; set; }
-        public bool isGrass { get; set; }
         public Color Color { get; set; } = Color.White;
         public SpriteSheet SpriteSheet { get; set; }
         public VertexArray VertexArray { get; set; }
-
+        public bool isGrass { get; set; }
+        public float Strength { get; set; } = 10;
         // Соседи
         public Tile upTile = null;     // Верхний сосед
         public Tile downTile = null;   // Нижний сосед
@@ -162,7 +155,7 @@ namespace MyTerraria.Worlds
 
         private void SetSpriteSheet(TileType type)
         {
-            switch(type)
+            /*switch(type)
             {
                 case TileType.None:
                     break;
@@ -170,7 +163,7 @@ namespace MyTerraria.Worlds
                     SpriteSheet = Content.ssTileGround;    // Почва
                     break;
                 case TileType.GroundWall:
-                    SpriteSheet = Content.ssTileItemGround;
+                    SpriteSheet = Content.ssWallGround;
                     break;
                 case TileType.Sand:
                     SpriteSheet = Content.ssTileSand;    // Песок
@@ -215,7 +208,9 @@ namespace MyTerraria.Worlds
                     SpriteSheet = Content.ssWallBoard;
                     break;
 
-            }
+            }*/
+
+            SpriteSheet = Content.ssTileList[(int)type];
         }
 
         public void UpdateView()
@@ -394,7 +389,7 @@ namespace MyTerraria.Worlds
         {
             if (v)
             {
-                SpriteSheet = Content.ssTileGrass;
+                SpriteSheet = Content.ssTileList[(int)TileType.Grass];
                 texture = SpriteSheet.Texture;
             }
             else

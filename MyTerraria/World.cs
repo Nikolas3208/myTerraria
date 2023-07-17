@@ -20,7 +20,7 @@ namespace MyTerraria
     public class World : Transformable, Drawable
     {
         // Кол-во чанков по ширине и высоте
-        public const int WORLD_WIDTH = 100;
+        public const int WORLD_WIDTH = 10;
         public const int WORLD_HEIGHT = 16;
         public static (int, int) WORLD_LOAD = (200, 100);
 
@@ -39,6 +39,7 @@ namespace MyTerraria
 
         // Предметы
         public List<Item> items = new List<Item>();
+        public List<ItemBase> itemsBase = new List<ItemBase>();
 
         //Позиция камеры
         private Vector2f CamPos;
@@ -58,8 +59,6 @@ namespace MyTerraria
         private float terrainMounsFreq = 0.2f;
         private float terrainMounsFactor = 24f;
 
-        private float Time;
-
         private string name;
 
         // Конструктор класса
@@ -68,8 +67,6 @@ namespace MyTerraria
             Rand = seed > 0 ? new Random(seed) : new Random((int)DateTime.Now.Ticks);
             Perlin2D = new Perlin2D();
             chunks = new Chunk[WORLD_WIDTH * WORLD_HEIGHT];
-            InfoItem.Colectionsgen();
-            Time = 6.00f;
         }
 
         private void GenerateTerrain(int seed = -1)
@@ -388,9 +385,12 @@ namespace MyTerraria
 
                 //if (item != null)
                 {
-                    Item itemTile = new ItemTile(this, InfoItem.itemTile[type].Texture, ItemType.Tile, type);
+                    /*Item itemTile = new ItemTile(this, InfoItem.itemTile[type].Texture, type);
                     itemTile.Position = new Vector2f(x, y) * Tile.TILE_SIZE;
-                    items.Add(itemTile);
+                    items.Add(itemTile);*/
+                    ItemBase item = InfoItem.ItemTile(type);
+                    item.Position = new Vector2f(x, y) * Tile.TILE_SIZE;
+                    itemsBase.Add(item);
 
                     chunk.SetTile(TileType.None, (int)x, (int)y);
                 }
@@ -470,7 +470,20 @@ namespace MyTerraria
                     items[i].Update();
                     i++;
                 }
+
+                
             }
+            while (i < itemsBase.Count)
+            {
+                if (itemsBase[i].IsDestroyed)
+                    itemsBase.RemoveAt(i);
+                else
+                {
+                    itemsBase[i].Update();
+                    i++;
+                }
+            }
+
         }
         private Task SaveWordlFromFile(string path, Tile[] tiles)
         {
@@ -546,9 +559,11 @@ namespace MyTerraria
             Program.Game.Player = new Player(this);
             Program.Game.Player.StartPosition = new Vector2f(x * Chunk.CHUNK_SIZE, y * Chunk.CHUNK_SIZE);
             Program.Game.Player.Spawn();
-            Program.Game.Player.AddTools();
 
             Program.Game.Player.Invertory = new UIInvertory();
+            Program.Game.Player.Health = new UIHealth(100, 20);
+            Program.Game.Player.AddTools();
+
         }
 
         // Нарисовать мир
@@ -582,84 +597,11 @@ namespace MyTerraria
                             }
                             catch (Exception ex)
                             {
-                                //MessageBox.Show(ex.Message);
+                                MessageBox.Show(ex.Message);
                             }
 
-                            /*for (int Xc = 0; Xc <= 15; Xc++)
-                            {
-                                byte color = 255;
-                                for (int Yc = 0; Yc < 15; Yc++)
-                                {
-                                    float col = (color - Xc * 17 - Yc * 17);
-
-                                    if (col > 255)
-                                        col = 255;
-                                    if (col <= 0)
-                                        color = 0;
-                                    else
-                                        color = (byte)col;
-                                    
-
-                                    if (chunk.GetTile((int)CamPos.X / Tile.TILE_SIZE + Xc, (int)CamPos.Y / Tile.TILE_SIZE + Yc + 3) != null)
-                                    {
-                                        //if (GetTile((int)CamPos.X / Tile.TILE_SIZE + Xc, (int)CamPos.Y / Tile.TILE_SIZE + Yc + 3).Color != new Color(color, color, color))
-                                        GetTile((int)CamPos.X / Tile.TILE_SIZE + Xc, (int)CamPos.Y / Tile.TILE_SIZE + Yc + 3).UpdateColor(new Color(color, color, color));
-                                    }
-                                    if (chunk.GetTile((int)CamPos.X / Tile.TILE_SIZE - Xc, (int)CamPos.Y / Tile.TILE_SIZE + Yc + 3) != null)
-                                    {
-                                        //if (GetTile((int)CamPos.X / Tile.TILE_SIZE - Xc, (int)CamPos.Y / Tile.TILE_SIZE + Yc + 3).Color != new Color(color, color, color))
-                                        GetTile((int)CamPos.X / Tile.TILE_SIZE - Xc, (int)CamPos.Y / Tile.TILE_SIZE + Yc + 3).UpdateColor(new Color(color, color, color));
-                                    }
-
-                                    if (chunk.GetTile((int)CamPos.X / Tile.TILE_SIZE + Xc, (int)CamPos.Y / Tile.TILE_SIZE - Yc + 3) != null)
-                                    {
-                                        //if (GetTile((int)CamPos.X / Tile.TILE_SIZE + Xc, (int)CamPos.Y / Tile.TILE_SIZE - Yc + 3).Color != new Color(color, color, color))
-                                        GetTile((int)CamPos.X / Tile.TILE_SIZE + Xc, (int)CamPos.Y / Tile.TILE_SIZE - Yc + 3).UpdateColor(new Color(color, color, color));
-                                    }
-                                    if (chunk.GetTile((int)CamPos.X / Tile.TILE_SIZE - Xc, (int)CamPos.Y / Tile.TILE_SIZE - Yc + 3) != null)
-                                    {
-                                        //if (GetTile((int)CamPos.X / Tile.TILE_SIZE - Xc, (int)CamPos.Y / Tile.TILE_SIZE - Yc + 3).Color != new Color(color, color, color))
-                                        GetTile((int)CamPos.X / Tile.TILE_SIZE - Xc, (int)CamPos.Y / Tile.TILE_SIZE - Yc + 3).UpdateColor(new Color(color, color, color));
-                                    }
-                                }
-                            }*/
-
-
-
+                            
                         }
-
-                        /*if (chunks[index] != null)
-                        {
-                            if (GetTile(x, y).type != TileType.Treebark)
-                            {
-                                for (int i = 0; i <= 15; i++)
-                                {
-                                    byte color = (byte)(255 - i * 17);
-
-                                    if (GetTile(x, y - i) == null)
-                                    {
-                                        color = (byte)(255 - i * 10);
-                                    }
-                                    if (GetTile(x, y + i) == null)
-                                        color = (byte)(255 - i * 10);
-
-                                    if (GetTile(x, y + i) != null)
-                                    {
-                                        if (GetTile(x, y - i) != null)
-                                        {
-                                            if (GetITile(x, y).Color != new Color(color, color, color))
-                                                Tiles[x + y * WORLD_WIDTH].UpdateColor(new Color(color, color, color));
-                                        }
-                                    }
-
-                                }
-                            }
-
-                            FloatRect chunk = GetChunk(x, y).GetFloatRect();
-                            DebugRender.AddRectangle(chunk, Color.Magenta);
-
-                            target.Draw(chunks[x + y * WORLD_WIDTH], states);
-                        }*/
                     }
                 }
             }
@@ -667,14 +609,16 @@ namespace MyTerraria
             try
             {
                 // Рисуем вещи
-                foreach (var item in items)
-                    /*if (item.Position.X / 16 > LeftMostTilesPos && item.Position.X / 16 < LeftMostTilesPos + tilesPerScreen.Item1 + 1)
-                        if (item.Position.Y / 16 > TopMostTilesPos && item.Position.Y / 16 < TopMostTilesPos + tilesPerScreen.Item2 + 1)*/
-                            target.Draw(item);
+                foreach (var item in itemsBase)
+                {
+                    Sprite sprite = new Sprite(item.Texture);
+                    sprite.Position = item.Position;
+                    target.Draw(sprite);
+                }
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message);
             }
         }
     }

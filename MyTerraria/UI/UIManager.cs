@@ -1,4 +1,5 @@
-﻿using SFML.Window;
+﻿using SFML.System;
+using SFML.Window;
 using System;
 using System.Collections.Generic;
 
@@ -27,17 +28,9 @@ namespace MyTerraria.UI
 
         public static void Update()
         {
-            /*for(int i = 0; i <= UIInvertory.cells.Count; i++)
-            {
-                if (UIInvertory.cells[i].ItemStack != null && UIInvertory.cells[i].ItemStack.InfoItem.Tooltype != ToolType.None)
-                {
-                    //UIInvertory.cells[i].ItemStack.ItemCountMax = 1;
-                }
-            }*/
-
             if (Drag != null)
             {
-                Drag.Position = new SFML.System.Vector2i((int)Program.Game.Player.GetGlobalPosition().X, (int)Program.Game.Player.GetGlobalPosition().Y);
+                Drag.Position = new Vector2i((int)Program.Game.Player.GetGlobalPosition().X, (int)Program.Game.Player.GetGlobalPosition().Y);
 
                 if (Over != null)
                         Over.OnDrop(Drag);

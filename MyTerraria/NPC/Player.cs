@@ -1,6 +1,6 @@
 ﻿using MyTerraria.Items;
 using MyTerraria.Items.ItemTile;
-using MyTerraria.Items.Tools;
+using MyTerraria.Items.ItemTool;
 using MyTerraria.UI;
 using MyTerraria.Worlds;
 
@@ -36,6 +36,7 @@ namespace MyTerraria.NPC
 
         // UI
         public UIInvertory Invertory;
+        public UIHealth Health;
 
         //Прыжок?
         private bool isJump;
@@ -67,7 +68,7 @@ namespace MyTerraria.NPC
 
             CreateAnimation();
 
-            
+
             CreateSoundController();
         }
 
@@ -300,6 +301,12 @@ namespace MyTerraria.NPC
             UpdateMouse();
 
             UpdateUIInventoriSelected();
+
+            Invertory.Update();
+            Health.Update();
+
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Escape))
+                Invertory.VisibleInvertoryFull();
         }
 
         private void UpdateUIInventoriSelected()
@@ -360,7 +367,7 @@ namespace MyTerraria.NPC
                             FloatRect tileRect = new FloatRect(tilePos, new Vector2f(Tile.TILE_SIZE, Tile.TILE_SIZE));
                             DebugRender.AddRectangle(tileRect, Color.Green);
 
-                            if (Item.type == ItemType.Pick && Item.OnClickMouseButton(tile))
+                            if (Item.IType == ItemType.Pick)
                             {
                                 world.SetTile(tile.type, tilePos.X / 16, tilePos.Y / 16, destriy: true);
                                 AnimationUpdate(AnimType.Tool);
@@ -369,7 +376,7 @@ namespace MyTerraria.NPC
 
                                 DebugRender.AddText(timeTile.ToString(), Position.X, Position.Y, Content.font);
                             }
-                            else if (Item.type == ItemType.Axe && Item.OnClickMouseButton(tile))
+                            else if (Item.IType == ItemType.Axe)
                             {
                                 AnimationUpdate(AnimType.Tool);
                             }
@@ -379,14 +386,14 @@ namespace MyTerraria.NPC
 
                     if (world.GetTile(mousePos.X / Chunk.CHUNK_SIZE, mousePos.Y / Chunk.CHUNK_SIZE) == null)
                     {
-                        Tile upTile = (Tile)Program.Game.World.GetTile(mousePos.X / 16, mousePos.Y / 16 - 1);     // Верхний сосед
-                        Tile downTile = (Tile)Program.Game.World.GetTile(mousePos.X / 16, mousePos.Y / 16 + 1);   // Нижний сосед
-                        Tile leftTile = (Tile)Program.Game.World.GetTile(mousePos.X / 16 - 1, mousePos.Y / 16);   // Левый сосед
-                        Tile rightTile = (Tile)Program.Game.World.GetTile(mousePos.X / 16 + 1, mousePos.Y / 16);  // Правый сосед
+                        Tile upTile = world.GetTile(mousePos.X / 16, mousePos.Y / 16 - 1);     // Верхний сосед
+                        Tile downTile = world.GetTile(mousePos.X / 16, mousePos.Y / 16 + 1);   // Нижний сосед
+                        Tile leftTile = world.GetTile(mousePos.X / 16 - 1, mousePos.Y / 16);   // Левый сосед
+                        Tile rightTile = world.GetTile(mousePos.X / 16 + 1, mousePos.Y / 16);  // Правый сосед
 
-                        if (Item.TileType != TileType.None && (upTile != null || downTile != null || leftTile != null || rightTile != null))
+                        if (Item.IType == ItemType.Tile && (upTile != null || downTile != null || leftTile != null || rightTile != null))
                         {
-                            world.SetTile(Item.TileType, mousePos.X / 16, mousePos.Y / 16);
+                            world.SetTile(Item.tileType, mousePos.X / 16, mousePos.Y / 16);
                             UIInvertory.cells[uiIsSelected].ItemStack.ItemCount--;
 
                             AnimationUpdate(AnimType.Tool);
@@ -423,7 +430,7 @@ namespace MyTerraria.NPC
 
         public void AnimationUpdate(AnimType type)
         {
-            if(type == AnimType.Run)
+            if (type == AnimType.Run)
             {
                 tool = null;
 
@@ -435,7 +442,7 @@ namespace MyTerraria.NPC
                 asLegs.Play("run");
                 asShoes.Play("run");
             }
-            else if(type == AnimType.Idle)
+            else if (type == AnimType.Idle)
             {
                 tool = null;
 
@@ -447,7 +454,7 @@ namespace MyTerraria.NPC
                 asLegs.Play("idle");
                 asShoes.Play("idle");
             }
-            else if(type == AnimType.Jump)
+            else if (type == AnimType.Jump)
             {
                 tool = null;
 
@@ -459,7 +466,7 @@ namespace MyTerraria.NPC
                 asLegs.Play("jump");
                 asShoes.Play("jump");
             }
-            else if(type == AnimType.Tool)
+            else if (type == AnimType.Tool)
             {
                 asHair.Play("tool");
                 asHead.Play("tool");
@@ -485,7 +492,7 @@ namespace MyTerraria.NPC
             if (!isFly)
                 isJump = Keyboard.IsKeyPressed(Keyboard.Key.Space);
 
-            bool isMove = isMoveLeft || isMoveRight;            
+            bool isMove = isMoveLeft || isMoveRight;
 
             int jump = 0;
             float jumpSpeed = 10.01f;
@@ -550,7 +557,7 @@ namespace MyTerraria.NPC
                     Direction = 1;
                 }
 
-                
+
 
                 if (movement.X > PLAYER_MOVE_SPEED)
                     movement.X = PLAYER_MOVE_SPEED;
@@ -558,7 +565,7 @@ namespace MyTerraria.NPC
                     movement.X = -PLAYER_MOVE_SPEED;
 
                 // Анимация ходьбы
-                if(isJump && timerA == 0)
+                if (isJump && timerA == 0)
                     AnimationUpdate(AnimType.Jump);
                 else if (!isJump)
                     AnimationUpdate(AnimType.Run);
@@ -572,10 +579,10 @@ namespace MyTerraria.NPC
                 if (!isFly && !Mouse.IsButtonPressed(Mouse.Button.Left))
                     AnimationUpdate(AnimType.Idle);
 
-                if(isJump)
+                if (isJump)
                     AnimationUpdate(AnimType.Jump);
 
-                if(Mouse.IsButtonPressed(Mouse.Button.Left))
+                if (Mouse.IsButtonPressed(Mouse.Button.Left))
                     AnimationUpdate(AnimType.Tool);
             }
 
@@ -606,17 +613,12 @@ namespace MyTerraria.NPC
 
         public void AddTools()
         {
-            
-            var itemPick = new ItemPick(world, Content.ssTileItemPick.Texture, ItemType.Pick);
-            itemPick.Position = Position;
-            world.items.Add(itemPick);
-            world.items.Add(itemPick);
-            var itemAxe = new ItemAxe(world, Content.ssTileItemAxe.Texture, ItemType.Axe);
-            itemAxe.Position = Position;
-            world.items.Add(itemAxe);
-            var itemGround = new ItemTile(world, Content.ssTileItemGround.Texture, ItemType.Tile, TileType.Ground);
-            itemGround.Position = Position;
-            world.items.Add(itemGround);
+            if (Invertory != null)
+            {
+                Invertory.AddItemStack(new UIItemStack(InfoItem.ItemTile(TileType.Ground), 1));
+                Invertory.AddItemStack(new UIItemStack(InfoItem.ItemTool(ItemToolType.IronPick), 1));
+                Invertory.AddItemStack(new UIItemStack(InfoItem.ItemTool(ItemToolType.IronAxe), 1));
+            }
         }
     }
 }

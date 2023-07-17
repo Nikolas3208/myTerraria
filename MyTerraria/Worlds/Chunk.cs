@@ -107,7 +107,6 @@ namespace MyTerraria.Worlds
         public void Draw(RenderTarget target, RenderStates states)
         {
             states.Transform *= Transform;
-            states.Texture = Content.ssTileBoard.Texture;
 
             for (int y = 0; y < 16; y++)
             {

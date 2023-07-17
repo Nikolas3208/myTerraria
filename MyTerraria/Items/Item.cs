@@ -4,16 +4,10 @@ using MyTerraria.Items.ItemTile;
 using SFML.Graphics;
 using SFML.System;
 using System;
-using MyTerraria.Items.Tools;
+using MyTerraria.Items.ItemTool;
 
 namespace MyTerraria.Items
 {
-    public enum ItemType
-    {
-        Tile,
-        Axe,
-        Pick
-    };
     public abstract class Item : Entity
     {
         // Максимальное кол-во предметов в стеке
@@ -31,7 +25,7 @@ namespace MyTerraria.Items
         public const float TAKE_DISTANCE_TO_PLAYER = 20f;   // Дистанция подбора предмета игроком
         public const float MOVE_SPEED_COEF = 0.5f;          // Коэффицент увеличения скорости движения
 
-        public Item(World world, Texture texture, ItemType type) : base(world)
+        public Item(World world, Texture texture) : base(world)
         {
             this.Texture = texture;
             this.type = type;
@@ -53,21 +47,11 @@ namespace MyTerraria.Items
             {
                 if (dist < TAKE_DISTANCE_TO_PLAYER)
                 {
-                    if (type == ItemType.Tile && Program.Game.Player.Invertory.AddItemStack(new UIItemStack(new ItemTile.ItemTile(world, Texture, type, TileType), Count)))
+                    /*if (Program.Game.Player.Invertory.AddItemStack(new UIItemStack(new ItemTile.ItemTile(world, Texture, TileType), Count)))
                     {
                         IsDestroyed = true;
                         sound.PlaySound("grab");
-                    }
-                    else if(type == ItemType.Axe && Program.Game.Player.Invertory.AddItemStack(new UIItemStack(new ItemAxe(world, Texture, type), Count)))
-                    {
-                        IsDestroyed = true;
-                        sound.PlaySound("grab");
-                    }
-                    else if (type == ItemType.Pick && Program.Game.Player.Invertory.AddItemStack(new UIItemStack(new ItemPick(world, Texture, type), Count)))
-                    {
-                        IsDestroyed = true;
-                        sound.PlaySound("grab");
-                    }
+                    }*/
                 }
                 else
                 {
@@ -91,5 +75,6 @@ namespace MyTerraria.Items
         }
 
         public abstract bool OnClickMouseButton(Tile tile);
+        public abstract void SetSetingsItem();
     }
 }
